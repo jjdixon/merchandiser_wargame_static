@@ -21,3 +21,9 @@ Format: ID · date · decision — why.
   single-file prototype jumped the clock and drifted departure times — fixed here.
 - **D-006** · 2026-10-23 · Sample data is fictional (store chains, people, grid
   coordinates). Real data replaces `src/data/*.json`; sensitive exports stay out of git.
+- **D-007** · 2026-10-23 · Repo made **public** and deployed to GitHub Pages so
+  testers can open the app from a link (Free plan only supports Pages on public
+  repos). Acceptable only while all data is fictional. **Before committing any real
+  store list, employee names or actual pay figures, set the repo back to private and
+  move hosting** (internal IIS or a password-protected host) — git history can't be
+  un-published.

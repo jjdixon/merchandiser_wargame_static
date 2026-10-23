@@ -38,6 +38,10 @@ Replace the JSON in `src/data/`. Field definitions are in
 
 ## Deploying
 
+Every push to `main` builds and publishes to GitHub Pages
+(`.github/workflows/pages.yml`). The site is public while the repo is public, so keep
+real data out (see `docs/decisions.md`, D-007).
+
 `npm run build` produces a fully static `dist/` folder (relative paths) that can be
 served from any web server, an internal IIS site, S3, or GitHub Pages.
 

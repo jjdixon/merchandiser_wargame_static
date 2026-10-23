@@ -78,6 +78,9 @@ Rules:
 - v0.1 — ported from the single-file chat prototype. All five views working, 18
   engine tests, sample data only (14 fictional stores, 4 merchandisers).
 - Findings are browser-local (localStorage); export via "Copy for backlog.md".
+- Repo is **public** and auto-deploys to GitHub Pages on push to `main`
+  (`.github/workflows/pages.yml`). **Never commit real store, employee or pay data
+  while public** — see D-007.
 - Not yet: real store data, breaks/meal periods, multi-day/weekly scheduling,
   shared multiplayer clock, real routing, photo capture.
 - Next likely work: see top of `docs/backlog.md`.
@@ -87,6 +90,8 @@ Rules:
 - One scoped task per session. Read the relevant files, make the change, add/adjust
   tests, run `npm run check`, commit with a clear message.
 - Prefer editing seed JSON over code when the ask is "make the data look like X".
+- Before adding any real data, check whether the repo is still public (D-007). If it
+  is, stop and ask the user to make it private first.
 - Pay rules are placeholders pending legal review — never present them as fact in UI
   copy. See `docs/pay-rules.md`.
 - When a war-game finding is implemented, check it off in `docs/backlog.md` and note
