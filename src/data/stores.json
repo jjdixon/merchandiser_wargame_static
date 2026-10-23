@@ -1,0 +1,16 @@
+[
+  { "id": "s1",  "name": "ValuMart #1042",    "x": 11, "y": 6,  "cases": 168, "truckEta": "05:30", "doneBy": "13:00", "assignedTo": "ana", "order": 1 },
+  { "id": "s2",  "name": "Fresh Fare #214",   "x": 15, "y": 11, "cases": 96,  "truckEta": "07:00", "doneBy": "14:00", "assignedTo": "ana", "order": 2 },
+  { "id": "s3",  "name": "Corner Stop #88",   "x": 4,  "y": 15, "cases": 22,  "truckEta": "08:00", "doneBy": "16:00", "assignedTo": "ana", "order": 3 },
+  { "id": "s4",  "name": "Pantry Plus #31",   "x": 19, "y": 3,  "cases": 64,  "truckEta": "09:00", "doneBy": "15:00", "assignedTo": "ana", "order": 4 },
+  { "id": "s5",  "name": "ValuMart #1107",    "x": 26, "y": 9,  "cases": 152, "truckEta": "06:00", "doneBy": "13:00", "assignedTo": "mar", "order": 1 },
+  { "id": "s6",  "name": "Fresh Fare #230",   "x": 35, "y": 11, "cases": 88,  "truckEta": "07:30", "doneBy": "14:00", "assignedTo": "mar", "order": 2 },
+  { "id": "s7",  "name": "Dollar Daily #512", "x": 28, "y": 15, "cases": 30,  "truckEta": "10:00", "doneBy": "17:00", "assignedTo": "mar", "order": 3 },
+  { "id": "s8",  "name": "Hometown Grocer",   "x": 12, "y": 22, "cases": 74,  "truckEta": "06:30", "doneBy": "11:30", "assignedTo": "dee", "order": 1 },
+  { "id": "s9",  "name": "Pantry Plus #44",   "x": 5,  "y": 28, "cases": 58,  "truckEta": "08:00", "doneBy": "15:00", "assignedTo": "dee", "order": 2 },
+  { "id": "s10", "name": "Corner Stop #91",   "x": 17, "y": 28, "cases": 18,  "truckEta": "10:30", "doneBy": "17:00", "assignedTo": "dee", "order": 3 },
+  { "id": "s11", "name": "ValuMart #1180",    "x": 30, "y": 21, "cases": 176, "truckEta": "06:00", "doneBy": "13:00", "assignedTo": "lui", "order": 1 },
+  { "id": "s12", "name": "Fresh Fare #245",   "x": 37, "y": 28, "cases": 102, "truckEta": "08:00", "doneBy": "14:00", "assignedTo": "lui", "order": 2 },
+  { "id": "s13", "name": "Corner Stop #97",   "x": 25, "y": 26, "cases": 26,  "truckEta": "09:30", "doneBy": "17:00", "assignedTo": "lui", "order": 3 },
+  { "id": "s14", "name": "Dollar Daily #520", "x": 22, "y": 18, "cases": 34,  "truckEta": "11:00", "doneBy": "17:00", "assignedTo": "lui", "order": 4 }
+]

@@ -1,0 +1,27 @@
+{
+  "tasks": [
+    "Check in with receiving",
+    "Work truck to shelf",
+    "Rotate / FIFO",
+    "Work backstock",
+    "Build or refresh display",
+    "Shelf photo (after)",
+    "Log out-of-stocks"
+  ],
+  "issues": [
+    "No room for backstock",
+    "Store manager wants a different set",
+    "Product short or damaged on order",
+    "Can't reach shelf — store reset in progress",
+    "Receiving won't check in the truck yet"
+  ],
+  "findingAreas": [
+    "Scheduling & routing",
+    "Pay, time & overtime",
+    "In-store work",
+    "Delivery handoff",
+    "Supervisor / coverage",
+    "Store relationship",
+    "Other"
+  ]
+}

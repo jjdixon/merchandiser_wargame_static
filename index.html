@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Merch Day War Game</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+</head>
+<body>
+<header>
+  <div class="gut bar">
+    <div class="brand"><h1>Merch Day War Game</h1><span>Hourly merchandiser prototype · sample data</span></div>
+    <div class="ctl">
+      <label class="lbl" for="scn">Scenario</label>
+      <select id="scn"></select>
+    </div>
+    <div class="clock">
+      <span class="d" id="dow">Thu</span><span class="t" id="clk">5:00a</span>
+      <button class="btn pri" id="play" aria-label="Start simulation">▶ Run</button>
+      <select id="spd" aria-label="Simulation speed">
+        <option value="2">2 min/s</option><option value="5">5 min/s</option><option value="10" selected>10 min/s</option><option value="30">30 min/s</option>
+      </select>
+      <button class="btn" id="reset">Reset day</button>
+    </div>
+  </div>
+  <div class="inject">
+    <div class="gut row">
+      <span class="lbl">Throw a curveball</span>
+      <select id="evType" aria-label="Event type">
+        <option value="truck">Truck late</option>
+        <option value="heavy">Heavier load than ordered</option>
+        <option value="callout">Merchandiser calls out / goes home</option>
+        <option value="extra">Store requests extra visit</option>
+      </select>
+      <select id="evTarget" aria-label="Event target"></select>
+      <select id="evAmt" aria-label="Delay"><option value="30">+30 min</option><option value="60" selected>+60 min</option><option value="120">+2 hrs</option></select>
+      <button class="btn" id="evGo">Inject</button>
+    </div>
+  </div>
+  <nav class="gut tabs" role="tablist" id="tabs">
+    <button role="tab" data-v="sched">Scheduler</button>
+    <button role="tab" data-v="merch">Merchandiser</button>
+    <button role="tab" data-v="super">Supervisor</button>
+    <button role="tab" data-v="rules">Pay &amp; labor rules</button>
+    <button role="tab" data-v="findings">Findings <span id="fcount" class="mono"></span></button>
+  </nav>
+</header>
+
+<main class="gut" id="view"></main>
+
+<button class="fab" id="fab">This won't work because…</button>
+<div class="scrim" id="scrim" hidden>
+  <form class="sheet" id="fbForm">
+    <h2 style="font-size:18px">This won't work because…</h2>
+    <div class="ctx" id="fbCtx"></div>
+    <label class="lbl" for="fbCat">Area</label>
+    <select id="fbCat"></select>
+    <label class="lbl" for="fbTxt">What breaks, and what really happens in the field?</label>
+    <textarea id="fbTxt" placeholder="e.g. Receiving at ValuMart doesn't open until 7 — trucks get there at 5:30 but we can't touch product until they check it in."></textarea>
+    <div class="ctl" style="justify-content:flex-end">
+      <button type="button" class="btn" id="fbCancel">Cancel</button>
+      <button type="submit" class="btn pri">Log finding</button>
+    </div>
+  </form>
+</div>
+<script type="module" src="/src/main.ts"></script>
+</body>
+</html>

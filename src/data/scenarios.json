@@ -1,0 +1,24 @@
+[
+  {
+    "id": "normal",
+    "label": "Normal Thursday",
+    "notes": "Baseline day. Luis is already near 40 hours, so his route projects overtime."
+  },
+  {
+    "id": "late",
+    "label": "Late trucks",
+    "truckDelays": { "s1": 120, "s5": 90, "s11": 75 },
+    "openingAlert": { "sev": "warn", "text": "Dispatch: three trucks running behind (ValuMart #1042 +2h, #1107 +1.5h, #1180 +1.25h)." }
+  },
+  {
+    "id": "callout",
+    "label": "Call-out at start",
+    "callouts": ["lui"]
+  },
+  {
+    "id": "holiday",
+    "label": "Holiday volume (+50%)",
+    "caseMultiplier": 1.5,
+    "openingAlert": { "sev": "info", "text": "Holiday volume: all orders up 50%." }
+  }
+]

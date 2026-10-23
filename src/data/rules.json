@@ -1,0 +1,13 @@
+{
+  "shiftStart": "05:00",
+  "buffer": 10,
+  "mpc": 0.8,
+  "fixed": 15,
+  "speed": 40,
+  "road": 1.3,
+  "paidBetween": true,
+  "paidCommute": false,
+  "ot": 40,
+  "wage": 17,
+  "mileage": 0.70
+}
