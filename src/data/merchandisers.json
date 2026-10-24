@@ -1,6 +1,8 @@
 [
-  { "id": "ana", "name": "Ana Ruiz",     "x": 6,  "y": 7,  "hoursThisWeek": 31.5 },
-  { "id": "mar", "name": "Marcus Bell",  "x": 31, "y": 5,  "hoursThisWeek": 33 },
-  { "id": "dee", "name": "Dee Okafor",   "x": 7,  "y": 26, "hoursThisWeek": 26 },
-  { "id": "lui", "name": "Luis Treviño", "x": 33, "y": 25, "hoursThisWeek": 35 }
+  {"id": "ana", "name": "Ana Ruiz", "x": 6, "y": 7, "hoursThisWeek": 31.5, "role": "merchandiser", "market": "North", "routeTypes": ["LF", "Traditional"]},
+  {"id": "mar", "name": "Marcus Bell", "x": 31, "y": 5, "hoursThisWeek": 33, "role": "merchandiser", "market": "North", "routeTypes": ["LF", "Traditional", "Xpress"]},
+  {"id": "dee", "name": "Dee Okafor", "x": 7, "y": 26, "hoursThisWeek": 26, "role": "merchandiser", "market": "South", "routeTypes": ["LF", "Traditional"]},
+  {"id": "lui", "name": "Luis Treviño", "x": 33, "y": 25, "hoursThisWeek": 35, "role": "merchandiser", "market": "South", "routeTypes": ["LF", "Xpress"]},
+  {"id": "ros", "name": "Rosa Vance", "x": 20, "y": 14, "hoursThisWeek": 24, "role": "relief", "market": "North", "routeTypes": ["LF", "Traditional", "Xpress"]},
+  {"id": "sam", "name": "Sam Kito", "x": 18, "y": 24, "hoursThisWeek": 28, "role": "jumper", "market": "South", "routeTypes": ["LF", "Traditional"]}
 ]

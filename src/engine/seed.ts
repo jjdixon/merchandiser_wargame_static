@@ -1,5 +1,5 @@
 // Builds a fresh SimState from seed data + a scenario. Pure: no DOM, no globals.
-import type { EngineFeature, Rules, SimState, Severity } from './types';
+import type { EngineFeature, MerchRole, RouteType, Rules, SimState, Severity } from './types';
 import { parseHHMM } from './time';
 import { callOut, raise } from './sim';
 import { emptyExtensions, enableFeatures } from './feature';
@@ -7,8 +7,12 @@ import { emptyExtensions, enableFeatures } from './feature';
 export interface StoreRow {
   id: string; name: string; x: number; y: number; cases: number;
   truckEta: string; doneBy: string; assignedTo: string | null; order: number;
+  routeType?: RouteType; market?: string;
 }
-export interface MerchRow { id: string; name: string; x: number; y: number; hoursThisWeek: number }
+export interface MerchRow {
+  id: string; name: string; x: number; y: number; hoursThisWeek: number;
+  role?: MerchRole; market?: string; routeTypes?: RouteType[];
+}
 export interface RulesRow extends Omit<Rules, 'shiftStart' | 'feature'> { shiftStart: string }
 export interface Scenario {
   id: string;
@@ -40,9 +44,12 @@ export function newDay(seed: Seed, scenarioId: string, opts: DayOptions = {}): S
     t: r.shiftStart,
     scenario: scenarioId,
     rules: r,
-    merch: seed.merch.map(m => ({ id: m.id, name: m.name, home: [m.x, m.y], week: m.hoursThisWeek, out: false })),
+    merch: seed.merch.map(m => ({
+      id: m.id, name: m.name, role: m.role ?? 'merchandiser', market: m.market ?? '',
+      routeTypes: m.routeTypes ?? ['LF'], home: [m.x, m.y], week: m.hoursThisWeek, out: false,
+    })),
     stores: seed.stores.map(s => ({
-      id: s.id, name: s.name, xy: [s.x, s.y], cases: s.cases,
+      id: s.id, name: s.name, routeType: s.routeType ?? 'LF', market: s.market ?? '', xy: [s.x, s.y], cases: s.cases,
       eta: parseHHMM(s.truckEta), win: parseHHMM(s.doneBy),
       assign: s.assignedTo, seq: s.order, extra: 0, lock: null, tasks: {},
     })),
@@ -51,6 +58,7 @@ export function newDay(seed: Seed, scenarioId: string, opts: DayOptions = {}): S
     nextId: 0,
     ext: emptyExtensions(),
     enabled: [],
+    fx: {},
   };
   // Features first, so scenario setup (e.g. call-outs) sees their hooks.
   enableFeatures(state, opts.features ?? []);

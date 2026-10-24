@@ -13,6 +13,7 @@ export const shortName = (n: string) => n.replace(/^.* (#\d+)$/, '$1').replace('
 export const firstName = (n: string) => n.split(' ')[0];
 export const initials = (n: string) => n.split(' ').map(w => w[0]).join('');
 
+const ROLE_WORD = { merchandiser: 'Merchandiser', relief: 'Vacation relief', jumper: 'Route jumper' } as const;
 const STATUS_WORD = { work: 'In store', drive: 'Driving', wait: 'Waiting', done: 'Done', out: 'Out', off: 'Off clock', idle: 'Off clock' } as const;
 
 export function crewCard(state: SimState, p: DayPlan): string {
@@ -21,6 +22,7 @@ export function crewCard(state: SimState, p: DayPlan): string {
   const where = s.stop && s.k !== 'off' && s.k !== 'drive' ? ' · ' + esc(s.stop.s.name) : '';
   return `<div class="card">
     <div class="top"><h3>${esc(p.m.name)}</h3><span class="pill p-${s.k}">${STATUS_WORD[s.k]}</span></div>
+    <div class="muted" style="font-size:12px;margin-top:-4px">${esc(ROLE_WORD[p.m.role])}${p.m.market ? ' · ' + esc(p.m.market) : ''} · ${esc(p.m.routeTypes.join(', '))}</div>
     <div class="muted" style="font-size:12.5px;min-height:2.6em">${esc(s.label)}${where}</div>
     <dl class="kv">
       <dt>Stops</dt><dd>${p.stops.filter(x => state.t >= x.end).length}/${p.stops.length}</dd>

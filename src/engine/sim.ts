@@ -77,6 +77,32 @@ export function addWork(state: SimState, s: Store, minutes: number): void {
   if (s.lock && state.t < s.lock.end) { s.lock.work += minutes; s.lock.end += minutes }
 }
 
+/**
+ * Actual drive differs from planned (traffic, detours). Shifts a locked stop's
+ * arrival, start and end. Only before arrival. Drive never drops below 0.
+ */
+export function adjustDrive(state: SimState, s: Store, minutes: number): void {
+  const L = s.lock;
+  if (!L || state.t >= L.arrive) return;
+  const d = Math.max(0, L.drive + minutes) - L.drive;
+  L.drive += d; L.arrive += d;
+  L.start = Math.max(L.arrive, readyAt(state, s));
+  L.wait = L.start - L.arrive;
+  L.end = L.start + L.work;
+}
+
+/**
+ * Actual work time differs from the labor standard. Changes a locked stop's work
+ * and end without touching store.extra (which records added scope). Only before
+ * the stop ends. Work never drops below 1 minute.
+ */
+export function adjustWork(state: SimState, s: Store, minutes: number): void {
+  const L = s.lock;
+  if (!L || state.t >= L.end) return;
+  const d = Math.max(1, L.work + minutes) - L.work;
+  L.work += d; L.end += d;
+}
+
 /** Order arrives heavier than planned. Returns cases added. */
 export function heavierLoad(state: SimState, s: Store, fraction = 0.4): number {
   const add = Math.round(s.cases * fraction);
@@ -91,6 +117,7 @@ export function extraVisit(state: SimState, base: Store, cases = 45, windowMin =
   const n: Store = {
     id: 'x' + ++state.nextId, name: base.name + ' · extra visit', xy: base.xy, cases,
     eta: state.t, win: state.t + windowMin, assign: null, seq: 99, extra: 0, lock: null, tasks: {},
+    routeType: base.routeType, market: base.market,
   };
   state.stores.push(n);
   return n;

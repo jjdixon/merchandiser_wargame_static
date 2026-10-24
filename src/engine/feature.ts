@@ -36,6 +36,15 @@ export function enableFeatures(state: SimState, features: EngineFeature[]): void
   state.rules = withFeatureDefaults(state.rules, features);
 }
 
+/**
+ * A feature's own day-scoped state, created on first use. Survives the feature
+ * being switched off and on mid-day; reset when a new day starts.
+ */
+export function featureState<T>(state: SimState, featureId: string, init: () => T): T {
+  if (!(featureId in state.fx)) state.fx[featureId] = init();
+  return state.fx[featureId] as T;
+}
+
 const CORE_KEYS = new Set(['shiftStart', 'buffer', 'mpc', 'fixed', 'speed', 'road', 'paidBetween', 'paidCommute', 'ot', 'wage', 'mileage']);
 export const isCoreRule = (key: string) => CORE_KEYS.has(key);
 

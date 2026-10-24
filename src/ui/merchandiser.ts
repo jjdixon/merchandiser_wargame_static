@@ -9,7 +9,7 @@ export function merchandiserView(ctx: ViewCtx): string {
   const onClock = p.clockIn != null && state.t >= p.clockIn && state.t < p.clockOut!;
   const sofar = paidSoFar(state, p);
 
-  const picker = `<div class="picker">${state.merch.map(x =>
+  const picker = ctx.scope.lockMerch ? '' : `<div class="picker">${state.merch.filter(ctx.scope.merch).map(x =>
     `<button class="chip" data-act="selm" data-id="${x.id}" aria-pressed="${x.id === selM}">${esc(firstName(x.name))}${x.out ? ' (out)' : ''}</button>`).join('')}</div>`;
 
   let curHtml: string;

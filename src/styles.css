@@ -39,7 +39,9 @@ header{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var
 .brand{display:flex;flex-direction:column;gap:0;min-width:0;margin-right:auto}
 .brand h1{font-size:18px;font-weight:700}
 .brand span{font-size:12px;color:var(--muted)}
-.clock{display:flex;align-items:center;gap:8px}
+.clock{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+#hdrSlot:empty{display:none}
+#hdrSlot select{min-width:0;max-width:100%}
 .clock .t{font-family:var(--mono);font-size:24px;font-weight:600;letter-spacing:-.02em;min-width:5.6ch;text-align:right}
 .clock .d{font-family:var(--display);font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
 .btn{border:1px solid var(--line);background:var(--panel);border-radius:6px;padding:6px 11px;font-weight:500;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}

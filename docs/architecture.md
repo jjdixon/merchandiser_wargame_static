@@ -35,9 +35,12 @@ screen-side ones in `src/app/feature.ts` (`Feature`).
 | `onTick(state)` | after every clock step (≤ 1 min) | alerts, geofence events, actual-time drift |
 | `curveballs` | the header *Throw a curveball* bar | load cuts/adds (BR-017) |
 | `settings` + `ruleDefaults` | the *Pay & labor rules* screen; values in `rules.feature` | a per-feature switch or number |
-| `panels` (slot + render) | slots in core views: `sched.after`, `merch.after`, `super.main`, `super.aside`, `rules.after` | alert feed, coverage helpers |
+| `panels` (slot + render) | slots: `header`, `sched.after`, `merch.after`, `super.main`, `super.aside`, `rules.after` | alert feed, role picker, store hours |
 | `views` | a whole new tab | Findings, photo review (BR-043) |
 | `actions` / `changes` | clicks/changes on `data-act="<id>:<name>"` / `data-fchange="<id>:<name>"` | buttons inside a feature's panel |
+| `access(app)` | who is looking: allowed tabs, people, stores, locked phone | role picker (BR-001) |
+| `views[].public` | tab visible to every role | Findings |
+| `featureState(state, id, init)` | a feature's own day-scoped state in `state.fx[id]` | baselines, recorded times (BR-012) |
 | `mount(app)` | once at startup — **locked features only** | floating findings button |
 
 Hooks of the same kind run in registry order, each receiving the previous value.
@@ -82,7 +85,10 @@ Creates the folder from a template, registers it, and starts it switched off.
   being frozen.
 - **Day plan and pay math** (`plan`, `summarize`, `totals`) — every screen shows hours
   and cost. Features adjust inputs through hooks rather than replacing the math.
-- **Event primitives** (`delayTruck`, `heavierLoad`, `addWork`, `callOut`,
-  `extraVisit`, `assign`, `move`, `raise`) — shared by curveballs and merchandiser
+- **Event primitives** (`delayTruck`, `heavierLoad`, `addWork`, `adjustDrive`,
+  `adjustWork`, `callOut`, `extraVisit`, `assign`, `move`, `raise`) — shared by curveballs and merchandiser
   actions.
-- **The four core views** — they define the slots features fill.
+- **The four core views** — they define the slots features fill, and apply the
+  viewer's scope (`ctx.scope`) to people and stores.
+- **People and store attributes many features need**: role, market, route types
+  (people); route type, market (stores).

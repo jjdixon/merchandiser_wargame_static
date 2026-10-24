@@ -35,9 +35,22 @@ export interface Rules {
   feature: Record<string, number | boolean>;
 }
 
+/** Route types (BR-005). Stores and relief qualifications use these. */
+export type RouteType = 'LF' | 'Traditional' | 'Xpress';
+/**
+ * Field roles that work stores (BR-001). Office roles (scheduler, manager, MSL)
+ * are viewers, not simulated workers — see the role-access feature.
+ */
+export type MerchRole = 'merchandiser' | 'relief' | 'jumper';
+
 export interface Merchandiser {
   id: string;
   name: string;
+  role: MerchRole;
+  /** Market (MSL area) this person belongs to. */
+  market: string;
+  /** Route types this person is qualified to work. */
+  routeTypes: RouteType[];
   home: Point;
   /** Paid hours already worked earlier this week. */
   week: number;
@@ -61,6 +74,8 @@ export interface Lock {
 export interface Store {
   id: string;
   name: string;
+  routeType: RouteType;
+  market: string;
   xy: Point;
   cases: number;
   /** Truck arrival time. */
@@ -95,6 +110,11 @@ export interface SimState {
   ext: Extensions;
   /** Ids of enabled features, in registry order. */
   enabled: string[];
+  /**
+   * Day-scoped state owned by features, keyed by feature id. Reset by newDay().
+   * Read/write through featureState() so each feature only sees its own slot.
+   */
+  fx: Record<string, unknown>;
 }
 
 export interface Stop {

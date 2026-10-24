@@ -36,3 +36,14 @@ Format: ID · date · decision — why.
 - **D-009** · 2026-10-23 · Pay math, the clock and event primitives stay in the core
   (every screen depends on them). Features adjust their inputs via hooks rather than
   replacing them.
+- **D-010** · 2026-10-23 · Role, market and route type are core fields on people and
+  stores (not feature data), because many features need them and features can't
+  import each other. Office roles (scheduler, manager, MSL) are viewers, not
+  simulated workers.
+- **D-011** · 2026-10-23 · Roles change what's *shown*, not the simulation. Each
+  browser still runs its own clock; a shared multiplayer clock remains in the backlog.
+- **D-012** · 2026-10-23 · Real-world drift (BR-012) is repeatable per scenario and
+  store, so a war game can be replayed and compared. Default ±15% skewed toward
+  running over.
+- **D-013** · 2026-10-23 · Per-store standards scale the global standard by class
+  percentage rather than replacing it, so one global edit still moves everything.
