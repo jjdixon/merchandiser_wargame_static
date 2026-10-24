@@ -65,3 +65,6 @@ Format: ID · date · decision — why.
   (merchandiser vs MSL/scheduler) is an open question against BR-010.
 - **D-019** · 2026-10-23 · Rejected geofence minutes are recorded but don't change
   today's paid hours yet; the timesheet/payroll step (BR-013, M6) will apply them.
+- **D-020** · 2026-10-24 · Practice visits run on a copy of the day (sandbox), so they
+  can be used for training and demos at any time without disturbing a war game in
+  progress. Other features still react inside the copy.

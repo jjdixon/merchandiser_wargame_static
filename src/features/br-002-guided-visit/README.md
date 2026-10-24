@@ -26,13 +26,22 @@ step, close out).
 - Everyone else is **simulated**: when their planned work time ends, the remaining
   steps are answered automatically (marked "auto").
 
+### Practice visit (sandbox)
+Below the phone, **Practice a store visit** opens any store's visit with every step
+unlocked, so you can click through without running the clock. This is for training,
+demos and walking the business through the flow. It works on a copy of the day:
+nothing is saved back, and other features still react inside the copy (the
+out-of-stock routing shows under *What would have been sent*). **Restart** and
+**Exit** are on the card.
+
 ## War-game check
 Hand a merchandiser the phone, tick "I'm playing", and let them run a store. Watch
 the Supervisor's *Store visits* panel and the timeline react to how long it takes.
 
 ## Where things live
 - `aisles.json`: aisles per chain.
-- `engine.ts`: base steps, auto-complete, close-out, play/hold (pure, tested).
+- `engine.ts`: base steps, auto-complete, close-out, play/hold, practice sandbox
+  (`startPractice`, `practiceCloseOut`; pure, tested).
 - `ui.ts`: generic step inputs (check / count / choice / entries + photo), the Next
   card, and the Supervisor panel. Steps from other features render here
   automatically through the core `visitSteps` plug-in.

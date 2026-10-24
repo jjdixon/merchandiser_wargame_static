@@ -48,18 +48,23 @@ across sessions.
       suggestion · BR-039 · `br-039-photo-capture` · M
 - [x] **T-205** (#3) "Next action" home screen on the phone · BR-015 · S
 
-## M3 — Day-of disruptions · branch `m3-disruptions`
+## M3 — Day-of disruptions · merged #4
 
-- [x] **T-301** Delivery status per stop; late-truck notice *before* leaving
+- [x] **T-301** (#4) Delivery status per stop; late-truck notice *before* leaving
       · BR-014 · `br-014-truck-visibility` · M
-- [x] **T-302** Late-truck decision prompt: wait / go to next store / swap order, with
+- [x] **T-302** (#4) Late-truck decision prompt: wait / go to next store / swap order, with
       the effect on the day · BR-009 · M
-- [x] **T-303** Load cuts and adds curveball, ordered vs. delivered, notifications
+- [x] **T-303** (#4) Load cuts and adds curveball, ordered vs. delivered, notifications
       · BR-017 · `br-017-load-adjustments` · S
-- [x] **T-304** Two-way messages tied to a stop (merchandiser, MSL, scheduler,
+- [x] **T-304** (#4) Two-way messages tied to a stop (merchandiser, MSL, scheduler,
       driver) · BR-028 · `br-028-messaging` · M
-- [x] **T-305** Geofence exceptions (missing entry/exit) and a review queue
+- [x] **T-305** (#4) Geofence exceptions (missing entry/exit) and a review queue
       · BR-011 · `br-011-geofence-exceptions` · M
+
+## Added between milestones
+
+- [x] **T-206** Practice visit: click through any store's visit in a sandbox, no
+      clock, nothing saved to the day · BR-002 · `br-002-guided-visit` · S
 
 ## M4 — Scheduling (starts with the week model)
 

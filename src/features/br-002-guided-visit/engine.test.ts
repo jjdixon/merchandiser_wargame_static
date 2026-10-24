@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { answerStep, newDay, plan, storeById, tick, visitProgress, visitSteps } from '../../engine';
 import { seed } from '../../data';
-import { aislesFor, autoComplete, br002GuidedVisitEngine, canCloseOut, closeOut, setPlaying, visitState } from './engine';
+import { aislesFor, autoComplete, br002GuidedVisitEngine, canCloseOut, closeOut, practiceCloseOut, setPlaying, startPractice, visitState } from './engine';
 
 const day = () => newDay(seed, 'normal', { features: [br002GuidedVisitEngine] });
 const startWork = (s: ReturnType<typeof day>, id: string) => { const st = storeById(s, id)!; while (!st.lock || s.t < st.lock.start) tick(s, 1); return st };
@@ -67,5 +67,41 @@ describe('br-002-guided-visit [BR-002 BR-015 BR-021]', () => {
     autoComplete(s, st);
     expect(st.answers['br-002-guided-visit:validate'].photo?.simulated).toBe(true);
     expect(visitProgress(s, st).complete).toBe(true);
+  });
+});
+
+describe('br-002-guided-visit practice sandbox [BR-002]', () => {
+  const listener = {
+    id: 'test-listener', title: 't', description: 't', requirements: [], defaultOn: true,
+    onStepAnswered: (st: Parameters<NonNullable<import('../../engine').EngineFeature['onStepAnswered']>>[0]) => { st.alerts.unshift({ t: st.t, sev: 'info' as const, text: 'heard' }) },
+  };
+  const fresh = () => newDay(seed, 'normal', { features: [br002GuidedVisitEngine, listener] });
+
+  it('practicing any store never changes the real day', () => {
+    const s = fresh(), p = startPractice(s, 's4')!;        // a store Ana hasn't reached
+    const st = p.state.stores.find(x => x.id === 's4')!;
+    for (const step of visitSteps(p.state, st)) answerStep(p.state, st, step.id, step.kind === 'count' ? { count: 3 } : { done: true });
+    expect(visitProgress(p.state, st).complete).toBe(true);
+    expect(storeById(s, 's4')!.answers).toEqual({});
+    expect(s.alerts.some(a => a.text === 'heard')).toBe(false);
+    expect(p.state.alerts.some(a => a.text === 'heard')).toBe(true);
+  });
+
+  it('practice close-out needs the required steps but no clock or truck', () => {
+    const s = fresh(), p = startPractice(s, 's2')!;
+    expect(practiceCloseOut(p)).toBe(false);
+    const st = p.state.stores.find(x => x.id === 's2')!;
+    for (const step of visitSteps(p.state, st)) answerStep(p.state, st, step.id, step.kind === 'count' ? { count: 0 } : { done: true });
+    expect(practiceCloseOut(p)).toBe(true);
+    expect(s.t).toBe(p.state.t);
+  });
+
+  it('a practice started mid-day starts with a blank visit, even for a finished store', () => {
+    const s = fresh();
+    while (s.t < 10 * 60) tick(s, 5);
+    const p = startPractice(s, 's8')!;
+    expect(Object.keys(p.state.stores.find(x => x.id === 's8')!.answers)).toEqual([]);
+    expect(storeById(s, 's8')!.answers).not.toEqual({});
+    expect(startPractice(s, 'nope')).toBeNull();
   });
 });

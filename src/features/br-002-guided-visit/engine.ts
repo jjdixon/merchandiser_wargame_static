@@ -113,3 +113,38 @@ export const br002GuidedVisitEngine: EngineFeature = {
   visitSteps: baseSteps,
   onTick,
 };
+
+/* ---------- practice visit (sandbox) ----------
+ * A throwaway copy of the day for clicking through any store's visit without the
+ * clock: every step unlocked, nothing written back. Other features' hooks still run
+ * (out-of-stock routing, photo records), but only against the copy.
+ */
+export interface Practice { state: SimState; storeId: string; closedAt: number | null }
+
+/** Copy the day so practice answers can't leak into it. */
+export function sandboxOf(state: SimState): SimState {
+  return {
+    ...state,
+    merch: state.merch.map(m => ({ ...m })),
+    stores: state.stores.map(s => ({ ...s, lock: s.lock ? { ...s.lock } : null, answers: {} })),
+    alerts: [],
+    fired: {},
+    // Feature day-state is plain data; a JSON copy keeps it separate.
+    fx: JSON.parse(JSON.stringify(state.fx)),
+  };
+}
+
+export function startPractice(state: SimState, storeId: string): Practice | null {
+  if (!state.stores.some(s => s.id === storeId)) return null;
+  const sb = sandboxOf(state);
+  delete sb.fx[ID];                                  // fresh visit state in the copy
+  return { state: sb, storeId, closedAt: null };
+}
+
+/** In practice, close-out only needs the required steps; there's no clock or truck. */
+export function practiceCloseOut(p: Practice): boolean {
+  const s = p.state.stores.find(x => x.id === p.storeId);
+  if (!s || !visitProgress(p.state, s).complete) return false;
+  p.closedAt = p.state.t;
+  return true;
+}
