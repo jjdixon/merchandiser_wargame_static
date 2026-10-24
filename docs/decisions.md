@@ -116,3 +116,16 @@ Format: ID · date · decision — why.
 - **D-033** · 2026-10-24 · New tabs per role (BR-001): Promotions for schedulers and
   managers; Displays for schedulers, managers and MSLs; Photo review for managers and
   MSLs; Stores for everyone.
+- **D-034** · 2026-10-24 · Scorecard KPIs (BR-025) are drafts with goals as settings:
+  on-time = finished by the store's done-by time; completion = finished ÷ on route;
+  units per *work* hour (in-store only); steps and displays as shares. Sales is left
+  out (no data).
+- **D-035** · 2026-10-24 · The exceptions report (BR-026) types alerts by their text
+  and finds the person and store by name, so no feature had to change to feed it. A
+  production system should put a type, person and store on every event.
+- **D-036** · 2026-10-24 · Timesheets (BR-013) are approved per person per day;
+  adjustments need a reason and send the sheet back for approval. Rejected geofence
+  minutes (D-019) are applied by the approver as an adjustment, not automatically.
+- **D-037** · 2026-10-24 · Two screen-side core additions: a `view.top` slot above
+  every tab (for tips) and `ctx.view` (the tab id). Both live in the app shell, which
+  has no DOM tests; the browser check covers them.

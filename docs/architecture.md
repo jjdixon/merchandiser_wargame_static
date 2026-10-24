@@ -35,7 +35,7 @@ screen-side ones in `src/app/feature.ts` (`Feature`).
 | `onTick(state)` | after every clock step (≤ 1 min) | alerts, geofence events, actual-time drift |
 | `curveballs` | the header *Throw a curveball* bar | load cuts/adds (BR-017) |
 | `settings` + `ruleDefaults` | the *Pay & labor rules* screen; values in `rules.feature` | a per-feature switch or number |
-| `panels` (slot + render) | slots: `header`, `sched.after`, `merch.after`, `super.main`, `super.aside`, `rules.after` | alert feed, role picker, store hours |
+| `panels` (slot + render) | slots: `header`, `view.top` (above every tab; `ctx.view` = tab id), `sched.after`, `merch.top`, `merch.visit`, `merch.after`, `super.main`, `super.aside`, `rules.after`, `week.after` | alert feed, role picker, store hours |
 | `views` | a whole new tab | Findings, photo review (BR-043) |
 | `actions` / `changes` | clicks/changes on `data-act="<id>:<name>"` / `data-fchange="<id>:<name>"` | buttons inside a feature's panel |
 | `access(app)` | who is looking: allowed tabs, people, stores, locked phone | role picker (BR-001) |

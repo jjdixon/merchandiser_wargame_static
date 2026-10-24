@@ -168,7 +168,7 @@ business document. For each one:
   totals. Missing: GPS-based mileage (with geofencing, M3).
 - **Open questions:** Home-to-first-store and last-store-to-home rules.
 
-**BR-013 Payroll and expense integration** · 🔌 Simulate only
+**BR-013 Payroll and expense integration** · 🔌 Simulated (M6) · `br-013-timesheet-export`
 - **Story:** Approved hours, overtime and mileage flow to payroll and the expense
   system, with worker identity and exception/reconciliation status.
 - **War-game check:** a timesheet approval step for the manager, and a preview of the
@@ -283,7 +283,7 @@ business document. For each one:
 - **Open questions:** What's the numerator (units or cases)? How is store complexity
   defined? Who sets standards, and how?
 
-**BR-025 KPI scorecard and coaching** · ⬜ Not yet
+**BR-025 KPI scorecard and coaching** · ✅ Covered (M6) · `br-025-scorecards`
 - **Story:** Weekly scorecards for schedule adherence, time, mileage, units per hour,
   completion, sales, out-of-stocks, display execution, responsibilities completed and
   exception trends. Workers see their own goals and results.
@@ -291,7 +291,7 @@ business document. For each one:
   comparing them.
 - **Open questions:** KPI definitions and targets need business approval.
 
-**BR-026 Exception-based reporting** · 🟡 Partial
+**BR-026 Exception-based reporting** · ✅ Covered (M6) · `br-026-exceptions`
 - **Story:** Weekly exception reports with drill-down to day, worker, route, store,
   visit, activity, geofence, delivery, overtime and incomplete work, so managers
   don't have to make phone calls.
@@ -299,7 +299,7 @@ business document. For each one:
   stop.
 - **Today:** a live alert feed for the day only.
 
-**BR-027 Scheduled vs. actual workforce visibility** · 🟡 Partial
+**BR-027 Scheduled vs. actual workforce visibility** · ✅ Covered (M6) · `br-027-workforce-visibility`
 - **Story:** See who is available, where they were scheduled, where they actually
   are, progress, time by activity and second-visit coverage, across LF, Traditional,
   part-time and relief staff, including down-day work.
@@ -324,7 +324,7 @@ business document. For each one:
 - **War-game check:** the supervisor view plus photo review and scorecards.
 - **Today:** supervisor view without photos or scorecards.
 
-**BR-030 Training and in-app guidance** · ⬜ Not yet
+**BR-030 Training and in-app guidance** · 🟡 Partial (M6: first-run tips) · `br-030-first-run-tips`
 - **Story:** Role-based onboarding, guided workflows, standard work, searchable help.
 - **War-game check:** first-run tips on each screen; measure whether a new player can
   complete a day unaided.
@@ -407,7 +407,7 @@ business document. For each one:
 - Needs real daily store sales. Could be mocked later to show what the analysis
   would look like, but it can't be war-gamed meaningfully on fake data.
 
-**BR-043 Reporting, dashboards and centralized photo review** · 🟡 Partial (M5: displays) · `br-043-photo-review`
+**BR-043 Reporting, dashboards and centralized photo review** · ✅ Covered (M5 + M6 scorecards/exceptions) · `br-043-photo-review`
 - **Story:** Role-based dashboards and one place to review photos for planned,
   assigned, completed, overdue, absent, compliant and non-compliant tasks, with rates
   across user, route, store, banner, market and time; suspected non-compliance first.
@@ -507,6 +507,11 @@ Updated as features land. To change a requirement, edit only its folder
 | BR-040 | `src/features/br-040-display-compliance` | Displays tab, override |
 | BR-041 | `src/features/br-041-store-profile` | Stores tab; store links are core (`ctx.storeLink`) |
 | BR-043 | `src/features/br-043-photo-review` | Photo review tab; other dashboards are M6 |
+| BR-025 | `src/features/br-025-scorecards` | Goals are draft settings |
+| BR-026 | `src/features/br-026-exceptions` | Types alerts by text (`types.json`) |
+| BR-027 | `src/features/br-027-workforce-visibility` | Supervisor panel |
+| BR-013 | `src/features/br-013-timesheet-export` | Timesheets tab, export preview |
+| BR-030 | `src/features/br-030-first-run-tips` | Tips in the core `view.top` slot |
 | War-game findings | `src/features/findings` | Not a business requirement |
 
 ## Open questions (consolidated)

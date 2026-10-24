@@ -1,0 +1,19 @@
+{
+  "_note": "One first-run tip per tab (by tab id). Plain language; keep each under ~40 words.",
+  "tips": {
+    "sched": { "title": "Build the day", "text": "Each row is a store. Assign it to a person, reorder stops with the arrows, and watch hours and cost change. Press Run to start the clock." },
+    "merch": { "title": "The merchandiser's phone", "text": "This is what one person sees. The top card says what to do next. Tick 'Play this merchandiser' to work visits yourself, or practice any store without the clock." },
+    "super": { "title": "Watch the day", "text": "Who's where, what's late and what's uncovered. Buttons under 'Needs coverage' show when each person would finish a stop. Alerts list everything that went wrong." },
+    "week": { "title": "The week", "text": "Hours so far and projected for each day. End day rolls today in; New week starts Monday fresh." },
+    "rules": { "title": "Switch the assumptions", "text": "Pay rules, labor standards and goals are placeholders. Change one and every screen updates. Switch whole features off to see the day without them." },
+    "findings": { "title": "Log what won't work", "text": "Anything that wouldn't work in real life goes here, from any screen. These become requirements." },
+    "messages": { "title": "Messages", "text": "Messages tied to a stop between merchandisers, MSLs, schedulers and drivers. Replies are simulated." },
+    "promos": { "title": "Promotions", "text": "Promotions become display tasks at each matching store. Paste rows from a spreadsheet to try your own." },
+    "displays": { "title": "Display compliance", "text": "Every display from setup to removal and its result. Override a result after checking the photo." },
+    "store": { "title": "Store page", "text": "Everything about one store, plus notes that stay with it for whoever works it next. Click any store name to come here." },
+    "photos": { "title": "Photo review", "text": "Suspected problems come first. Confirm or change the result; your call becomes the display's result." },
+    "scorecards": { "title": "Scorecards", "text": "Each person's day and week against draft goals. Change the goals under Pay & labor rules." },
+    "exceptions": { "title": "Exceptions", "text": "Everything that went wrong this week, by type and day. Click a number to drill down to the stop." },
+    "timesheets": { "title": "Timesheets", "text": "Approve, return or adjust each person's day, then preview the payroll and mileage export. Nothing is sent." }
+  }
+}

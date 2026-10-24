@@ -15,7 +15,8 @@ export type Slot =
   | 'super.main'       // left column of the Supervisor view, after crew cards
   | 'super.aside'      // right column of the Supervisor view, after the map
   | 'rules.after'      // below the Pay & labor rules view
-  | 'week.after';      // below the Week view
+  | 'week.after'       // below the Week view
+  | 'view.top';        // above every tab's content (core and feature tabs)
 
 export interface FeatureSummary {
   id: string; title: string; description: string; requirements: string[];
@@ -67,6 +68,8 @@ export interface ViewCtx {
   catalog: FeatureSummary[];
   /** Store chosen for the store page (BR-041), if any. */
   selStore: string | null;
+  /** Id of the tab being shown (e.g. 'sched', 'displays'). */
+  view: string;
   /**
    * A store's name as a link to the store page when a feature provides one
    * (a view with opensStore); otherwise just the escaped name.

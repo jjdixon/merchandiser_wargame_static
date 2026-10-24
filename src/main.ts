@@ -93,6 +93,7 @@ function ctx(): ViewCtx {
     projectDay: project,
     catalog,
     selStore,
+    view,
     storeLink: s => (storePage() ? `<a href="#" class="slink" data-act="open-store" data-store="${esc(s.id)}">${esc(s.name)}</a>` : esc(s.name)),
     slot: (name: Slot) => on.flatMap(f => f.panels ?? []).filter(p => p.slot === name)
       .sort((a, b) => (a.order ?? 100) - (b.order ?? 100)).map(p => p.render(ctx())).join(''),
@@ -149,7 +150,8 @@ function render(force = false): void {
   const hdr = $('#hdrSlot');
   if (force || !hdr.contains(document.activeElement)) hdr.innerHTML = ctx().slot('header');
   if (!force && busy()) return;
-  $('#view').innerHTML = currentView().render(ctx());
+  const c = ctx();
+  $('#view').innerHTML = c.slot('view.top') + currentView().render(c);
 }
 
 /* ---------- curveball bar (built from enabled features) ---------- */
@@ -279,6 +281,7 @@ V.addEventListener('click', e => {
   const b = (e.target as HTMLElement).closest<HTMLElement>('[data-act]');
   if (!b || (b as HTMLButtonElement).disabled) return;
   const a = b.dataset.act!, id = b.dataset.id ?? '';
+  if (b.tagName === 'A') e.preventDefault();
   if (a === 'open-store') { e.preventDefault(); openStore(b.dataset.store!); return }
   // Feature actions: data-act="<feature id>:<action>"
   if (a.includes(':')) {

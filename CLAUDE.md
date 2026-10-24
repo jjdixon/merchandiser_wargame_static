@@ -76,6 +76,11 @@ src/
     br-040-display-compliance/ Displays tab: lifecycle, compliance states, override
     br-041-store-profile/      Stores tab (store links everywhere), structured notes
     br-043-photo-review/       photo review queue, display compliance dashboard
+    br-025-scorecards/         Scorecards tab + "your scorecard" on the phone, draft goals
+    br-026-exceptions/         Exceptions tab: by type × day, drill-down, unfinished stops
+    br-027-workforce-visibility/ Supervisor: scheduled vs actual for everyone
+    br-013-timesheet-export/   Timesheets tab: approve / return / adjust, export preview
+    br-030-first-run-tips/     a tip on each tab (view.top slot)
   main.ts        app shell: registry wiring, tabs, curveball bar, events, clock loop
 tests/           core tests (engine + plug-in points). Feature tests live in each folder.
 scripts/         check-boundaries.mjs, new-feature.mjs
@@ -138,6 +143,11 @@ Rules:
 
 ## Status
 
+- v0.8 (M6) — reporting and oversight: scorecards with draft goals (BR-025),
+  exceptions report with drill-down (BR-026), scheduled vs actual for everyone
+  (BR-027), timesheet approval and payroll/mileage export preview (BR-013),
+  first-run tips (BR-030). Core: `view.top` slot, `ctx.view`. All planned
+  milestones are built; next is war-gaming with the business.
 - v0.7 (M5) — display tracking: core display model (promotions → store tasks →
   events), promotion feed with pasted spreadsheets (BR-036), display steps with
   reason codes and escalation (BR-037), lifecycle and compliance with override
@@ -167,7 +177,7 @@ Rules:
   Seed adds route types, markets, a vacation relief and a route jumper. 68 tests.
 - v0.2 (M0) — feature architecture (merged #1).
 - Requirements: `docs/requirements.md` (41 BRs). Build order: `docs/backlog.md`
-  (M6 next: reporting and oversight).
+  (all milestones built; triage war-game findings next).
 - Findings are browser-local (localStorage); export via "Copy for backlog.md".
 - Repo is **public** and auto-deploys to GitHub Pages on push to `main`
   (`.github/workflows/pages.yml`). **Never commit real store, employee or pay data
