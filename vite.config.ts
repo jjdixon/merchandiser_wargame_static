@@ -5,5 +5,5 @@ import { defineConfig } from 'vite';
 export default defineConfig({
   base: './',
   build: { outDir: 'dist', sourcemap: true },
-  test: { globals: true, environment: 'node', include: ['tests/**/*.test.ts'] },
+  test: { globals: true, environment: 'node', include: ['tests/**/*.test.ts', 'src/**/*.test.ts'] },
 });

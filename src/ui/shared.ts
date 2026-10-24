@@ -1,15 +1,9 @@
 // Shared view helpers. Views are pure functions: (ctx) => HTML string.
 // Interaction is wired in main.ts via data-act / data-* attributes.
+// Feature folders may import these helpers.
 import type { DayPlan, SimState } from '../engine';
 import { fmt, hrs, status } from '../engine';
-import type { Finding } from '../storage/findings';
-
-export interface ViewCtx {
-  state: SimState;
-  selM: string;
-  findings: Finding[];
-  confirmClear: boolean;
-}
+export type { ViewCtx } from '../app/feature';
 
 export const esc = (s: unknown) =>
   String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);

@@ -9,9 +9,12 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "test": "vitest run",
+    "test:one": "vitest run -t",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
-    "check": "tsc --noEmit && vitest run && vite build"
+    "boundaries": "node scripts/check-boundaries.mjs",
+    "new-feature": "node scripts/new-feature.mjs",
+    "check": "node scripts/check-boundaries.mjs && tsc --noEmit && vitest run && vite build"
   },
   "devDependencies": {
     "typescript": "5.6.3",

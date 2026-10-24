@@ -47,5 +47,12 @@ served from any web server, an internal IIS site, S3, or GitHub Pages.
 
 ## Working on it
 
-Architecture, conventions and current status are in [CLAUDE.md](CLAUDE.md) — written
-for both humans and AI coding sessions.
+Each requirement lives in its own folder under `src/features/`, plugged into a small
+core — see [docs/architecture.md](docs/architecture.md). Conventions and current
+status are in [CLAUDE.md](CLAUDE.md), written for both humans and AI coding sessions.
+
+```
+npm run new-feature -- br-009-store-hours "Store hours" BR-009
+npm run test:one -- BR-009
+npm run check
+```

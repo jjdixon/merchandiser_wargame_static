@@ -402,6 +402,18 @@ business document. For each one:
 
 ---
 
+## Where each requirement lives
+
+Updated as features land. To change a requirement, edit only its folder
+(see `docs/architecture.md`).
+
+| Requirement(s) | Feature folder | Notes |
+|---|---|---|
+| BR-007, BR-012, BR-024 (settings) | `src/features/pay-labor-rules` | Pay math itself is core (`src/engine/plan.ts`) |
+| BR-004, BR-008, BR-014, BR-017 (disruptions) | `src/features/curveballs` | Event primitives are core (`src/engine/sim.ts`) |
+| BR-007, BR-014, BR-026 (alerts) | `src/features/day-alerts` | |
+| War-game findings | `src/features/findings` | Not a business requirement |
+
 ## Open questions (consolidated)
 
 1. Were BR-018, BR-019, BR-023 and BR-032 removed on purpose?

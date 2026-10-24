@@ -16,12 +16,12 @@ across sessions.
 
 ---
 
-## M0 — Feature architecture (foundation, no new behavior)
+## M0 — Feature architecture (foundation, no new behavior) · branch `m0-feature-architecture`
 
-- [ ] **T-001** Feature plug-in contract, registry and on/off switches · M
-- [ ] **T-002** Move existing pieces into features: pay & labor rules, curveballs,
+- [x] **T-001** Feature plug-in contract, registry and on/off switches · M
+- [x] **T-002** Move existing pieces into features: pay & labor rules, curveballs,
       day alerts, findings · M
-- [ ] **T-003** Boundary check (features can't import each other; engine stays pure),
+- [x] **T-003** Boundary check (features can't import each other; engine stays pure),
       new-feature scaffold, `docs/architecture.md` · S
 
 ## M1 — Foundation for the requirements

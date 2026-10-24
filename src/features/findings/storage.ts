@@ -1,6 +1,6 @@
 // Findings ("This won't work because…") persisted in the browser.
 // Browser-only on purpose for now; see docs/decisions.md (D-004) for the
-// planned move to a shared store.
+// planned move to a shared store. The only browser-storage code in the app.
 export interface Finding { id: string; area: string; context: string; text: string; at: string }
 
 const KEY = 'mwg.findings';

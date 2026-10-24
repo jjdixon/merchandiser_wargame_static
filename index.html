@@ -24,46 +24,21 @@
       <button class="btn" id="reset">Reset day</button>
     </div>
   </div>
-  <div class="inject">
+  <div class="inject" id="inject">
     <div class="gut row">
       <span class="lbl">Throw a curveball</span>
-      <select id="evType" aria-label="Event type">
-        <option value="truck">Truck late</option>
-        <option value="heavy">Heavier load than ordered</option>
-        <option value="callout">Merchandiser calls out / goes home</option>
-        <option value="extra">Store requests extra visit</option>
-      </select>
-      <select id="evTarget" aria-label="Event target"></select>
-      <select id="evAmt" aria-label="Delay"><option value="30">+30 min</option><option value="60" selected>+60 min</option><option value="120">+2 hrs</option></select>
+      <select id="evType" aria-label="Curveball"></select>
+      <select id="evTarget" aria-label="Apply to"></select>
+      <span id="evParams" class="ctl"></span>
       <button class="btn" id="evGo">Inject</button>
     </div>
   </div>
-  <nav class="gut tabs" role="tablist" id="tabs">
-    <button role="tab" data-v="sched">Scheduler</button>
-    <button role="tab" data-v="merch">Merchandiser</button>
-    <button role="tab" data-v="super">Supervisor</button>
-    <button role="tab" data-v="rules">Pay &amp; labor rules</button>
-    <button role="tab" data-v="findings">Findings <span id="fcount" class="mono"></span></button>
-  </nav>
+  <nav class="gut tabs" role="tablist" id="tabs"></nav>
 </header>
 
 <main class="gut" id="view"></main>
 
-<button class="fab" id="fab">This won't work because…</button>
-<div class="scrim" id="scrim" hidden>
-  <form class="sheet" id="fbForm">
-    <h2 style="font-size:18px">This won't work because…</h2>
-    <div class="ctx" id="fbCtx"></div>
-    <label class="lbl" for="fbCat">Area</label>
-    <select id="fbCat"></select>
-    <label class="lbl" for="fbTxt">What breaks, and what really happens in the field?</label>
-    <textarea id="fbTxt" placeholder="e.g. Receiving at ValuMart doesn't open until 7 — trucks get there at 5:30 but we can't touch product until they check it in."></textarea>
-    <div class="ctl" style="justify-content:flex-end">
-      <button type="button" class="btn" id="fbCancel">Cancel</button>
-      <button type="submit" class="btn pri">Log finding</button>
-    </div>
-  </form>
-</div>
+<!-- The findings button and form are added by src/features/findings. -->
 <script type="module" src="/src/main.ts"></script>
 </body>
 </html>

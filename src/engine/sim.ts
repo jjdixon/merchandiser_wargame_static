@@ -1,8 +1,7 @@
 // Simulation clock, events and assignment actions. All functions mutate the
 // SimState passed in and touch nothing else (no DOM, no storage).
 import type { Merchandiser, Severity, SimState, Store } from './types';
-import { allPlans, plan, readyAt } from './plan';
-import { fmt, hrs } from './time';
+import { plan, readyAt, workMin } from './plan';
 
 export const END_OF_DAY = 23 * 60;
 
@@ -24,7 +23,7 @@ export const nextSeq = (state: SimState, mid: string) =>
  * Advance the clock by dt minutes.
  * Steps in ≤1-minute increments: each step plans at the current time, locks any
  * stop whose planned departure falls inside the step (keeping its planned
- * times), then advances the clock and raises alerts. Jumping the clock in one
+ * times), then advances the clock and runs every enabled feature's onTick. Jumping the clock in one
  * go would re-time departures to "now" — see tests/engine.test.ts.
  */
 export function tick(state: SimState, dt: number): void {
@@ -41,33 +40,14 @@ export function tick(state: SimState, dt: number): void {
       }
     }
     state.t = target;
-    raiseAlerts(state);
+    for (const h of state.ext.onTick) h(state);
   }
 }
 
-function raiseAlerts(state: SimState): void {
-  const r = state.rules;
-
-  for (const p of allPlans(state)) {
-    const m = p.m;
-    for (const x of p.stops) {
-      if (x.wait > 3 && state.t >= x.arrive && state.t < x.start)
-        raise(state, 'warn', `${m.name} is at ${x.s.name} waiting on the truck — ${Math.round(x.wait)} min of paid idle time.`, 'w' + x.s.id + Math.round(x.s.eta));
-      if (x.end > x.s.win && state.t >= x.s.win && state.t < x.end)
-        raise(state, 'bad', `${x.s.name} passed its done-by time (${fmt(x.s.win)}). ${m.name} projects finishing ${fmt(x.end)}.`, 'l' + x.s.id);
-    }
-    if (p.weekProj > r.ot)
-      raise(state, 'warn', `${m.name} projects ${p.weekProj.toFixed(1)} hrs this week — overtime after ${r.ot}.`, 'o' + m.id + (m.out ? 'x' : ''));
-    if (p.stops.length && p.clockOut! <= state.t && !m.out)
-      raise(state, 'info', `${m.name} clocked out at ${fmt(p.clockOut)} · ${hrs(p.paid)} paid.`, 'd' + m.id);
-  }
-
-  for (const s of state.stores)
-    if (!s.assign && readyAt(r, s) <= state.t)
-      raise(state, 'bad', `${s.name}: product is on the dock and nobody is assigned.`, 'u' + s.id);
-}
-
-/* ---------- events (curveballs) ---------- */
+/* ---------- event primitives ----------
+ * The building blocks curveballs and merchandiser actions use. The curveball
+ * menu itself lives in src/features/curveballs.
+ */
 
 /** Merchandiser calls out or goes home. Finishes a stop already in progress; releases the rest. */
 export function callOut(state: SimState, m: Merchandiser): Store[] {
@@ -85,7 +65,7 @@ export function delayTruck(state: SimState, s: Store, minutes: number): void {
   s.eta += minutes;
   if (s.lock) {
     const L = s.lock;
-    L.start = Math.max(L.arrive, readyAt(state.rules, s));
+    L.start = Math.max(L.arrive, readyAt(state, s));
     L.wait = L.start - L.arrive;
     L.end = L.start + L.work;
   }
@@ -100,8 +80,9 @@ export function addWork(state: SimState, s: Store, minutes: number): void {
 /** Order arrives heavier than planned. Returns cases added. */
 export function heavierLoad(state: SimState, s: Store, fraction = 0.4): number {
   const add = Math.round(s.cases * fraction);
+  const before = workMin(state, s);
   s.cases += add;
-  if (s.lock && state.t < s.lock.end) { const m = add * state.rules.mpc; s.lock.work += m; s.lock.end += m }
+  if (s.lock && state.t < s.lock.end) { const m = workMin(state, s) - before; s.lock.work += m; s.lock.end += m }
   return add;
 }
 

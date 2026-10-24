@@ -28,6 +28,11 @@ export interface Rules {
   wage: number;
   /** Mileage reimbursement, dollars per mile (reimbursed miles only). */
   mileage: number;
+  /**
+   * Settings owned by feature folders, keyed by setting key. Defaults come from
+   * each feature's `ruleDefaults`. Read/write with getRule/setRule.
+   */
+  feature: Record<string, number | boolean>;
 }
 
 export interface Merchandiser {
@@ -86,6 +91,10 @@ export interface SimState {
   fired: Record<string, true>;
   /** Counter for generated ids (extra visits). */
   nextId: number;
+  /** Hooks contributed by enabled features. Rebuilt by enableFeatures(). */
+  ext: Extensions;
+  /** Ids of enabled features, in registry order. */
+  enabled: string[];
 }
 
 export interface Stop {
@@ -137,4 +146,71 @@ export interface Status {
   stop?: Stop;
   pct?: number;
   pos?: Point;
+}
+
+/* ---------- feature plug-in contract (engine side) ----------
+ * A feature is one requirement's behavior, living in src/features/<id>/.
+ * The core calls these plug-in points; it never knows which features exist.
+ * Everything here is pure: no DOM, no storage. Screen-side parts of a feature
+ * (panels, tabs, click actions) are declared in src/app/feature.ts.
+ */
+
+/** Adjusts a value the core computed for a store. Receives the previous value in the chain. */
+export type StoreHook = (state: SimState, s: Store, base: Minutes) => Minutes;
+
+export interface Option { value: string; label: string }
+
+/** A disruption the facilitator can inject from the header bar. */
+export interface Curveball {
+  id: string;
+  label: string;
+  /** What it can be applied to right now (stores, merchandisers…). */
+  targets(state: SimState): Option[];
+  /** Extra choices shown next to the target (e.g. how late). */
+  params?: Array<{ id: string; label: string; options: Option[]; default: string }>;
+  /** Apply it. Should raise its own alert describing what happened. */
+  apply(state: SimState, target: string, params: Record<string, string>): void;
+}
+
+/** A switchable assumption shown on the Pay & labor rules screen. */
+export interface Setting {
+  /** A core Rules key (e.g. "mpc") or a feature-owned key stored in rules.feature. */
+  key: string;
+  label: string;
+  help: string;
+  type: 'number' | 'boolean';
+  step?: number;
+  /** Groups settings into panels on the rules screen. */
+  section: string;
+}
+
+export interface EngineFeature {
+  /** Folder name, e.g. "br-009-store-hours". */
+  id: string;
+  title: string;
+  /** One sentence shown next to its on/off switch. */
+  description: string;
+  /** BR IDs this feature implements (traceability). */
+  requirements: string[];
+  defaultOn: boolean;
+  /** Can't be switched off (the app depends on it). */
+  locked?: boolean;
+  /** Adjust when product at a store is ready to work (default: truck ETA + buffer). */
+  readyAt?: StoreHook;
+  /** Adjust the labor minutes for a visit (default: fixed + cases × mpc + extra). */
+  workMinutes?: StoreHook;
+  /** Runs after every clock step (≤1 min). Use for alerts and time-driven changes. */
+  onTick?: (state: SimState) => void;
+  curveballs?: Curveball[];
+  settings?: Setting[];
+  /** Defaults for feature-owned settings (merged into rules.feature). */
+  ruleDefaults?: Record<string, number | boolean>;
+}
+
+export interface Extensions {
+  readyAt: StoreHook[];
+  workMinutes: StoreHook[];
+  onTick: Array<(state: SimState) => void>;
+  curveballs: Curveball[];
+  settings: Setting[];
 }

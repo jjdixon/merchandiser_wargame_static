@@ -3,7 +3,8 @@ import { crewCard, esc, firstName, initials, shortName, type ViewCtx } from './s
 
 const SCALE = 10; // px per km on the map
 
-export function supervisorView({ state }: ViewCtx): string {
+export function supervisorView(ctx: ViewCtx): string {
+  const { state } = ctx;
   const r = state.rules, plans = allPlans(state), t = totals(plans);
   const done = plans.reduce((a, p) => a + p.stops.filter(x => state.t >= x.end).length, 0);
   const un = state.stores.filter(s => !s.assign);
@@ -26,7 +27,7 @@ export function supervisorView({ state }: ViewCtx): string {
   for (const s of state.stores) {
     const lk = s.lock;
     const c = !s.assign ? 'var(--late)' : lk && state.t >= lk.end ? 'var(--ok)' : lk && state.t >= lk.start ? 'var(--work)' : 'var(--panel)';
-    svg += `<circle cx="${px(s.xy[0])}" cy="${px(s.xy[1])}" r="6" fill="${c}" stroke="var(--ink)" stroke-width="1.2"><title>${esc(s.name)}${!s.assign && readyAt(r, s) <= state.t ? ' — product waiting' : ''}</title></circle>
+    svg += `<circle cx="${px(s.xy[0])}" cy="${px(s.xy[1])}" r="6" fill="${c}" stroke="var(--ink)" stroke-width="1.2"><title>${esc(s.name)}${!s.assign && readyAt(state, s) <= state.t ? ' — product waiting' : ''}</title></circle>
       <text x="${px(s.xy[0]) + 8}" y="${px(s.xy[1]) + 4}" font-size="10" fill="var(--muted)" font-family="IBM Plex Sans Condensed,sans-serif">${esc(shortName(s.name))}</text>`;
   }
   for (const p of plans) {
@@ -53,12 +54,11 @@ export function supervisorView({ state }: ViewCtx): string {
     <div class="grid" style="align-content:start">
       <div class="panel"><div class="ph"><h2>Needs coverage</h2><span class="muted" style="font-size:12.5px">Buttons show when each person would finish it</span></div><div class="pb una">${unHtml}</div></div>
       <div class="grid crew">${plans.map(p => crewCard(state, p)).join('')}</div>
+      ${ctx.slot('super.main')}
     </div>
     <div class="grid" style="align-content:start">
       <div class="panel map"><div class="ph"><h2>Live map</h2><span class="legend"><span><i style="background:var(--ok)"></i>done</span><span><i style="background:var(--work)"></i>in progress</span><span><i style="background:var(--late)"></i>uncovered</span></span></div><div class="pb">${svg}</div></div>
-      <div class="panel"><div class="ph"><h2>Alerts</h2><span class="muted mono" style="font-size:12px">${state.alerts.length}</span></div>
-        <div class="alerts">${state.alerts.length ? state.alerts.map(a => `<div class="al ${a.sev}"><span class="tm">${fmt(a.t)}</span><span>${esc(a.text)}</span></div>`).join('')
-          : '<div class="empty"><strong>Quiet so far</strong>Press Run, or throw a curveball from the bar above.</div>'}</div></div>
+      ${ctx.slot('super.aside')}
     </div>
   </section>`;
 }

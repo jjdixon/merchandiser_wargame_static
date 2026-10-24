@@ -1,38 +1,72 @@
-// App shell: owns UI state, the clock loop, and all DOM event wiring.
-// Business logic lives in src/engine; views in src/ui are pure render functions.
+// App shell: owns UI state, the clock loop, DOM event wiring, and the feature
+// registry wiring. Business logic lives in src/engine and src/features/*/engine.ts;
+// views are pure render functions. See docs/architecture.md.
 import './styles.css';
 import {
-  addWork, assign, autoAssign, callOut, delayTruck, extraVisit, fmt, heavierLoad, merchById,
-  move, newDay, raise, readyAt, rulesFrom, storeById, tick, END_OF_DAY, type Rules, type SimState,
+  addWork, assign, autoAssign, delayTruck, enableFeatures, fmt, merchById, move, newDay,
+  raise, readyAt, rulesFrom, setRule, storeById, tick, withFeatureDefaults, END_OF_DAY, type SimState,
 } from './engine';
-import { FINDING_AREAS, seed } from './data';
-import { findingsAsMarkdown, findingsAsText, loadFindings, saveFindings, type Finding } from './storage/findings';
-import { esc, type ViewCtx } from './ui/shared';
+import { seed } from './data';
+import { FEATURES } from './features';
+import type { AppApi, Feature, FeatureSummary, Slot, ViewCtx, ViewDef } from './app/feature';
+import { esc } from './ui/shared';
 import { schedulerView } from './ui/scheduler';
 import { merchandiserView } from './ui/merchandiser';
 import { supervisorView } from './ui/supervisor';
 import { rulesView } from './ui/rules';
-import { findingsView } from './ui/findings';
-
-const VIEWS = {
-  sched: { name: 'Scheduler', render: schedulerView },
-  merch: { name: 'Merchandiser', render: merchandiserView },
-  super: { name: 'Supervisor', render: supervisorView },
-  rules: { name: 'Pay & labor rules', render: rulesView },
-  findings: { name: 'Findings', render: findingsView },
-} as const;
-type ViewId = keyof typeof VIEWS;
 
 const $ = <T extends HTMLElement = HTMLElement>(sel: string) => document.querySelector(sel) as T;
 
-/* ---------- app state ---------- */
-let state: SimState = newDay(seed, seed.scenarios[0].id);
-let findings: Finding[] = loadFindings();
-let view: ViewId = (location.hash.slice(1) in VIEWS ? location.hash.slice(1) : 'sched') as ViewId;
-let selM = state.merch[0].id;
-let running = false, speed = 10, holding = false, confirmClear = false;
+/* ---------- features: which are on (per browser) ---------- */
+const FEATURE_KEY = 'mwg.features';
+function loadSwitches(): Record<string, boolean> {
+  try { return JSON.parse(localStorage.getItem(FEATURE_KEY) ?? '{}') } catch { return {} }
+}
+let switches = loadSwitches();
+const isOn = (f: Feature) => f.locked || (switches[f.id] ?? f.defaultOn);
+const enabledFeatures = () => FEATURES.filter(isOn);
+function saveSwitches(): void { try { localStorage.setItem(FEATURE_KEY, JSON.stringify(switches)) } catch { /* storage blocked */ } }
 
-const ctx = (): ViewCtx => ({ state, selM, findings, confirmClear });
+/* ---------- views (core tabs + feature tabs) ---------- */
+const CORE_VIEWS: ViewDef[] = [
+  { id: 'sched', label: 'Scheduler', render: schedulerView },
+  { id: 'merch', label: 'Merchandiser', render: merchandiserView },
+  { id: 'super', label: 'Supervisor', render: supervisorView },
+  { id: 'rules', label: 'Pay & labor rules', render: rulesView },
+];
+const allViews = () => [...CORE_VIEWS, ...enabledFeatures().flatMap(f => f.views ?? [])];
+
+/* ---------- app state ---------- */
+let state: SimState = newDay(seed, seed.scenarios[0].id, { features: enabledFeatures() });
+let view = location.hash.slice(1);
+if (!allViews().some(v => v.id === view)) view = 'sched';
+let selM = state.merch[0].id;
+let running = false, speed = 10, holding = false;
+
+const scenarioLabel = () => $<HTMLSelectElement>('#scn').selectedOptions[0]?.text ?? '';
+const currentView = () => allViews().find(v => v.id === view) ?? CORE_VIEWS[0];
+
+function ctx(): ViewCtx {
+  const on = enabledFeatures();
+  const catalog: FeatureSummary[] = FEATURES.map(f => ({ id: f.id, title: f.title, description: f.description, requirements: f.requirements, locked: !!f.locked, on: isOn(f) }));
+  return {
+    state, selM,
+    settings: state.ext.settings,
+    catalog,
+    slot: (name: Slot) => on.flatMap(f => f.panels ?? []).filter(p => p.slot === name)
+      .sort((a, b) => (a.order ?? 100) - (b.order ?? 100)).map(p => p.render(ctx())).join(''),
+  };
+}
+
+const app: AppApi = {
+  get state() { return state },
+  get selM() { return selM },
+  get viewName() { return currentView().label },
+  get scenarioLabel() { return scenarioLabel() },
+  refresh: () => changed(),
+  toast,
+  copy,
+};
 
 /* ---------- rendering ---------- */
 // Re-rendering replaces #view's HTML. Skip while the user is mid-interaction
@@ -42,44 +76,50 @@ function busy(): boolean {
   const a = document.activeElement as HTMLInputElement | null;
   return !!a && $('#view').contains(a) && (a.tagName === 'SELECT' || a.tagName === 'TEXTAREA' || (a.tagName === 'INPUT' && a.type !== 'checkbox'));
 }
+function renderTabs(): void {
+  $('#tabs').innerHTML = allViews().map(v => {
+    const badge = v.badge?.() ?? '';
+    return `<button role="tab" data-v="${esc(v.id)}" aria-selected="${v.id === view}">${esc(v.label)}${badge ? ` <span class="mono">${esc(badge)}</span>` : ''}</button>`;
+  }).join('');
+}
 function render(force = false): void {
   $('#clk').textContent = fmt(state.t);
-  $('#fcount').textContent = findings.length ? `(${findings.length})` : '';
-  document.querySelectorAll<HTMLButtonElement>('#tabs button').forEach(b => b.setAttribute('aria-selected', String(b.dataset.v === view)));
-  if (!force && (holding || busy())) return;
-  $('#view').innerHTML = VIEWS[view].render(ctx());
+  if (!force && holding) return;
+  renderTabs();
+  if (!force && busy()) return;
+  $('#view').innerHTML = currentView().render(ctx());
+}
+
+/* ---------- curveball bar (built from enabled features) ---------- */
+function fillCurveballs(): void {
+  const cbs = state.ext.curveballs;
+  $('#inject').hidden = cbs.length === 0;
+  const typeSel = $<HTMLSelectElement>('#evType');
+  if (document.activeElement === typeSel) return;
+  const prevType = typeSel.value;
+  typeSel.innerHTML = cbs.map(c => `<option value="${esc(c.id)}">${esc(c.label)}</option>`).join('');
+  if (cbs.some(c => c.id === prevType)) typeSel.value = prevType;
+  fillTargets();
 }
 function fillTargets(): void {
-  const ty = $<HTMLSelectElement>('#evType').value, sel = $<HTMLSelectElement>('#evTarget');
-  if (document.activeElement === sel) return;
+  const cb = state.ext.curveballs.find(c => c.id === $<HTMLSelectElement>('#evType').value);
+  const sel = $<HTMLSelectElement>('#evTarget'), params = $('#evParams');
+  if (!cb || document.activeElement === sel || params.contains(document.activeElement)) return;
   const prev = sel.value;
-  const t = state.t;
-  const opts = ty === 'callout'
-    ? state.merch.filter(m => !m.out).map(m => `<option value="${m.id}">${esc(m.name)}</option>`)
-    : state.stores.filter(s => ty === 'truck' ? !(s.lock && t >= s.lock.start) : ty === 'heavy' ? !(s.lock && t >= s.lock.end) : !s.id.startsWith('x'))
-        .map(s => `<option value="${s.id}">${esc(s.name)}</option>`);
-  sel.innerHTML = opts.join('') || '<option value="">Nothing eligible</option>';
-  if ([...sel.options].some(o => o.value === prev)) sel.value = prev;
-  $('#evAmt').hidden = ty !== 'truck';
+  const opts = cb.targets(state);
+  sel.innerHTML = opts.map(o => `<option value="${esc(o.value)}">${esc(o.label)}</option>`).join('') || '<option value="">Nothing eligible</option>';
+  if (opts.some(o => o.value === prev)) sel.value = prev;
+  const prevParams = Object.fromEntries([...params.querySelectorAll<HTMLSelectElement>('select')].map(s => [s.dataset.param, s.value]));
+  params.innerHTML = (cb.params ?? []).map(p =>
+    `<select data-param="${esc(p.id)}" aria-label="${esc(p.label)}">${p.options.map(o => `<option value="${esc(o.value)}"${(prevParams[p.id] ?? p.default) === o.value ? ' selected' : ''}>${esc(o.label)}</option>`).join('')}</select>`).join('');
 }
-function changed(): void { fillTargets(); render(true) }
+
+function changed(): void { fillCurveballs(); render(true) }
 function toast(msg: string): void {
   const el = document.createElement('div');
   el.className = 'toast'; el.setAttribute('role', 'status'); el.textContent = msg;
   document.body.appendChild(el);
   setTimeout(() => el.remove(), 2200);
-}
-function setRunning(on: boolean): void {
-  running = on;
-  const b = $('#play');
-  b.textContent = on ? '❚❚ Pause' : '▶ Run';
-  b.setAttribute('aria-label', on ? 'Pause simulation' : 'Start simulation');
-}
-function loadScenario(id: string): void {
-  setRunning(false);
-  state = newDay(seed, id, { ...state.rules });
-  if (!merchById(state, selM)) selM = state.merch[0].id;
-  changed();
 }
 async function copy(text: string, okMsg: string): Promise<void> {
   try { await navigator.clipboard.writeText(text); toast(okMsg) }
@@ -90,10 +130,30 @@ async function copy(text: string, okMsg: string): Promise<void> {
     ta.remove();
   }
 }
+function setRunning(on: boolean): void {
+  running = on;
+  const b = $('#play');
+  b.textContent = on ? '❚❚ Pause' : '▶ Run';
+  b.setAttribute('aria-label', on ? 'Pause simulation' : 'Start simulation');
+}
+function loadScenario(id: string): void {
+  setRunning(false);
+  state = newDay(seed, id, { rules: state.rules, features: enabledFeatures() });
+  if (!merchById(state, selM)) selM = state.merch[0].id;
+  changed();
+}
+function toggleFeature(id: string): void {
+  const f = FEATURES.find(x => x.id === id);
+  if (!f || f.locked) return;
+  switches[id] = !isOn(f);
+  saveSwitches();
+  enableFeatures(state, enabledFeatures());
+  if (!allViews().some(v => v.id === view)) view = 'rules';
+  toast(`${f.title} ${switches[id] ? 'on' : 'off'}`);
+}
 
 /* ---------- header wiring ---------- */
 $<HTMLSelectElement>('#scn').innerHTML = seed.scenarios.map(s => `<option value="${s.id}">${esc(s.label)}</option>`).join('');
-$<HTMLSelectElement>('#fbCat').innerHTML = FINDING_AREAS.map(a => `<option>${esc(a)}</option>`).join('');
 
 document.addEventListener('pointerdown', () => (holding = true), true);
 const release = () => setTimeout(() => (holding = false), 0);
@@ -103,7 +163,7 @@ document.addEventListener('pointercancel', release, true);
 $('#tabs').addEventListener('click', e => {
   const b = (e.target as HTMLElement).closest<HTMLButtonElement>('button[data-v]');
   if (!b) return;
-  view = b.dataset.v as ViewId; confirmClear = false;
+  view = b.dataset.v!;
   try { history.replaceState(null, '', '#' + view) } catch { /* sandboxed */ }
   render(true);
 });
@@ -114,32 +174,29 @@ $<HTMLSelectElement>('#scn').addEventListener('change', e => {
   const sel = e.target as HTMLSelectElement;
   loadScenario(sel.value); toast('Loaded: ' + sel.selectedOptions[0].text);
 });
-$('#evType').addEventListener('change', fillTargets);
+$('#evType').addEventListener('change', () => { $('#evParams').innerHTML = ''; fillTargets() });
 $('#evGo').addEventListener('click', () => {
-  const ty = $<HTMLSelectElement>('#evType').value, id = $<HTMLSelectElement>('#evTarget').value;
-  if (!id) return;
-  if (ty === 'truck') {
-    const s = storeById(state, id)!, d = Number($<HTMLSelectElement>('#evAmt').value);
-    delayTruck(state, s, d);
-    raise(state, 'warn', `Dispatch: truck to ${s.name} running ${d} min late — now ${fmt(s.eta)}.`);
-  } else if (ty === 'heavy') {
-    const s = storeById(state, id)!, add = heavierLoad(state, s);
-    raise(state, 'warn', `${s.name}: order came in ${add} cases heavier (${s.cases} total).`);
-  } else if (ty === 'callout') {
-    callOut(state, merchById(state, id)!);
-  } else if (ty === 'extra') {
-    const b = storeById(state, id)!, n = extraVisit(state, b);
-    raise(state, 'bad', `${b.name} manager called: wants an extra visit today (≈${n.cases} cases, done by ${fmt(n.win)}).`);
-  }
+  const cb = state.ext.curveballs.find(c => c.id === $<HTMLSelectElement>('#evType').value);
+  const target = $<HTMLSelectElement>('#evTarget').value;
+  if (!cb || !target) return;
+  const params = Object.fromEntries([...$('#evParams').querySelectorAll<HTMLSelectElement>('select')].map(s => [s.dataset.param!, s.value]));
+  cb.apply(state, target, params);
   changed(); toast('Curveball thrown');
 });
 
 /* ---------- view wiring (delegated) ---------- */
 const V = $('#view');
 V.addEventListener('click', e => {
-  const b = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-act]');
-  if (!b || b.disabled) return;
+  const b = (e.target as HTMLElement).closest<HTMLElement>('[data-act]');
+  if (!b || (b as HTMLButtonElement).disabled) return;
   const a = b.dataset.act!, id = b.dataset.id ?? '';
+  // Feature actions: data-act="<feature id>:<action>"
+  if (a.includes(':')) {
+    const [fid, name] = a.split(':');
+    const f = enabledFeatures().find(x => x.id === fid);
+    f?.actions?.[name]?.(app, b);
+    return;
+  }
   const s = id ? storeById(state, id) : undefined;
   switch (a) {
     case 'selm': selM = id; break;
@@ -147,53 +204,38 @@ V.addEventListener('click', e => {
     case 'dn': if (s) move(state, s, 1); break;
     case 'auto': autoAssign(state); toast('Open stops re-assigned'); break;
     case 'give': if (s) { assign(state, s, b.dataset.m!); raise(state, 'info', `${s.name} covered by ${merchById(state, b.dataset.m!)!.name}.`) } break;
-    case 'trucknot': if (s) { delayTruck(state, s, 30); raise(state, 'warn', `${merchById(state, selM)!.name} at ${s.name}: truck not here. Pushed ready time to ${fmt(readyAt(state.rules, s))}.`) } break;
+    case 'trucknot': if (s) { delayTruck(state, s, 30); raise(state, 'warn', `${merchById(state, selM)!.name} at ${s.name}: truck not here. Pushed ready time to ${fmt(readyAt(state, s))}.`) } break;
     case 'long': if (s) { addWork(state, s, 15); raise(state, 'warn', `${merchById(state, selM)!.name} running long at ${s.name} (+15 min).`) } break;
-    case 'rreset': state.rules = rulesFrom(seed.rules); break;
-    case 'copy': void copy(findingsAsText(findings), `Copied ${findings.length} findings`); return;
-    case 'copymd': void copy(findingsAsMarkdown(findings), 'Copied as Markdown checklist'); return;
-    case 'clr': confirmClear = true; break;
-    case 'clrno': confirmClear = false; break;
-    case 'clryes': findings = []; saveFindings(findings); confirmClear = false; break;
-    case 'fdel': findings = findings.filter(f => f.id !== id); saveFindings(findings); break;
+    case 'rreset': state.rules = withFeatureDefaults(rulesFrom(seed.rules), enabledFeatures()); break;
+    case 'feature-toggle': toggleFeature(id); break;
   }
   changed();
 });
 V.addEventListener('change', e => {
   const t = e.target as HTMLInputElement;
+  if (t.dataset.fchange) {
+    const [fid, name] = t.dataset.fchange.split(':');
+    enabledFeatures().find(x => x.id === fid)?.changes?.[name]?.(app, t);
+    return;
+  }
   if (t.dataset.assign !== undefined) { assign(state, storeById(state, t.dataset.assign)!, t.value || null); t.blur() }
   else if (t.dataset.task) { storeById(state, t.dataset.task)!.tasks[Number(t.dataset.i)] = t.checked }
   else if (t.dataset.issue) {
     if (t.value) raise(state, 'warn', `${merchById(state, selM)!.name} at ${storeById(state, t.dataset.issue)!.name}: ${t.value}.`);
     toast('Sent to supervisor'); t.blur();
   } else if (t.dataset.k) {
-    const k = t.dataset.k as keyof Rules;
-    (state.rules as unknown as Record<string, number | boolean>)[k] = t.type === 'checkbox' ? t.checked : Number(t.value) || 0;
+    setRule(state.rules, t.dataset.k, t.type === 'checkbox' ? t.checked : Number(t.value) || 0);
     if (t.type !== 'checkbox') t.blur();
-  }
+  } else return;
   changed();
 });
 
-/* ---------- findings sheet ---------- */
-const ctxLine = () => `${VIEWS[view].name}${view === 'merch' ? ' · ' + merchById(state, selM)!.name : ''} · ${fmt(state.t)} · ${$<HTMLSelectElement>('#scn').selectedOptions[0].text}`;
-const closeSheet = () => { $('#scrim').hidden = true; $<HTMLTextAreaElement>('#fbTxt').value = '' };
-$('#fab').addEventListener('click', () => {
-  $('#fbCtx').textContent = ctxLine(); $('#scrim').hidden = false;
-  setTimeout(() => $('#fbTxt').focus(), 30);
-});
-$('#fbCancel').addEventListener('click', closeSheet);
-$('#scrim').addEventListener('click', e => { if ((e.target as HTMLElement).id === 'scrim') closeSheet() });
-document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#scrim').hidden) closeSheet() });
-$('#fbForm').addEventListener('submit', e => {
-  e.preventDefault();
-  const text = $<HTMLTextAreaElement>('#fbTxt').value.trim();
-  if (!text) { $('#fbTxt').focus(); return }
-  findings.push({ id: 'f' + Date.now(), area: $<HTMLSelectElement>('#fbCat').value, context: ctxLine(), text, at: new Date().toISOString() });
-  saveFindings(findings); closeSheet(); toast('Finding logged'); render(true);
-});
+/* ---------- startup ---------- */
+// Only locked features may mount (a mount can't be undone when switched off).
+for (const f of FEATURES) if (f.mount && f.locked) f.mount(app);
+changed();
 
 /* ---------- clock loop ---------- */
-fillTargets(); render(true);
 let last = performance.now(), sinceRender = 0;
 setInterval(() => {
   const now = performance.now(), dt = (now - last) / 1000;
