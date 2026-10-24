@@ -42,7 +42,7 @@ the Supervisor's *Store visits* panel and the timeline react to how long it take
 - `aisles.json`: aisles per chain.
 - `engine.ts`: base steps, auto-complete, close-out, play/hold, practice sandbox
   (`startPractice`, `practiceCloseOut`; pure, tested).
-- `ui.ts`: generic step inputs (check / count / choice / entries + photo), the Next
+- `ui.ts`: generic step inputs (check / count / counts / choice / entries + photo), the Next
   card, and the Supervisor panel. Steps from other features render here
   automatically through the core `visitSteps` plug-in.
 

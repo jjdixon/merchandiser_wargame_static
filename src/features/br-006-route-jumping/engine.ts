@@ -47,7 +47,7 @@ export function sendHelp(state: SimState, storeId: string, helperId: string, sha
   if (!s) return null;
   if (!s.assign) { s.assign = helperId; s.seq = 99; raise(state, 'info', `${s.name} covered by ${state.merch.find(m => m.id === helperId)?.name}.`); return s }
   const n = splitWork(state, s, helperId, share, 'help');
-  if (n) raise(state, 'info', `${state.merch.find(m => m.id === helperId)?.name} sent to help at ${s.name} (${n.cases} cases).`);
+  if (n) raise(state, 'info', `${state.merch.find(m => m.id === helperId)?.name} sent to help at ${s.name} (${n.trays} trays · ${n.cases} cases).`);
   return n;
 }
 

@@ -12,12 +12,12 @@ export const KM_TO_MI = 0.621371;
 export const dist = (r: Rules, a: Point, b: Point) => Math.hypot(a[0] - b[0], a[1] - b[1]) * r.road;
 export const driveMin = (r: Rules, km: number) => (km / r.speed) * 60;
 /**
- * Labor minutes for one visit: fixed + cases × minutes-per-case + extra, then
+ * Labor minutes for one visit: fixed + trays × minutes-per-tray + cases × minutes-per-case + extra, then
  * adjusted by any enabled feature's workMinutes hook (e.g. per-store standards).
  */
 export function workMin(state: SimState, s: Store): Minutes {
   const r = state.rules;
-  return state.ext.workMinutes.reduce((v, h) => h(state, s, v), r.fixed + s.cases * r.mpc + s.extra);
+  return state.ext.workMinutes.reduce((v, h) => h(state, s, v), r.fixed + s.trays * r.mpt + s.cases * r.mpc + s.extra);
 }
 /**
  * When product is workable: truck arrival + receiving buffer, then adjusted by
@@ -65,9 +65,9 @@ export function plan(state: SimState, m: Merchandiser): DayPlan {
 }
 
 function summarize(r: Rules, m: Merchandiser, stops: Stop[]): DayPlan {
-  let work = 0, wait = 0, dB = 0, dF = 0, kB = 0, kF = 0, cases = 0;
+  let work = 0, wait = 0, dB = 0, dF = 0, kB = 0, kF = 0, cases = 0, trays = 0;
   for (const x of stops) {
-    work += x.work; wait += x.wait; cases += x.s.cases;
+    work += x.work; wait += x.wait; cases += x.s.cases; trays += x.s.trays;
     if (x.first) { dF += x.drive; kF += x.km } else { dB += x.drive; kB += x.km }
   }
   const paid = work + wait + (r.paidBetween ? dB : 0) + (r.paidCommute ? dF : 0);
@@ -76,7 +76,7 @@ function summarize(r: Rules, m: Merchandiser, stops: Stop[]): DayPlan {
   const oth = paid / 60 - reg;
   const miles = (kB + (r.paidCommute ? kF : 0)) * KM_TO_MI;
   return {
-    m, stops, work, wait, dB, dF, kB, kF, paid, cases, weekProj, reg, oth, miles,
+    m, stops, work, wait, dB, dF, kB, kF, paid, cases, trays, weekProj, reg, oth, miles,
     late: stops.filter(x => x.end > x.s.win),
     clockIn: stops.length ? (r.paidCommute ? stops[0].depart : stops[0].arrive) : null,
     clockOut: stops.length ? stops[stops.length - 1].end : null,
@@ -115,13 +115,18 @@ export function status(state: SimState, p: DayPlan): Status {
   return { k: 'done', label: 'Day done · out ' + fmt(p.clockOut), pos: prev };
 }
 
-export interface Totals { reg: number; oth: number; labor: number; miles: number; mileage: number; cases: number; wait: number; driveBetween: number; paid: number; cost: number; costPerCase: number }
+export interface Totals {
+  reg: number; oth: number; labor: number; miles: number; mileage: number; cases: number; trays: number;
+  wait: number; driveBetween: number; paid: number; cost: number;
+  /** Cost per unit delivered (a tray or a case). */
+  costPerUnit: number;
+}
 export function totals(plans: DayPlan[]): Totals {
   const t = plans.reduce((a, p) => ({
     reg: a.reg + p.reg, oth: a.oth + p.oth, labor: a.labor + p.labor, miles: a.miles + p.miles,
-    mileage: a.mileage + p.mileage, cases: a.cases + p.cases, wait: a.wait + p.wait,
+    mileage: a.mileage + p.mileage, cases: a.cases + p.cases, trays: a.trays + p.trays, wait: a.wait + p.wait,
     driveBetween: a.driveBetween + p.dB, paid: a.paid + p.paid,
-  }), { reg: 0, oth: 0, labor: 0, miles: 0, mileage: 0, cases: 0, wait: 0, driveBetween: 0, paid: 0 });
+  }), { reg: 0, oth: 0, labor: 0, miles: 0, mileage: 0, cases: 0, trays: 0, wait: 0, driveBetween: 0, paid: 0 });
   const cost = t.labor + t.mileage;
-  return { ...t, cost, costPerCase: cost / Math.max(1, t.cases) };
+  return { ...t, cost, costPerUnit: cost / Math.max(1, t.cases + t.trays) };
 }

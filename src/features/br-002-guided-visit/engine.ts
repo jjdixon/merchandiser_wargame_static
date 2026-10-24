@@ -1,7 +1,7 @@
 // BR-002 / BR-015 / BR-021 Guided store visit.
 // The in-store workflow from the business MVP feedback:
-//   note backstock → each display → each aisle → validate → out-of-stocks → close out.
-// This feature adds the backstock, aisle and validate steps; other features add
+//   backstock (NR-002) → check in → each display → each aisle → validate → out-of-stocks → before you leave → close out.
+// This feature adds the check-in, aisle and validate steps; other features add
 // theirs (displays, out-of-stocks) through the core visitSteps plug-in.
 //
 // War-game mechanics:
@@ -10,7 +10,7 @@
 // - Everyone else is simulated: when their planned work time ends, remaining steps
 //   are answered automatically (each step's autoAnswer, or a sensible default).
 import {
-  adjustWork, answerStep, featureState, hash01, isAnswered, merchById, raise, visitProgress, visitSteps,
+  adjustWork, answerStep, featureState, isAnswered, merchById, raise, visitProgress, visitSteps,
   type EngineFeature, type SimState, type StepAnswer, type Store, type VisitStep,
 } from '../../engine';
 import AISLES from './aisles.json';
@@ -34,9 +34,7 @@ export function aislesFor(s: Store): string[] {
 export function baseSteps(_state: SimState, s: Store): VisitStep[] {
   const step = (x: Omit<VisitStep, 'featureId'>): VisitStep => ({ featureId: ID, ...x });
   return [
-    step({ id: `${ID}:backstock`, phase: 'backstock', order: 10, kind: 'count', unit: 'cases', required: true,
-      title: 'Note backstock', detail: 'Count cases already in the backroom before the new delivery.',
-      autoAnswer: (st, x) => ({ count: Math.round(hash01(`${st.scenario}|${x.id}|backstock`) * 24) }) }),
+    // The backstock count itself is NR-002's step (nr-002-backstock), at arrival and when leaving.
     // Down-day pull-ups have no delivery to check in.
     ...(s.pullUp ? [] : [step({ id: `${ID}:receive`, phase: 'backstock', order: 20, kind: 'check', required: true, needsProduct: true,
       title: 'Check in the delivery', detail: 'Count it in with receiving and sign the invoice.' })]),
@@ -63,6 +61,7 @@ function defaultAnswer(step: VisitStep): Omit<StepAnswer, 'at'> {
     case 'count': return { count: 0 };
     case 'choice': return { choice: step.options?.[0] ?? 'n/a' };
     case 'entries': return { done: true, entries: [] };
+    case 'counts': return { counts: Object.fromEntries((step.countFields ?? []).map(f => [f.id, 0])) };
   }
 }
 

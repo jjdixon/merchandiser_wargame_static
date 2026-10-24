@@ -26,6 +26,8 @@ import { br008MultiVisitHoliday } from './br-008-multi-visit-holiday';
 import { br006RouteJumping } from './br-006-route-jumping';
 import { br005ReliefCoverage } from './br-005-relief-coverage';
 import { br003RouteBidding } from './br-003-route-bidding';
+import { nr002Backstock } from './nr-002-backstock';
+import { nr003OrderFeedback } from './nr-003-order-feedback';
 // <feature-imports>
 
 export const FEATURES: Feature[] = [
@@ -53,5 +55,7 @@ export const FEATURES: Feature[] = [
   br006RouteJumping,
   br005ReliefCoverage,
   br003RouteBidding,
+  nr002Backstock,
+  nr003OrderFeedback,
   // <feature-list>
 ];

@@ -23,7 +23,7 @@ export function merchandiserView(ctx: ViewCtx): string {
     const sx = cur.s;
     const sub = s.k === 'drive' ? `Arrive ${fmt(cur.arrive)} · ${(cur.km * KM_TO_MI).toFixed(1)} mi`
       : s.k === 'wait' ? `Checked in ${fmt(cur.arrive)} (geofence OK) · truck ready ${fmt(readyAt(state, sx))} · paid idle so far ${Math.round(state.t - cur.arrive)} min`
-      : `${sx.cases} cases · est. done ${fmt(cur.end)} · store wants done by ${fmt(sx.win)}`;
+      : `${sx.trays} trays · ${sx.cases} cases · est. done ${fmt(cur.end)} · store wants done by ${fmt(sx.win)}`;
     curHtml = `<div class="cur">
       <div style="display:flex;justify-content:space-between;align-items:center"><span class="lbl">Current stop</span><span class="pill p-${s.k}">${s.k === 'work' ? 'Working' : s.k === 'wait' ? 'Waiting on truck' : 'Driving'}</span></div>
       <h3>${esc(sx.name)}</h3>
@@ -41,7 +41,7 @@ export function merchandiserView(ctx: ViewCtx): string {
   const route = p.stops.map((x, i) => {
     const cls = state.t >= x.end ? 'done' : cur && cur.s.id === x.s.id ? 'cur' : '';
     return `<div class="st ${cls}"><span class="dot">${state.t >= x.end ? '✓' : i + 1}</span>
-      <div><div style="font-weight:600">${esc(x.s.name)}</div><div class="muted" style="font-size:12.5px">${x.s.cases} cases · truck ${fmt(x.s.eta)}${x.wait > 3 ? ` · <span class="flag wait">wait ${Math.round(x.wait)}m</span>` : ''}${x.end > x.s.win ? ' · <span class="flag late">late</span>' : ''}</div></div>
+      <div><div style="font-weight:600">${esc(x.s.name)}</div><div class="muted" style="font-size:12.5px">${x.s.trays} trays · ${x.s.cases} cases · truck ${fmt(x.s.eta)}${x.wait > 3 ? ` · <span class="flag wait">wait ${Math.round(x.wait)}m</span>` : ''}${x.end > x.s.win ? ' · <span class="flag late">late</span>' : ''}</div></div>
       <div class="mono" style="font-size:12.5px;text-align:right">${fmt(x.start)}<br><span class="muted">${fmt(x.end)}</span></div></div>`;
   }).join('');
 

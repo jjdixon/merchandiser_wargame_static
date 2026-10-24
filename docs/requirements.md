@@ -426,6 +426,47 @@ business document. For each one:
 
 ---
 
+## Module C — Added business context (not in the workbook)
+
+Added 2026-10-24 from the business owner. IDs use `NR-` so they don't collide with
+workbook IDs.
+
+**NR-001 Trays and cases** · ✅ Covered (M4.5) · core
+- **Story:** The business delivers both **trays** and **cases**. Each takes a different
+  amount of labor time, and runs are planned on both.
+- **War-game check:** every store's delivery shows trays and cases; minutes per tray and
+  minutes per case are separate, editable labor standards; work standards, load
+  changes, pull-ups, second visits, splits and planned vs. actual handle both.
+- **Decision:** "different timing" means different labor minutes per unit only (not
+  different trucks or separate runs).
+
+**NR-002 Backstock at start and end of every visit** · ✅ Covered (M4.5) · `nr-002-backstock`
+- **Story:** Record how much backstock (trays and cases) is in the store when the
+  merchandiser arrives and when they leave, so ordering and labor can be judged.
+- **War-game check:** the visit opens with a starting count and closes with an ending
+  count; supervisors and MSLs see start/end by store across the week.
+- **Open question:** granularity: totals or by category/product? A switch lets the
+  business try both and time them.
+
+**NR-003 Light / heavy order feedback to the MSL** · ✅ Covered (M4.5) · `nr-003-order-feedback`
+- **Story:** MSLs own ordering. The merchandiser tells the MSL whether the store looks
+  **light, about right or heavy** for the next delivery, based on their current
+  position, taking into account when the next delivery is and average sales.
+- **War-game check:** at the end of the visit the app suggests light / about right /
+  heavy (on hand vs. sales until the next truck), separately for trays and cases; the
+  merchandiser agrees or overrides; the store's MSL gets it with the numbers behind it.
+- **How the suggestion works (v1):** on hand = today's delivery + backstock found on
+  arrival; need = average daily sales × days until the next delivery (from the route
+  type's weekly pattern). Heavy if on hand is more than need + tolerance (25%) or
+  leftover backstock is more than tolerance × need; light if below need − tolerance,
+  or out-of-stocks were found and on hand is below need. Pull-ups get no feedback.
+- **Open questions:** where average sales and shelf capacity come from; how far ahead
+  the "next delivery" should look; whether merchandisers should suggest quantities;
+  whether sales should vary by day of week; whether feedback belongs on pull-ups.
+
+**Change to BR-020:** out-of-stocks caused by ordering now route to the **MSL** (MSLs
+own ordering).
+
 ## Where each requirement lives
 
 Updated as features land. To change a requirement, edit only its folder
@@ -442,7 +483,7 @@ Updated as features land. To change a requirement, edit only its folder
 | BR-024 (work standards) | `src/features/br-024-work-standards` | |
 | BR-002, BR-015, BR-021 (guided visit) | `src/features/br-002-guided-visit` | Steps and answers are core (`src/engine/visit.ts`) |
 | BR-022 (display awareness) | `src/features/br-022-display-awareness` | Full Display Tracking is M5 |
-| BR-020 (out-of-stocks) | `src/features/br-020-oos-root-cause` | |
+| BR-020 (out-of-stocks) | `src/features/br-020-oos-root-cause` | Ordering causes go to the MSL (`oos.json`) |
 | BR-039 (photos) | `src/features/br-039-photo-capture` | Photo review queue is BR-043, M5 |
 | BR-014 (truck visibility) | `src/features/br-014-truck-visibility` | |
 | BR-009 (late-truck options) | `src/features/br-009-late-truck-options` | Store hours stay in `br-009-store-hours` |
@@ -457,6 +498,9 @@ Updated as features land. To change a requirement, edit only its folder
 | BR-006 | `src/features/br-006-route-jumping` | |
 | BR-005 | `src/features/br-005-relief-coverage` | |
 | BR-003 | `src/features/br-003-route-bidding` | |
+| NR-001 (trays and cases) | core: `Rules.mpt`, `Store.trays`, `src/engine/plan.ts` | Every volume feature scales both |
+| NR-002 (backstock) | `src/features/nr-002-backstock` | Counts land on core `store.backstock` |
+| NR-003 (order feedback) | `src/features/nr-003-order-feedback` | Sales: `sales.json` in the folder |
 | War-game findings | `src/features/findings` | Not a business requirement |
 
 ## Open questions (consolidated)

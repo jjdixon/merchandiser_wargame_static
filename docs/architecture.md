@@ -31,7 +31,7 @@ screen-side ones in `src/app/feature.ts` (`Feature`).
 | Plug-in | Where it's used | Example use |
 |---|---|---|
 | `readyAt(state, store, base)` | when product is workable (default: truck ETA + buffer) | store receiving hours (BR-009) |
-| `workMinutes(state, store, base)` | labor minutes for a visit (default: fixed + cases × mpc + extra) | per-store standards (BR-024) |
+| `workMinutes(state, store, base)` | labor minutes for a visit (default: fixed + trays × mpt + cases × mpc + extra) | per-store standards (BR-024) |
 | `onTick(state)` | after every clock step (≤ 1 min) | alerts, geofence events, actual-time drift |
 | `curveballs` | the header *Throw a curveball* bar | load cuts/adds (BR-017) |
 | `settings` + `ruleDefaults` | the *Pay & labor rules* screen; values in `rules.feature` | a per-feature switch or number |
@@ -40,7 +40,7 @@ screen-side ones in `src/app/feature.ts` (`Feature`).
 | `actions` / `changes` | clicks/changes on `data-act="<id>:<name>"` / `data-fchange="<id>:<name>"` | buttons inside a feature's panel |
 | `access(app)` | who is looking: allowed tabs, people, stores, locked phone | role picker (BR-001) |
 | `views[].public` | tab visible to every role | Findings |
-| `visitSteps(state, store)` | add steps to a store visit (phase, kind, required, photo) | displays, out-of-stocks (M2) |
+| `visitSteps(state, store)` | add steps to a store visit (phase: backstock → display → aisle → validate → oos → closeout; kind: check / count / counts / choice / entries; required, photo) | displays, out-of-stocks, backstock counts |
 | `adjustStep(state, store, step)` | change any feature's step before it's shown | photo policy (BR-039) |
 | `onStepAnswered(state, store, step, answer)` | react to any answer, by a person or the sim | route out-of-stocks, record photos |
 | `hash01(key)` / `pickShare(ids, salt, pct)` | repeatable "random" choices; exactly pct% of items | late trucks, load changes, geofence problems |
@@ -48,6 +48,7 @@ screen-side ones in `src/app/feature.ts` (`Feature`).
 | `onDayStart(state)` | when a day is built: change who's out, which stores, volumes (read week state only) | vacations, holidays, second visits |
 | `onDayEnd(state)` | when the facilitator ends the day (write week state here) | usual service times |
 | `weekState(state, id, init)` | a feature's own week-scoped state, survives across days | bids, vacations, change log |
+| `store.backstock` | arrival / leaving backstock (trays, cases), written by NR-002 | order feedback (NR-003) |
 | `state.week.master` | permanent store owners from the next day on | permanent reassignment, bid awards |
 | `splitWork(state, store, to, share)` | move part of a store's remaining work to a helper | split, send help |
 | `ctx.projectDay(day)` / `app.projectDay(day)` | a future day as planned, without changing anything | Week view, hours this week |

@@ -59,7 +59,7 @@ export function weekState<T>(state: SimState, featureId: string, init: () => T):
   return fx[featureId] as T;
 }
 
-const CORE_KEYS = new Set(['shiftStart', 'buffer', 'mpc', 'fixed', 'speed', 'road', 'paidBetween', 'paidCommute', 'ot', 'wage', 'mileage']);
+const CORE_KEYS = new Set(['shiftStart', 'buffer', 'mpc', 'mpt', 'fixed', 'speed', 'road', 'paidBetween', 'paidCommute', 'ot', 'wage', 'mileage']);
 export const isCoreRule = (key: string) => CORE_KEYS.has(key);
 
 export function getRule(rules: Rules, key: string): number | boolean | undefined {

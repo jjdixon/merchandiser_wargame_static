@@ -7,12 +7,11 @@ const day = () => newDay(seed, 'normal', { features: [br002GuidedVisitEngine] })
 const startWork = (s: ReturnType<typeof day>, id: string) => { const st = storeById(s, id)!; while (!st.lock || s.t < st.lock.start) tick(s, 1); return st };
 
 describe('br-002-guided-visit [BR-002 BR-015 BR-021]', () => {
-  it('builds the MVP order: backstock, receive, each aisle, validate', () => {
+  it('builds the MVP order: receive, each aisle, validate (backstock counts are NR-002)', () => {
     const s = day(), st = storeById(s, 's1')!;
     const titles = visitSteps(s, st).map(x => x.title);
-    expect(titles[0]).toBe('Note backstock');
-    expect(titles[1]).toBe('Check in the delivery');
-    expect(titles.slice(2, 2 + aislesFor(st).length)).toEqual(aislesFor(st).map(a => `Work ${a}`));
+    expect(titles[0]).toBe('Check in the delivery');
+    expect(titles.slice(1, 1 + aislesFor(st).length)).toEqual(aislesFor(st).map(a => `Work ${a}`));
     expect(titles.at(-1)).toBe('Validate the set');
   });
 

@@ -34,7 +34,7 @@ export const heavyLoad: Curveball = {
     const s = storeById(state, target);
     if (!s) return;
     const add = heavierLoad(state, s);
-    raise(state, 'warn', `${s.name}: order came in ${add} cases heavier (${s.cases} total).`);
+    raise(state, 'warn', `${s.name}: order came in ${add} units heavier (${s.trays} trays · ${s.cases} cases now).`);
   },
 };
 
@@ -57,7 +57,7 @@ export const extraVisitCb: Curveball = {
     const b = storeById(state, target);
     if (!b) return;
     const n = extraVisit(state, b);
-    raise(state, 'bad', `${b.name} manager called: wants an extra visit today (≈${n.cases} cases, done by ${fmt(n.win)}).`);
+    raise(state, 'bad', `${b.name} manager called: wants an extra visit today (≈${n.trays} trays · ${n.cases} cases, done by ${fmt(n.win)}).`);
   },
 };
 

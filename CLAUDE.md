@@ -68,6 +68,8 @@ src/
     br-006-route-jumping/      at-risk stops, send help (jumper first)
     br-005-relief-coverage/    vacations, relief pool coverage (onDayStart)
     br-003-route-bidding/      open bid, eligible bids, award, publish to week.master
+    nr-002-backstock/          backstock counts on arrival + leaving (totals or by category)
+    nr-003-order-feedback/     light / about right / heavy to the MSL, with a suggestion
   main.ts        app shell: registry wiring, tabs, curveball bar, events, clock loop
 tests/           core tests (engine + plug-in points). Feature tests live in each folder.
 scripts/         check-boundaries.mjs, new-feature.mjs
@@ -111,7 +113,7 @@ Rules:
   step, the stop is **locked** (`store.lock`) with its planned times. History is then
   frozen; events and edits only change the future. Do not "simplify" tick into one
   jump — a test covers why.
-- Work minutes = `fixed + cases × mpc + extra`, then each enabled feature's
+- Work minutes = `fixed + trays × mpt + cases × mpc + extra` (NR-001), then each enabled feature's
   `workMinutes` hook. Ready time = `eta + buffer`, then each `readyAt` hook. Always
   call `workMin(state, s)` / `readyAt(state, s)`, never recompute. Wait = start −
   arrive (paid).
@@ -130,6 +132,11 @@ Rules:
 
 ## Status
 
+- v0.6.5 (M4.5) — added business context: trays and cases with separate labor
+  minutes (NR-001, core), backstock counts at arrival and leaving (NR-002), light /
+  heavy order feedback to the MSL (NR-003), ordering out-of-stocks to the MSL
+  (BR-020). New core: `counts` step kind, `closeout` phase, `store.backstock`.
+  Requirement ids may be `NR-0xx` (not in the workbook).
 - v0.6 (M4) — week model (days, pull-ups, End day / New week, Week tab) plus
   schedule governance (BR-010), reassign/split (BR-004), hours guarantees (BR-007),
   second visits/holidays (BR-008), route jumping (BR-006), vacations/relief (BR-005),

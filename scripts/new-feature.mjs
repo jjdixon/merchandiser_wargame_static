@@ -14,11 +14,11 @@ const ROOT = resolve(dirname(new URL(import.meta.url).pathname), '..');
 const [id, title, ...reqs] = process.argv.slice(2);
 
 if (!id || !title || !/^[a-z0-9]+(-[a-z0-9]+)*$/.test(id)) {
-  console.error('Usage: npm run new-feature -- <id> "<Title>" [BR-0xx ...]\n  id: lowercase-with-dashes, e.g. br-009-store-hours');
+  console.error('Usage: npm run new-feature -- <id> "<Title>" [BR-0xx|NR-0xx ...]\n  id: lowercase-with-dashes, e.g. br-009-store-hours');
   process.exit(1);
 }
-const bad = reqs.filter(r => !/^BR-\d{3}$/.test(r));
-if (bad.length) { console.error(`Not a BR id: ${bad.join(', ')} (expected BR-0xx)`); process.exit(1) }
+const bad = reqs.filter(r => !/^(BR|NR)-\d{3}$/.test(r));
+if (bad.length) { console.error(`Not a requirement id: ${bad.join(', ')} (expected BR-0xx or NR-0xx)`); process.exit(1) }
 
 const dir = join(ROOT, 'src', 'features', id);
 if (existsSync(dir)) { console.error(`src/features/${id} already exists`); process.exit(1) }

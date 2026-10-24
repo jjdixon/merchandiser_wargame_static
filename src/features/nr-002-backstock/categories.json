@@ -1,0 +1,9 @@
+{
+  "_note": "Generic product categories for by-category backstock counts. Each lists the units it ships in.",
+  "categories": [
+    { "id": "bread",   "label": "Bread",        "units": ["trays"] },
+    { "id": "buns",    "label": "Buns & rolls", "units": ["trays"] },
+    { "id": "snack",   "label": "Snack cakes",  "units": ["cases"] },
+    { "id": "special", "label": "Specialty",    "units": ["trays", "cases"] }
+  ]
+}

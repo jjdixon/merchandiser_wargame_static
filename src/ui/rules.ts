@@ -32,7 +32,7 @@ export function rulesView(ctx: ViewCtx): string {
         ${kpi('Overtime hours', t.oth.toFixed(1), t.oth > 0)}
         ${kpi('Labor', money(t.labor))}
         ${kpi('Mileage', money(t.mileage))}
-        ${kpi('Cost per case', '$' + t.costPerCase.toFixed(2))}
+        ${kpi('Cost per unit', '$' + t.costPerUnit.toFixed(2))}
       </div>
       <div class="math">paid = in-store work + truck waits${R.paidBetween ? ' + drives between stores' : ''}${R.paidCommute ? ' + drive to first store' : ''}
 labor = regular × $${R.wage} + OT × $${(R.wage * 1.5).toFixed(2)}     (OT once week hours pass ${R.ot})

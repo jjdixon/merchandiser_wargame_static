@@ -103,19 +103,20 @@ export function adjustWork(state: SimState, s: Store, minutes: number): void {
   L.work += d; L.end += d;
 }
 
-/** Order arrives heavier than planned. Returns cases added. */
+/** Order arrives heavier than planned (trays and cases). Returns units added. */
 export function heavierLoad(state: SimState, s: Store, fraction = 0.4): number {
-  const add = Math.round(s.cases * fraction);
+  const addC = Math.round(s.cases * fraction), addT = Math.round(s.trays * fraction);
   const before = workMin(state, s);
-  s.cases += add;
+  s.cases += addC; s.trays += addT;
   if (s.lock && state.t < s.lock.end) { const m = workMin(state, s) - before; s.lock.work += m; s.lock.end += m }
-  return add;
+  return addC + addT;
 }
 
 /** Store asks for an extra same-day visit. Creates an unassigned stop at the same location. */
-export function extraVisit(state: SimState, base: Store, cases = 45, windowMin = 240): Store {
+export function extraVisit(state: SimState, base: Store, units = 45, windowMin = 240): Store {
+  const trays = Math.round(units * 0.6), cases = units - trays;
   const n: Store = {
-    id: 'x' + ++state.nextId, name: base.name + ' · extra visit', xy: base.xy, cases,
+    id: 'x' + ++state.nextId, name: base.name + ' · extra visit', xy: base.xy, cases, trays,
     eta: state.t, win: state.t + windowMin, assign: null, seq: 99, extra: 0, lock: null, answers: {},
     routeType: base.routeType, market: base.market, pullUp: false,
   };
@@ -176,20 +177,21 @@ export function autoAssign(state: SimState): void {
 
 /**
  * Split part of a store's remaining work off to another person (a helper, a second
- * merchandiser). Creates a new stop at the same store with that share of the cases;
+ * merchandiser). Creates a new stop at the same store with that share of the trays and cases;
  * the original keeps the rest. A stop already in progress gives up the share of what
  * it hasn't done yet. Returns the new stop, or null if there's nothing left to split.
  */
 export function splitWork(state: SimState, s: Store, toMerch: string, share = 0.5, label = 'help'): Store | null {
   if (s.lock && state.t >= s.lock.end) return null;
   const remaining = s.lock && state.t > s.lock.start ? Math.max(0, (s.lock.end - state.t) / s.lock.work) : 1;
-  const moved = Math.round(s.cases * remaining * Math.max(0, Math.min(1, share)));
-  if (moved < 1) return null;
+  const f = remaining * Math.max(0, Math.min(1, share));
+  const movedC = Math.round(s.cases * f), movedT = Math.round(s.trays * f);
+  if (movedC + movedT < 1) return null;
   const before = workMin(state, s);
-  s.cases -= moved;
+  s.cases -= movedC; s.trays -= movedT;
   if (s.lock) { const d = workMin(state, s) - before; s.lock.work = Math.max(1, s.lock.work + d); s.lock.end = s.lock.start + s.lock.work }
   const n: Store = {
-    ...s, id: `${s.id}~${label}${++state.nextId}`, name: `${s.name} · ${label}`, cases: moved, extra: 0,
+    ...s, id: `${s.id}~${label}${++state.nextId}`, name: `${s.name} · ${label}`, cases: movedC, trays: movedT, extra: 0,
     assign: toMerch, seq: nextSeq(state, toMerch), lock: null, answers: {},
   };
   state.stores.push(n);
