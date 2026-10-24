@@ -19,7 +19,7 @@ export function schedulerView(ctx: ViewCtx): string {
       !s.assign ? '<span class="flag late">needs coverage</span>' : ''].filter(Boolean).join(' · ');
     return `<tr class="${s.assign ? '' : 'un'}">
       <td><div class="sname">${esc(s.name)}<small>${esc(s.routeType)}${s.pullUp ? ' · pull-up' : ''} · ${s.extra ? '+' + s.extra + ' min added · ' : ''}${Math.round(workMin(state, s))} min labor</small></div></td>
-      <td class="n">${s.cases}</td><td class="n">${fmt(s.eta)}</td><td class="n">${fmt(s.win)}</td>
+      <td class="n">${s.trays} · ${s.cases}</td><td class="n">${fmt(s.eta)}</td><td class="n">${fmt(s.win)}</td>
       <td>${lk ? `<span class="muted">${esc(merchById(state, s.assign!)?.name ?? '')}</span>` : `<select data-assign="${s.id}" aria-label="Assign ${esc(s.name)}">${opts}</select>`}</td>
       <td>${!lk && s.assign ? `<span class="ord"><button data-act="up" data-id="${s.id}" aria-label="Earlier">↑</button><button data-act="dn" data-id="${s.id}" aria-label="Later">↓</button></span>` : ''}</td>
       <td class="n">${x ? fmt(x.start) + '–' + fmt(x.end) : '—'}</td>
@@ -32,9 +32,9 @@ export function schedulerView(ctx: ViewCtx): string {
   <section class="panel"><div class="ph"><h2>Day timeline</h2>${LEGEND}</div>${gantt(state, plans)}</section>
   <section class="panel">
     <div class="ph"><h2>Store assignments</h2>
-      <div class="ctl"><span class="muted mono" style="font-size:12.5px">${hrs(t.paid)} paid · ${money(t.cost)} · ${t.costPerCase.toFixed(2)} $/case</span><button class="btn" data-act="auto">Auto-assign open stops</button></div></div>
-    <div class="tw"><table><thead><tr><th>Store</th><th class="n">Cases</th><th class="n">Truck</th><th class="n">Done by</th><th>Merchandiser</th><th>Order</th><th class="n">Planned</th><th>Flags</th></tr></thead><tbody>${rows}</tbody></table></div>
-    <div class="pb note">Base labor per stop = ${r.fixed} min fixed + ${r.mpc} min × cases; work can't start until ${r.buffer} min after the truck arrives (Pay &amp; labor rules). Enabled features such as per-store standards and store hours adjust these — see the panels below. Auto-assign is a simple greedy pass ordered by truck time — good enough to argue with.</div>
+      <div class="ctl"><span class="muted mono" style="font-size:12.5px">${hrs(t.paid)} paid · ${money(t.cost)} · ${t.costPerUnit.toFixed(2)} $/unit</span><button class="btn" data-act="auto">Auto-assign open stops</button></div></div>
+    <div class="tw"><table><thead><tr><th>Store</th><th class="n">Trays · Cases</th><th class="n">Truck</th><th class="n">Done by</th><th>Merchandiser</th><th>Order</th><th class="n">Planned</th><th>Flags</th></tr></thead><tbody>${rows}</tbody></table></div>
+    <div class="pb note">Base labor per stop = ${r.fixed} min fixed + ${r.mpt} min × trays + ${r.mpc} min × cases; work can't start until ${r.buffer} min after the truck arrives (Pay &amp; labor rules). Enabled features such as per-store standards and store hours adjust these — see the panels below. Auto-assign is a simple greedy pass ordered by truck time — good enough to argue with.</div>
   </section>
   ${ctx.slot('sched.after')}`;
 }

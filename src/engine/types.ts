@@ -12,6 +12,8 @@ export interface Rules {
   buffer: Minutes;
   /** Labor standard: minutes per case worked. */
   mpc: number;
+  /** Labor standard: minutes per tray worked (NR-001). */
+  mpt: number;
   /** Fixed minutes per visit (check-in, backroom, photos, paperwork). */
   fixed: Minutes;
   /** Average drive speed, km/h. */
@@ -79,6 +81,9 @@ export interface Store {
   pullUp: boolean;
   market: string;
   xy: Point;
+  /** Trays delivered today (NR-001). */
+  trays: number;
+  /** Cases delivered today. */
   cases: number;
   /** Truck arrival time. */
   eta: Minutes;
@@ -127,7 +132,7 @@ export interface SimState {
 export interface DayRecord {
   day: number;
   scenario: string;
-  merch: Record<string, { paid: Minutes; stops: number; cases: number }>;
+  merch: Record<string, { paid: Minutes; stops: number; cases: number; trays: number }>;
 }
 
 /**
@@ -175,6 +180,7 @@ export interface DayPlan {
   /** Paid minutes today under the current rules. */
   paid: Minutes;
   cases: number;
+  trays: number;
   /** Projected paid hours for the week including today. */
   weekProj: number;
   /** Regular and overtime hours today. */
@@ -247,7 +253,7 @@ export interface EngineFeature {
   locked?: boolean;
   /** Adjust when product at a store is ready to work (default: truck ETA + buffer). */
   readyAt?: StoreHook;
-  /** Adjust the labor minutes for a visit (default: fixed + cases × mpc + extra). */
+  /** Adjust the labor minutes for a visit (default: fixed + trays × mpt + cases × mpc + extra). */
   workMinutes?: StoreHook;
   /** Runs after every clock step (≤1 min). Use for alerts and time-driven changes. */
   onTick?: (state: SimState) => void;

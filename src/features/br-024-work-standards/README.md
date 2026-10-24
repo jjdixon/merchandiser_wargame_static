@@ -23,7 +23,7 @@ which stores really are harder. Cases per hour is shown per store.
 
 ## Where things live
 - `standards.json` — classes, default percentages, which store is which class.
-- `engine.ts` — the `workMinutes` hook, `storeClass`, `casesPerHour` (pure, tested).
+- `engine.ts` — the `workMinutes` hook, `storeClass`, `unitsPerHour` (trays + cases per hour; pure, tested).
 - `ui.ts` — Scheduler panel and the class selector.
 - Per-store class is stored as a feature setting (`br024.class.<storeId>`), so it
   survives switching scenarios like other rule edits.

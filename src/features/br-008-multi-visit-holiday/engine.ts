@@ -29,11 +29,11 @@ export function onDayStart(state: SimState): void {
   const hol = holidayDay(state), H = DATA.holiday;
   if (hol >= 0) {
     if (state.day === hol) {
-      for (const s of state.stores) { s.pullUp = true; s.eta = state.rules.shiftStart; s.cases = Math.max(1, Math.round(s.cases * H.holidayPullUpShare)) }
+      for (const s of state.stores) { s.pullUp = true; s.eta = state.rules.shiftStart; s.cases = Math.max(1, Math.round(s.cases * H.holidayPullUpShare)); s.trays = Math.round(s.trays * H.holidayPullUpShare) }
       raise(state, 'info', `${DAYS[hol]} is a holiday: no deliveries, light pull-ups only.`);
     } else if (state.day === hol - 1 || state.day === hol + 1) {
       const f = state.day === hol - 1 ? H.beforeFactor : H.afterFactor;
-      for (const s of state.stores) if (!s.pullUp) s.cases = Math.round(s.cases * f);
+      for (const s of state.stores) if (!s.pullUp) { s.cases = Math.round(s.cases * f); s.trays = Math.round(s.trays * f) }
       raise(state, 'info', `${state.day === hol - 1 ? 'Pre-holiday build' : 'Post-holiday catch-up'}: orders ×${f} today.`);
     }
   }
@@ -43,7 +43,7 @@ export function onDayStart(state: SimState): void {
     if (!base || (hol === state.day)) continue;
     const n: Store = {
       ...base, id: `${base.id}~2nd`, name: `${base.name} · 2nd visit`, pullUp: true, extra: 0, lock: null, answers: {},
-      cases: Math.max(1, Math.round(base.cases * v.share)), eta: parseHHMM(v.at), win: parseHHMM(v.doneBy),
+      cases: Math.max(1, Math.round(base.cases * v.share)), trays: Math.round(base.trays * v.share), eta: parseHHMM(v.at), win: parseHHMM(v.doneBy),
       assign: v.assignTo && state.merch.some(m => m.id === v.assignTo) ? v.assignTo : base.assign, seq: 99,
     };
     state.stores.push(n);

@@ -426,6 +426,41 @@ business document. For each one:
 
 ---
 
+## Module C — Added business context (not in the workbook)
+
+Added 2026-10-24 from the business owner. IDs use `NR-` so they don't collide with
+workbook IDs.
+
+**NR-001 Trays and cases** · ✅ Covered (M4.5) · core
+- **Story:** The business delivers both **trays** and **cases**. Each takes a different
+  amount of labor time, and runs are planned on both.
+- **War-game check:** every store's delivery shows trays and cases; minutes per tray and
+  minutes per case are separate, editable labor standards; work standards, load
+  changes, pull-ups, second visits, splits and planned vs. actual handle both.
+- **Decision:** "different timing" means different labor minutes per unit only (not
+  different trucks or separate runs).
+
+**NR-002 Backstock at start and end of every visit** · ✅ Covered (M4.5) · `nr-002-backstock`
+- **Story:** Record how much backstock (trays and cases) is in the store when the
+  merchandiser arrives and when they leave, so ordering and labor can be judged.
+- **War-game check:** the visit opens with a starting count and closes with an ending
+  count; supervisors and MSLs see start/end by store across the week.
+- **Open question:** granularity: totals or by category/product? A switch lets the
+  business try both and time them.
+
+**NR-003 Light / heavy order feedback to the MSL** · ✅ Covered (M4.5) · `nr-003-order-feedback`
+- **Story:** MSLs own ordering. The merchandiser tells the MSL whether the store looks
+  **light, about right or heavy** for the next delivery, based on their current
+  position, taking into account when the next delivery is and average sales.
+- **War-game check:** at the end of the visit the app suggests light / about right /
+  heavy (on hand vs. sales until the next truck), separately for trays and cases; the
+  merchandiser agrees or overrides; the store's MSL gets it with the numbers behind it.
+- **Open questions:** where average sales and shelf capacity come from; how far ahead
+  the "next delivery" should look; whether merchandisers should suggest quantities.
+
+**Change to BR-020:** out-of-stocks caused by ordering now route to the **MSL** (MSLs
+own ordering).
+
 ## Where each requirement lives
 
 Updated as features land. To change a requirement, edit only its folder

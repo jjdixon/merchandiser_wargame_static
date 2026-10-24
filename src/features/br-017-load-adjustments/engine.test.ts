@@ -9,11 +9,12 @@ describe('br-017-load-adjustments [BR-017]', () => {
   it('a cut lowers delivered cases, fill rate and planned labor, and notifies', () => {
     const s = day(), st = storeById(s, 's2')!;
     const work = plan(s, s.merch[0]).stops[1].work;
-    adjustLoad(s, st, 72, 'warehouse');
-    expect(ordered(s, st)).toBe(96);
-    expect(fillRate(s, st)).toBeCloseTo(0.75);
+    adjustLoad(s, st, 0.75, 'warehouse');
+    expect(ordered(s, st)).toEqual({ trays: 58, cases: 38 });
+    expect(st.trays).toBe(44); expect(st.cases).toBe(29);
+    expect(fillRate(s, st)).toBeCloseTo(73 / 96);
     expect(plan(s, s.merch[0]).stops[1].work).toBeLessThan(work);
-    expect(s.alerts[0].text).toContain('Load cut for Fresh Fare #214: ordered 96, now 72');
+    expect(s.alerts[0].text).toContain('Load cut for Fresh Fare #214: ordered 58 trays · 38 cases, now 44 · 29');
     expect(s.alerts[0].text).toContain('MSL North notified');
   });
 

@@ -14,8 +14,8 @@ describe('br-024-work-standards [BR-024]', () => {
 
   it('complex and simple stores scale per-case and fixed minutes', () => {
     const s = day(), r = s.rules, s1 = storeById(s, 's1')!, s3 = storeById(s, 's3')!;
-    expect(workMin(s, s1)).toBeCloseTo(r.fixed * 1.6 + s1.cases * r.mpc * 1.2);
-    expect(workMin(s, s3)).toBeCloseTo(r.fixed * 0.7 + s3.cases * r.mpc * 0.85);
+    expect(workMin(s, s1)).toBeCloseTo(r.fixed * 1.6 + (s1.cases * r.mpc + s1.trays * r.mpt) * 1.2);
+    expect(workMin(s, s3)).toBeCloseTo(r.fixed * 0.7 + (s3.cases * r.mpc + s3.trays * r.mpt) * 0.85);
   });
 
   it('changing a store\'s class changes its plan', () => {

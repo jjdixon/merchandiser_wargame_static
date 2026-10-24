@@ -6,7 +6,8 @@ import type { EngineFeature, Setting } from '../../engine';
 const LABOR = 'Labor standards', PAY = 'Pay rules', TRAVEL = 'Travel & day';
 
 export const settings: Setting[] = [
-  { key: 'mpc', label: 'Minutes per case', help: 'Work truck to shelf, incl. rotation', type: 'number', step: 0.05, section: LABOR },
+  { key: 'mpt', label: 'Minutes per tray', help: 'Trays: fresh bread and buns, worked tray by tray', type: 'number', step: 0.05, section: LABOR },
+  { key: 'mpc', label: 'Minutes per case', help: 'Cases: work truck to shelf, incl. rotation', type: 'number', step: 0.05, section: LABOR },
   { key: 'fixed', label: 'Fixed minutes per visit', help: 'Check-in, backroom, photos, paperwork', type: 'number', section: LABOR },
   { key: 'buffer', label: 'Minutes after truck arrives', help: 'Receiving check-in before product is workable', type: 'number', section: LABOR },
   { key: 'paidBetween', label: 'Pay drive time between stores', help: 'Usually compensable — confirm with counsel', type: 'boolean', section: PAY },
@@ -22,7 +23,7 @@ export const payLaborRulesEngine: EngineFeature = {
   id: 'pay-labor-rules',
   title: 'Pay & labor rules',
   description: 'Labor standards, paid-time rules, wage and mileage used for every hour and cost figure.',
-  requirements: ['BR-007', 'BR-012', 'BR-024'],
+  requirements: ['BR-007', 'BR-012', 'BR-024', 'NR-001'],
   defaultOn: true,
   locked: true,
   settings,

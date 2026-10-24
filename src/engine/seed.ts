@@ -6,6 +6,8 @@ import { emptyExtensions, enableFeatures } from './feature';
 
 export interface StoreRow {
   id: string; name: string; x: number; y: number; cases: number;
+  /** Trays delivered (NR-001). Default 0. */
+  trays?: number;
   truckEta: string; doneBy: string; assignedTo: string | null; order: number;
   routeType?: RouteType; market?: string;
   /** Set by the week model for down-day visits. */
@@ -15,7 +17,11 @@ export interface MerchRow {
   id: string; name: string; x: number; y: number; hoursThisWeek: number;
   role?: MerchRole; market?: string; routeTypes?: RouteType[];
 }
-export interface RulesRow extends Omit<Rules, 'shiftStart' | 'feature'> { shiftStart: string }
+export interface RulesRow extends Omit<Rules, 'shiftStart' | 'feature' | 'mpt'> {
+  shiftStart: string;
+  /** Minutes per tray; defaults to minutes per case if missing. */
+  mpt?: number;
+}
 export interface Scenario {
   id: string;
   label: string;
@@ -34,7 +40,7 @@ export interface Seed {
 }
 
 export function rulesFrom(row: RulesRow): Rules {
-  return { ...row, shiftStart: parseHHMM(row.shiftStart), feature: {} };
+  return { ...row, mpt: row.mpt ?? row.mpc, shiftStart: parseHHMM(row.shiftStart), feature: {} };
 }
 
 export interface DayOptions {
@@ -68,7 +74,7 @@ export function newDay(seed: Seed, scenarioId: string, opts: DayOptions = {}): S
       routeTypes: m.routeTypes ?? ['LF'], home: [m.x, m.y], week: m.hoursThisWeek, out: false,
     })),
     stores: seed.stores.map(s => ({
-      id: s.id, name: s.name, routeType: s.routeType ?? 'LF', pullUp: !!s.pullUp, market: s.market ?? '', xy: [s.x, s.y], cases: s.cases,
+      id: s.id, name: s.name, routeType: s.routeType ?? 'LF', pullUp: !!s.pullUp, market: s.market ?? '', xy: [s.x, s.y], cases: s.cases, trays: s.trays ?? 0,
       eta: parseHHMM(s.truckEta), win: parseHHMM(s.doneBy),
       assign: s.assignedTo, seq: s.order, extra: 0, lock: null, answers: {},
     })),
@@ -87,7 +93,7 @@ export function newDay(seed: Seed, scenarioId: string, opts: DayOptions = {}): S
     const s = state.stores.find(x => x.id === id);
     if (s) s.eta += d;
   }
-  if (scn.caseMultiplier) state.stores.forEach(s => (s.cases = Math.round(s.cases * scn.caseMultiplier!)));
+  if (scn.caseMultiplier) state.stores.forEach(s => { s.cases = Math.round(s.cases * scn.caseMultiplier!); s.trays = Math.round(s.trays * scn.caseMultiplier!) });
   if (scn.openingAlert) raise(state, scn.openingAlert.sev, scn.openingAlert.text);
   for (const id of scn.callouts ?? []) {
     const m = state.merch.find(x => x.id === id);

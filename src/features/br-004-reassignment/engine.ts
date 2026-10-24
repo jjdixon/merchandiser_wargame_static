@@ -45,7 +45,7 @@ export function split(state: SimState, storeId: string, to: string, share: numbe
   if (!s) return false;
   const n = splitWork(state, s, to, share, 'split');
   if (!n) return false;
-  log(state, `${s.name} split: ${n.cases} cases to ${nm(state, to)}, ${s.cases} stay with ${nm(state, s.assign)}.`);
+  log(state, `${s.name} split: ${n.trays} trays · ${n.cases} cases to ${nm(state, to)}; ${s.trays} · ${s.cases} stay with ${nm(state, s.assign)}.`);
   return true;
 }
 

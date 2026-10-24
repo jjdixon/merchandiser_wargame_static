@@ -48,7 +48,7 @@ export function seedForDay(seed: Seed, week: WeekState, day: number): Seed {
     if (!kind) continue;
     const assignedTo = row.id in week.master ? week.master[row.id] : row.assignedTo;
     stores.push(kind === 'delivery' ? { ...row, assignedTo }
-      : { ...row, assignedTo, pullUp: true, truckEta: shift, cases: Math.max(1, Math.round(row.cases * wp.pullUpShare)) });
+      : { ...row, assignedTo, pullUp: true, truckEta: shift, cases: Math.max(1, Math.round(row.cases * wp.pullUpShare)), trays: Math.round((row.trays ?? 0) * wp.pullUpShare) });
   }
   const merch = seed.merch.map(m => ({ ...m, hoursThisWeek: hoursBefore(week, m.id) }));
   return { ...seed, stores, merch };
@@ -64,8 +64,8 @@ export function buildDay(seed: Seed, week: WeekState, scenarioId: string, opts: 
 /** Roll today up into the week and move to tomorrow. Runs features' onDayEnd first. */
 export function endDay(state: SimState): void {
   for (const h of state.ext.onDayEnd) h(state);
-  const merch: Record<string, { paid: number; stops: number; cases: number }> = {};
-  for (const p of allPlans(state)) merch[p.m.id] = { paid: p.paid, stops: p.stops.length, cases: p.cases };
+  const merch: Record<string, { paid: number; stops: number; cases: number; trays: number }> = {};
+  for (const p of allPlans(state)) merch[p.m.id] = { paid: p.paid, stops: p.stops.length, cases: p.cases, trays: p.trays };
   state.week.history.push({ day: state.day, scenario: state.scenario, merch });
   state.week.day = Math.min(6, state.day + 1);
 }

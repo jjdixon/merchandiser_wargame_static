@@ -26,8 +26,10 @@ export function factors(state: SimState, cls: number): [number, number] {
   return [(typeof c === 'number' ? c : 100) / 100, (typeof f === 'number' ? f : 100) / 100];
 }
 
-/** Engineered cases per hour at this store under the current standards. */
-export const casesPerHour = (state: SimState, s: Store) => s.cases / Math.max(1 / 60, workMin(state, s) / 60);
+/** Engineered units (trays + cases) per hour at this store under the current standards. */
+export const unitsPerHour = (state: SimState, s: Store) => (s.cases + s.trays) / Math.max(1 / 60, workMin(state, s) / 60);
+/** @deprecated use unitsPerHour (trays + cases). */
+export const casesPerHour = unitsPerHour;
 
 const ruleDefaults: Record<string, number> = {};
 for (const [cls, f] of Object.entries(DATA.factorDefaults)) {
@@ -41,7 +43,7 @@ const SECTION = 'Store work standards';
 const settings: Setting[] = Object.keys(DATA.factorDefaults).flatMap(cls => {
   const label = CLASSES.find(c => c.id === cls)!.label;
   return [
-    { key: pctKey(cls, 'case'), label: `${label}: per-case time (%)`, help: 'Percent of the global minutes per case', type: 'number', step: 5, section: SECTION },
+    { key: pctKey(cls, 'case'), label: `${label}: per-unit time (%)`, help: 'Percent of the global minutes per tray and per case', type: 'number', step: 5, section: SECTION },
     { key: pctKey(cls, 'fixed'), label: `${label}: fixed time (%)`, help: 'Percent of the global fixed minutes per visit', type: 'number', step: 5, section: SECTION },
   ] as Setting[];
 });
@@ -57,6 +59,6 @@ export const br024WorkStandardsEngine: EngineFeature = {
   workMinutes(state, s, base) {
     const [cf, ff] = factors(state, storeClass(state, s));
     const r = state.rules;
-    return base + s.cases * r.mpc * (cf - 1) + r.fixed * (ff - 1);
+    return base + (s.cases * r.mpc + s.trays * r.mpt) * (cf - 1) + r.fixed * (ff - 1);
   },
 };
