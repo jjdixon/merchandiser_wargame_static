@@ -26,17 +26,19 @@ export function roleOptions(state: SimState): RoleOption[] {
  * - MSL: their market only — Supervisor and phone views.
  * - Merchandiser / relief / jumper: their own phone and their own stops only.
  * Display tabs (M5): Promotions for schedulers and managers; Displays and Photo
- * review for MSLs and managers (schedulers see Displays). Public tabs (Findings,
+ * review for MSLs and managers (schedulers see Displays). Reporting tabs (M6):
+ * Scorecards and Exceptions for MSLs and managers (schedulers see Exceptions);
+ * Timesheets for managers. Public tabs (Findings,
  * Messages, Stores) stay visible to everyone.
  * Returns null for the facilitator (no limits) or an unknown role.
  */
 export function accessFor(state: SimState, roleId: string): Access | null {
-  if (roleId === 'scheduler') return { views: ['sched', 'super', 'week', 'merch', 'promos', 'displays'], label: 'LF Merchandiser Scheduler · portal' };
-  if (roleId === 'manager') return { views: ['super', 'sched', 'week', 'displays', 'photos', 'promos'], label: 'LF Merchandiser Manager · portal' };
+  if (roleId === 'scheduler') return { views: ['sched', 'super', 'week', 'merch', 'promos', 'displays', 'exceptions'], label: 'LF Merchandiser Scheduler · portal' };
+  if (roleId === 'manager') return { views: ['super', 'sched', 'week', 'scorecards', 'exceptions', 'timesheets', 'displays', 'photos', 'promos'], label: 'LF Merchandiser Manager · portal' };
   if (roleId.startsWith('msl:')) {
     const mk = roleId.slice(4);
     return {
-      views: ['super', 'week', 'merch', 'displays', 'photos'],
+      views: ['super', 'week', 'merch', 'scorecards', 'exceptions', 'displays', 'photos'],
       merch: (m: Merchandiser) => m.market === mk,
       store: (s: Store) => s.market === mk,
       label: `MSL · ${mk} market · mobile`,

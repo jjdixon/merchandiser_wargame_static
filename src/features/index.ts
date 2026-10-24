@@ -33,6 +33,11 @@ import { br037DisplayTasks } from './br-037-display-tasks';
 import { br040DisplayCompliance } from './br-040-display-compliance';
 import { br041StoreProfile } from './br-041-store-profile';
 import { br043PhotoReview } from './br-043-photo-review';
+import { br025Scorecards } from './br-025-scorecards';
+import { br026Exceptions } from './br-026-exceptions';
+import { br027WorkforceVisibility } from './br-027-workforce-visibility';
+import { br013TimesheetExport } from './br-013-timesheet-export';
+import { br030FirstRunTips } from './br-030-first-run-tips';
 // <feature-imports>
 
 export const FEATURES: Feature[] = [
@@ -67,5 +72,10 @@ export const FEATURES: Feature[] = [
   br040DisplayCompliance,
   br041StoreProfile,
   br043PhotoReview,
+  br025Scorecards,
+  br026Exceptions,
+  br027WorkforceVisibility,
+  br013TimesheetExport,
+  br030FirstRunTips,
   // <feature-list>
 ];

@@ -1,0 +1,15 @@
+{
+  "_note": "Exception types, matched in order against alert text (case-insensitive regex). First match wins. Alerts that match nothing and are only 'info' are not exceptions.",
+  "types": [
+    { "id": "geofence",   "label": "Geofence",                 "match": ["geofence", "miss the (entry|exit)"] },
+    { "id": "delivery",   "label": "Delivery / late truck",    "match": ["truck to .* (late|now)", "carrier update", "truck not in", "waiting on the truck"] },
+    { "id": "load",       "label": "Load cut or add",          "match": ["^load (cut|add)", "units heavier"] },
+    { "id": "overtime",   "label": "Overtime / hours",         "match": ["overtime", "hour maximum", "max hours", "-hour max"] },
+    { "id": "incomplete", "label": "Incomplete / uncovered work", "match": ["nobody is assigned", "passed its done-by", "not finished", "left undone", "called out"] },
+    { "id": "visit",      "label": "Visit running long",       "match": ["past the standard time", "running long"] },
+    { "id": "display",    "label": "Displays",                 "match": ["display"] },
+    { "id": "oos",        "label": "Out-of-stocks",            "match": ["out-of-stock"] },
+    { "id": "ordering",   "label": "Order feedback",           "match": ["order feedback"] },
+    { "id": "schedule",   "label": "Schedule changes",         "match": ["published schedule changed", "extra visit"] }
+  ]
+}

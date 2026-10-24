@@ -106,15 +106,15 @@ across sessions.
 - [x] **T-505** Photo review queue and display compliance dashboard
       · BR-043 · `br-043-photo-review` · M
 
-## M6 — Reporting and oversight
+## M6 — Reporting and oversight · branch `m6-reporting`
 
-- [ ] **T-601** End-of-day scorecard per merchandiser and manager comparison
+- [x] **T-601** End-of-day scorecard per merchandiser and manager comparison
       · BR-025 · `br-025-scorecards` · M
-- [ ] **T-602** Exceptions report grouped by type with drill-down · BR-026 · M
-- [ ] **T-603** Scheduled vs. actual across LF, relief and down-day work · BR-027 · M
-- [ ] **T-604** Timesheet approval and payroll/mileage export preview
+- [x] **T-602** Exceptions report grouped by type with drill-down · BR-026 · M
+- [x] **T-603** Scheduled vs. actual across LF, relief and down-day work · BR-027 · M
+- [x] **T-604** Timesheet approval and payroll/mileage export preview
       · BR-013 · `br-013-timesheet-export` · M
-- [ ] **T-605** First-run tips per screen · BR-030 · S
+- [x] **T-605** First-run tips per screen · BR-030 · S
 
 ## Not planned for the prototype
 
