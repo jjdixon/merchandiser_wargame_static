@@ -29,12 +29,12 @@ export function roleOptions(state: SimState): RoleOption[] {
  * Returns null for the facilitator (no limits) or an unknown role.
  */
 export function accessFor(state: SimState, roleId: string): Access | null {
-  if (roleId === 'scheduler') return { views: ['sched', 'super', 'merch'], label: 'LF Merchandiser Scheduler · portal' };
-  if (roleId === 'manager') return { views: ['super', 'sched'], label: 'LF Merchandiser Manager · portal' };
+  if (roleId === 'scheduler') return { views: ['sched', 'super', 'week', 'merch'], label: 'LF Merchandiser Scheduler · portal' };
+  if (roleId === 'manager') return { views: ['super', 'sched', 'week'], label: 'LF Merchandiser Manager · portal' };
   if (roleId.startsWith('msl:')) {
     const mk = roleId.slice(4);
     return {
-      views: ['super', 'merch'],
+      views: ['super', 'week', 'merch'],
       merch: (m: Merchandiser) => m.market === mk,
       store: (s: Store) => s.market === mk,
       label: `MSL · ${mk} market · mobile`,

@@ -9,9 +9,9 @@ A **Viewing as** picker in the header. Each role sees only what it should:
 | Role | Channel | Tabs | People & stores |
 |---|---|---|---|
 | Facilitator | — | everything | everything |
-| LF Merchandiser Scheduler | portal | Scheduler, Supervisor, Merchandiser | all |
-| LF Merchandiser Manager | portal | Supervisor, Scheduler | all |
-| MSL — *market* | mobile | Supervisor, Merchandiser | that market only |
+| LF Merchandiser Scheduler | portal | Scheduler, Supervisor, Week, Merchandiser | all |
+| LF Merchandiser Manager | portal | Supervisor, Scheduler, Week | all |
+| MSL — *market* | mobile | Supervisor, Week, Merchandiser | that market only |
 | Merchandiser / Vacation relief / Route jumper | mobile | Merchandiser (own phone) | self, own stops |
 
 The Findings tab is public — every role can log "this won't work because…".

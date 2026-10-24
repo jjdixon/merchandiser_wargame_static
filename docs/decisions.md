@@ -68,3 +68,17 @@ Format: ID · date · decision — why.
 - **D-020** · 2026-10-24 · Practice visits run on a copy of the day (sandbox), so they
   can be used for training and demos at any time without disturbing a war game in
   progress. Other features still react inside the copy.
+- **D-021** · 2026-10-24 · Week model: the seed stays "Thursday, every store", and
+  other days are derived from per-route-type patterns (`src/data/week.json`). Down-days
+  (Wed, Sun) are pull-ups: LF only, no truck, ~30% of cases. A session still opens on
+  Thursday with the seed's hours; *New week* starts a fresh Monday.
+- **D-022** · 2026-10-24 · Pull-ups are a core store flag, so four features got a
+  one-line guard each (no delivery step, no receiving wait, no truck status, no load
+  change) and the truck-late curveball skips them. These were deliberate, listed
+  exceptions to the one-folder rule, because a new core concept changed what
+  "a visit" means.
+- **D-023** · 2026-10-24 · Day salts: Thursday keeps the scenario id as its random
+  seed (so Thursday matches the single-day prototype); other days use "id@Day", so
+  each day has different but repeatable disruptions.
+- **D-024** · 2026-10-24 · Hours enforcement (BR-007) releases remaining stops at the
+  weekly max but lets the stop in progress finish.

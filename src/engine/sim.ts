@@ -117,7 +117,7 @@ export function extraVisit(state: SimState, base: Store, cases = 45, windowMin =
   const n: Store = {
     id: 'x' + ++state.nextId, name: base.name + ' · extra visit', xy: base.xy, cases,
     eta: state.t, win: state.t + windowMin, assign: null, seq: 99, extra: 0, lock: null, answers: {},
-    routeType: base.routeType, market: base.market,
+    routeType: base.routeType, market: base.market, pullUp: false,
   };
   state.stores.push(n);
   return n;
@@ -172,4 +172,26 @@ export function autoAssign(state: SimState): void {
     s.assign = best;
     if (best) s.seq = nextSeq(state, best);
   }
+}
+
+/**
+ * Split part of a store's remaining work off to another person (a helper, a second
+ * merchandiser). Creates a new stop at the same store with that share of the cases;
+ * the original keeps the rest. A stop already in progress gives up the share of what
+ * it hasn't done yet. Returns the new stop, or null if there's nothing left to split.
+ */
+export function splitWork(state: SimState, s: Store, toMerch: string, share = 0.5, label = 'help'): Store | null {
+  if (s.lock && state.t >= s.lock.end) return null;
+  const remaining = s.lock && state.t > s.lock.start ? Math.max(0, (s.lock.end - state.t) / s.lock.work) : 1;
+  const moved = Math.round(s.cases * remaining * Math.max(0, Math.min(1, share)));
+  if (moved < 1) return null;
+  const before = workMin(state, s);
+  s.cases -= moved;
+  if (s.lock) { const d = workMin(state, s) - before; s.lock.work = Math.max(1, s.lock.work + d); s.lock.end = s.lock.start + s.lock.work }
+  const n: Store = {
+    ...s, id: `${s.id}~${label}${++state.nextId}`, name: `${s.name} · ${label}`, cases: moved, extra: 0,
+    assign: toMerch, seq: nextSeq(state, toMerch), lock: null, answers: {},
+  };
+  state.stores.push(n);
+  return n;
 }

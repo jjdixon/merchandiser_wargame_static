@@ -77,15 +77,18 @@ business document. For each one:
 
 ### A2. Scheduling and coverage
 
-**BR-003 Digital route bidding and scheduling** · ⬜ Not yet
+**BR-003 Digital route bidding and scheduling** · 🟡 Partial (M4) · `br-003-route-bidding`
 - **Story:** Hourly merchandisers and relief staff bid on routes/runs digitally
   instead of on paper; schedulers award, schedule and publish.
 - **War-game check:** open a bid window, have players bid on a few runs, see
   eligibility, award by the chosen rule, and publish the resulting schedule.
+- **Today:** open a bid on a run, eligible (route-type qualified) people bid on the
+  phone or are simulated, award by seniority or same-market-first, publish as the
+  permanent owner from tomorrow. Missing: vacation bidding, bid calendars.
 - **Open questions:** What decides an award (seniority, qualification, hours)? How
   often do bids happen? Which rules are union-governed?
 
-**BR-004 Dynamic route and store reassignment** · 🟡 Partial
+**BR-004 Dynamic route and store reassignment** · ✅ Covered (M4) · `br-004-reassignment`, `br-010-schedule-governance`
 - **Story:** A scheduler can add, remove or move a route or store between workers, or
   split uncovered work, without changing who permanently owns it. Changes keep
   history and notify the people affected.
@@ -97,16 +100,18 @@ business document. For each one:
 - **Business feedback:** plans will be **hybrid**: route-based on regular days,
   more flexible on down-days. Needs to stay flexible.
 
-**BR-005 Vacation and cross-model relief coverage** · ⬜ Not yet
+**BR-005 Vacation and cross-model relief coverage** · 🟡 Partial (M4) · `br-005-relief-coverage`
 - **Story:** Vacation bidding and relief pools keep service going during absences
   across LF, Traditional and Xpress routes. When relief staff aren't assigned, show
   their availability and give them productive work.
 - **War-game check:** a relief pool with qualifications by route type; book a
   vacation; see relief assigned; see idle relief offered as helpers.
+- **Today:** vacations booked by day; relief pool covers qualified stops (same market
+  first); idle relief shown as available. Missing: vacation bidding.
 - **Open questions:** Can LF relief cover Xpress routes too, or only LF and
   Traditional? How far ahead are vacations bid?
 
-**BR-006 Workload optimization and route jumping** · 🟡 Partial
+**BR-006 Workload optimization and route jumping** · ✅ Covered (M4) · `br-006-route-jumping`
 - **Story:** Recommend nearby available workers to help unfinished routes, support a
   Route Jumper role, and optimize by remaining hours, location, workload and skills.
   Goal: push-button daily optimization.
@@ -115,7 +120,7 @@ business document. For each one:
 - **Today:** greedy auto-assign and "who could finish this" buttons consider finish
   time, overtime and lateness. Missing: jumper role, skills, splitting work to help.
 
-**BR-007 Hours, availability and overtime control** · 🟡 Partial
+**BR-007 Hours, availability and overtime control** · ✅ Covered (M4) · `br-007-hours-guarantees`
 - **Story:** Show worked and remaining hours against weekly guarantees, warn
   schedulers before limits, explain unfinished work when someone hits their maximum,
   and allow daily hours to vary within the weekly guarantee.
@@ -126,7 +131,7 @@ business document. For each one:
   hard maximums, the "why unfinished" capture.
 - **Open questions:** Labor/union rules need a discovery session (see pay-rules.md).
 
-**BR-008 Holiday and multiple-visit scheduling** · 🟡 Partial
+**BR-008 Holiday and multiple-visit scheduling** · ✅ Covered (M4) · `br-008-multi-visit-holiday`
 - **Story:** Apply holiday service patterns automatically and support two or more
   visits to the same store in one day, by different workers, including a
   merchandising-only second visit.
@@ -135,7 +140,7 @@ business document. For each one:
 - **Today:** "Holiday volume" scenario only scales cases; "extra visit" exists only
   as a curveball.
 
-**BR-010 Schedule governance** · 🟡 Partial
+**BR-010 Schedule governance** · ✅ Covered (M4) · `br-010-schedule-governance`
 - **Story:** Merchandisers can't change their own schedules. Authorized schedulers
   publish controlled changes. Customers get stable, expected service days and times.
 - **War-game check:** schedules have Draft and Published states; changes after
@@ -444,6 +449,14 @@ Updated as features land. To change a requirement, edit only its folder
 | BR-017 (load cuts/adds) | `src/features/br-017-load-adjustments` | |
 | BR-028 (messaging) | `src/features/br-028-messaging` | |
 | BR-011 (geofence) | `src/features/br-011-geofence-exceptions` | |
+| Week model (T-400) | core: `src/engine/week.ts`, `src/ui/week.ts`, `src/data/week.json` | Days, pull-ups, hours carry-over, permanent owners |
+| BR-010 (+ BR-004 history) | `src/features/br-010-schedule-governance` | |
+| BR-004 | `src/features/br-004-reassignment` | |
+| BR-007 | `src/features/br-007-hours-guarantees` | |
+| BR-008 | `src/features/br-008-multi-visit-holiday` | |
+| BR-006 | `src/features/br-006-route-jumping` | |
+| BR-005 | `src/features/br-005-relief-coverage` | |
+| BR-003 | `src/features/br-003-route-bidding` | |
 | War-game findings | `src/features/findings` | Not a business requirement |
 
 ## Open questions (consolidated)
@@ -465,9 +478,9 @@ Updated as features land. To change a requirement, edit only its folder
 
 | Status | Count | IDs |
 |---|---|---|
-| ✅ Covered | 6 | 001, 002, 009, 011, 014, 022 |
-| 🟡 Partial | 16 | 004, 006, 007, 008, 010, 012, 015, 020, 021, 024, 026, 027, 028, 031, 038, 039 |
-| ⬜ Not yet | 9 | 003, 005, 016, 025, 030, 037, 040, 041, 043 |
+| ✅ Covered | 11 | 001, 002, 004, 006, 007, 008, 009, 010, 011, 014, 022 |
+| 🟡 Partial | 13 | 003, 005, 012, 015, 020, 021, 024, 026, 027, 028, 031, 038, 039 |
+| ⬜ Not yet | 7 | 016, 025, 030, 037, 040, 041, 043 |
 | 🔌 Simulate only | 3 | 013, 017, 036 |
 | 🚫 Out of scope | 7 | 029, 033, 034, 035, 042, 044, 045 |
 | **Total** | **41** | |

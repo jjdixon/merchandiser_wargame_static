@@ -13,7 +13,7 @@ export const truckLate: Curveball = {
   id: 'truck',
   label: 'Truck late',
   // Only before work starts at that stop.
-  targets: state => storeOpts(state, (t, s) => !(s.lock && t >= s.lock.start)),
+  targets: state => storeOpts(state, (t, s) => !s.pullUp && !(s.lock && t >= s.lock.start)),
   params: [{ id: 'minutes', label: 'Delay', default: '60', options: [
     { value: '30', label: '+30 min' }, { value: '60', label: '+60 min' }, { value: '120', label: '+2 hrs' },
   ] }],

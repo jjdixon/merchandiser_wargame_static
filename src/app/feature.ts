@@ -14,7 +14,8 @@ export type Slot =
   | 'merch.after'      // below the merchandiser phone
   | 'super.main'       // left column of the Supervisor view, after crew cards
   | 'super.aside'      // right column of the Supervisor view, after the map
-  | 'rules.after';     // below the Pay & labor rules view
+  | 'rules.after'      // below the Pay & labor rules view
+  | 'week.after';      // below the Week view
 
 export interface FeatureSummary {
   id: string; title: string; description: string; requirements: string[];
@@ -57,6 +58,11 @@ export interface ViewCtx {
   slot(name: Slot): string;
   /** All settings from enabled features (for the rules view). */
   settings: Setting[];
+  /**
+   * Another day of this week as currently planned (no clock, nothing changes).
+   * Past days come from week.history; use this for today's start or future days.
+   */
+  projectDay(day: number): SimState;
   /** Every registered feature and whether it's on (for the rules view). */
   catalog: FeatureSummary[];
 }
@@ -70,6 +76,8 @@ export interface AppApi {
   readonly scenarioLabel: string;
   /** Who is viewing, from the access plug-in (e.g. "MSL · North market · mobile"); null = facilitator. */
   readonly viewer: string | null;
+  /** The same projection the Week view uses (see ViewCtx.projectDay). */
+  projectDay(day: number): SimState;
   /** Re-render now (after changing state). */
   refresh(): void;
   toast(message: string): void;

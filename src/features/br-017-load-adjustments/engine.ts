@@ -37,7 +37,7 @@ export function adjustLoad(state: SimState, s: Store, newCases: number, source: 
 
 /** Repeatable warehouse change for this store today: a fraction like −0.2 or +0.1, or 0. */
 export function warehouseChange(state: SimState, s: Store): number {
-  if (s.id.startsWith('x')) return 0;
+  if (s.id.startsWith('x') || s.pullUp) return 0;
   const ids = state.stores.filter(x => !x.id.startsWith('x')).map(x => x.id);
   if (!pickShare(ids, `${state.scenario}|load`, ruleNum(state.rules, PCT, 15)).has(s.id)) return 0;
   const u = hash01(`${s.id}|load-size`);

@@ -63,25 +63,25 @@ across sessions.
 
 ## Added between milestones
 
-- [x] **T-206** Practice visit: click through any store's visit in a sandbox, no
+- [x] **T-206** (#5) Practice visit: click through any store's visit in a sandbox, no
       clock, nothing saved to the day · BR-002 · `br-002-guided-visit` · S
 
-## M4 — Scheduling (starts with the week model)
+## M4 — Scheduling (starts with the week model) · branch `m4-scheduling`
 
-- [ ] **T-400** Week model: simulate several days, carry hours forward, down-days
+- [x] **T-400** Week model: simulate several days, carry hours forward, down-days
       (Wed/Sun) with pull-up runs · architecture · L
-- [ ] **T-401** Draft vs. published schedules, change history, flag changes to a
+- [x] **T-401** Draft vs. published schedules, change history, flag changes to a
       store's usual service time · BR-010, BR-004 · `br-010-schedule-governance` · M
-- [ ] **T-402** Today-only vs. permanent reassignment; split a store's work · BR-004 · M
-- [ ] **T-403** Weekly guaranteed and maximum hours; "why unfinished" at the
+- [x] **T-402** Today-only vs. permanent reassignment; split a store's work · BR-004 · M
+- [x] **T-403** Weekly guaranteed and maximum hours; "why unfinished" at the
       maximum · BR-007 · `br-007-hours-guarantees` · M
-- [ ] **T-404** Planned second visits and holiday service patterns
+- [x] **T-404** Planned second visits and holiday service patterns
       · BR-008 · `br-008-multi-visit-holiday` · M
-- [ ] **T-405** Route jumper role and "send help here" recommendations
+- [x] **T-405** Route jumper role and "send help here" recommendations
       · BR-006 · `br-006-route-jumping` · M
-- [ ] **T-406** Vacation booking and relief pool with route-type qualifications
+- [x] **T-406** Vacation booking and relief pool with route-type qualifications
       · BR-005 · `br-005-relief-coverage` · M
-- [ ] **T-407** Route/run bidding: window, eligibility, award, publish
+- [x] **T-407** Route/run bidding: window, eligibility, award, publish
       · BR-003 · `br-003-route-bidding` · L
 
 ## M5 — Display tracking
@@ -117,6 +117,14 @@ for why. One exception worth adding later: an "offline in the back room" scenari
 - [ ] Load real data for one route area — **only after the repo is private** (D-007).
 
 ---
+
+## Findings from building M4
+
+- [ ] **The sample routes don't fit an hourly week.** Started on Thursday with the
+      seed's hours, Ana, Marcus and Luis project 47–56 hours against a 40-hour max;
+      a fresh Monday week shows the same pattern. Either the sample routes are too
+      big, the labor standards are too high, or the model needs more people / relief.
+      Worth putting in front of the business: it's the core staffing question.
 
 ## Inbox (untriaged findings)
 

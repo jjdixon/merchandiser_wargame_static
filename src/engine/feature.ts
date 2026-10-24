@@ -2,7 +2,7 @@
 // Features plug into the core through SimState.ext; see docs/architecture.md.
 import type { EngineFeature, Extensions, Rules, SimState } from './types';
 
-export const emptyExtensions = (): Extensions => ({ readyAt: [], workMinutes: [], onTick: [], curveballs: [], settings: [], visitSteps: [], adjustStep: [], onStepAnswered: [] });
+export const emptyExtensions = (): Extensions => ({ readyAt: [], workMinutes: [], onTick: [], curveballs: [], settings: [], visitSteps: [], adjustStep: [], onStepAnswered: [], onDayStart: [], onDayEnd: [] });
 
 /** Combine the plug-ins of the given (enabled) features, in order. */
 export function buildExtensions(features: EngineFeature[]): Extensions {
@@ -16,6 +16,8 @@ export function buildExtensions(features: EngineFeature[]): Extensions {
     if (f.visitSteps) ext.visitSteps.push(f.visitSteps);
     if (f.adjustStep) ext.adjustStep.push(f.adjustStep);
     if (f.onStepAnswered) ext.onStepAnswered.push(f.onStepAnswered);
+    if (f.onDayStart) ext.onDayStart.push(f.onDayStart);
+    if (f.onDayEnd) ext.onDayEnd.push(f.onDayEnd);
   }
   return ext;
 }
@@ -46,6 +48,15 @@ export function enableFeatures(state: SimState, features: EngineFeature[]): void
 export function featureState<T>(state: SimState, featureId: string, init: () => T): T {
   if (!(featureId in state.fx)) state.fx[featureId] = init();
   return state.fx[featureId] as T;
+}
+
+/**
+ * A feature's own week-scoped state (survives from day to day; reset by a new week).
+ */
+export function weekState<T>(state: SimState, featureId: string, init: () => T): T {
+  const fx = state.week.fx;
+  if (!(featureId in fx)) fx[featureId] = init();
+  return fx[featureId] as T;
 }
 
 const CORE_KEYS = new Set(['shiftStart', 'buffer', 'mpc', 'fixed', 'speed', 'road', 'paidBetween', 'paidCommute', 'ot', 'wage', 'mileage']);

@@ -18,7 +18,7 @@ export function schedulerView(ctx: ViewCtx): string {
       x && x.end > s.win ? '<span class="flag late">late</span>' : '',
       !s.assign ? '<span class="flag late">needs coverage</span>' : ''].filter(Boolean).join(' · ');
     return `<tr class="${s.assign ? '' : 'un'}">
-      <td><div class="sname">${esc(s.name)}<small>${esc(s.routeType)} · ${s.extra ? '+' + s.extra + ' min added · ' : ''}${Math.round(workMin(state, s))} min labor</small></div></td>
+      <td><div class="sname">${esc(s.name)}<small>${esc(s.routeType)}${s.pullUp ? ' · pull-up' : ''} · ${s.extra ? '+' + s.extra + ' min added · ' : ''}${Math.round(workMin(state, s))} min labor</small></div></td>
       <td class="n">${s.cases}</td><td class="n">${fmt(s.eta)}</td><td class="n">${fmt(s.win)}</td>
       <td>${lk ? `<span class="muted">${esc(merchById(state, s.assign!)?.name ?? '')}</span>` : `<select data-assign="${s.id}" aria-label="Assign ${esc(s.name)}">${opts}</select>`}</td>
       <td>${!lk && s.assign ? `<span class="ord"><button data-act="up" data-id="${s.id}" aria-label="Earlier">↑</button><button data-act="dn" data-id="${s.id}" aria-label="Later">↓</button></span>` : ''}</td>
