@@ -117,7 +117,9 @@ Rules:
 
 ## Status
 
-- v0.5 (M3) — day-of disruptions: truck visibility (BR-014), late-truck options
+- v0.5.1 — practice visit: click through any store's visit in a sandbox copy of the
+  day, no clock needed (in `br-002-guided-visit`). 121 tests.
+- v0.5 (M3, merged #4) — day-of disruptions: truck visibility (BR-014), late-truck options
   (BR-009), load cuts/adds (BR-017), messaging (BR-028), geofence exceptions
   (BR-011). A Normal Thursday now has a few late trucks, load cuts and a geofence
   problem built in. 118 tests.

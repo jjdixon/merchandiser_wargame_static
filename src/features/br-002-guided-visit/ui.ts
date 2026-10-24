@@ -8,11 +8,15 @@ import {
 } from '../../engine';
 import { esc } from '../../ui/shared';
 import type { AppApi, Panel } from '../../app/feature';
-import { ID, canCloseOut, closeOut, setPlaying, visitState } from './engine';
+import { ID, canCloseOut, closeOut, practiceCloseOut, setPlaying, startPractice, visitState, type Practice } from './engine';
 
 const PHASE_LABEL: Record<VisitStep['phase'], string> = {
   backstock: '1 · Backstock', display: '2 · Displays', aisle: '3 · Aisles', validate: '4 · Validate', oos: '5 · Out-of-stocks',
 };
+
+/** The practice (sandbox) visit open on this screen, if any. Never part of the day. */
+let practice: Practice | null = null;
+const sbAttr = (sb: boolean) => (sb ? ' data-sb="1"' : '');
 
 /** Draft rows for 'entries' steps, before the user submits them. */
 const drafts = new Map<string, Array<Record<string, string>>>();
@@ -27,16 +31,16 @@ function currentVisit(state: SimState, merchId: string) {
   return { m, p, st, s: null as Store | null };
 }
 
-function photoControl(s: Store, step: VisitStep, a: StepAnswer | undefined, disabled: boolean): string {
+function photoControl(s: Store, step: VisitStep, a: StepAnswer | undefined, disabled: boolean, sb = false): string {
   if (!step.photo) return '';
   const label = a?.photo ? (a.photo.simulated ? 'Simulated photo' : `📷 ${esc(a.photo.name)}`) : step.photo === 'required' ? 'Photo required' : 'Add photo (optional)';
   const thumb = a?.photo?.url ? `<img src="${esc(a.photo.url)}" alt="" style="width:44px;height:44px;object-fit:cover;border-radius:6px">` : '';
   return `<label class="btn sm" style="gap:8px${disabled ? ';opacity:.5' : ''}">${thumb}<span>${label}</span>
-    <input type="file" accept="image/*" capture="environment" hidden data-fchange="${ID}:photo" data-store="${esc(s.id)}" data-step="${esc(step.id)}"${disabled ? ' disabled' : ''}></label>`;
+    <input type="file" accept="image/*" capture="environment" hidden data-fchange="${ID}:photo" data-store="${esc(s.id)}" data-step="${esc(step.id)}"${sbAttr(sb)}${disabled ? ' disabled' : ''}></label>`;
 }
 
-function stepInput(s: Store, step: VisitStep, a: StepAnswer | undefined, disabled: boolean): string {
-  const data = `data-store="${esc(s.id)}" data-step="${esc(step.id)}"${disabled ? ' disabled' : ''}`;
+function stepInput(s: Store, step: VisitStep, a: StepAnswer | undefined, disabled: boolean, sb = false): string {
+  const data = `data-store="${esc(s.id)}" data-step="${esc(step.id)}"${sbAttr(sb)}${disabled ? ' disabled' : ''}`;
   switch (step.kind) {
     case 'check':
       return `<input type="checkbox" data-fchange="${ID}:check" ${data}${a?.done ? ' checked' : ''} aria-label="${esc(step.title)}" style="width:22px;height:22px;accent-color:var(--work)">`;
@@ -51,7 +55,7 @@ function stepInput(s: Store, step: VisitStep, a: StepAnswer | undefined, disable
           ? `<div class="muted" style="font-size:13px">${rows.map(r => esc(Object.values(r).join(' — '))).join('<br>')}</div>`
           : '<span class="flag ok">None found</span>';
       }
-      const key = draftKey(s.id, step.id), rows = drafts.get(key) ?? [];
+      const key = (sb ? 'sb|' : '') + draftKey(s.id, step.id), rows = drafts.get(key) ?? [];
       const fields = (step.fields ?? []).map(f => `<select data-field="${esc(f.id)}" aria-label="${esc(f.label)}" style="min-width:0;flex:1 1 9em"><option value="">${esc(f.label)}…</option>${f.options.map(o => `<option>${esc(o)}</option>`).join('')}</select>`).join('');
       return `<div class="fg" style="gap:6px;width:100%" data-entries="${esc(key)}">
         ${rows.map(r => `<div class="muted" style="font-size:13px">• ${esc(Object.values(r).join(' — '))}</div>`).join('')}
@@ -61,10 +65,10 @@ function stepInput(s: Store, step: VisitStep, a: StepAnswer | undefined, disable
   }
 }
 
-function visitPanel(state: SimState, s: Store, atWork: boolean, merchId: string): string {
+function visitPanel(state: SimState, s: Store, atWork: boolean, merchId: string, sb = false): string {
   const prog = visitProgress(state, s), vs = visitState(state);
   if (!prog.steps.length) return '';
-  const closed = vs.closed[s.id] != null;
+  const closed = sb ? practice?.closedAt != null : vs.closed[s.id] != null;
   let lastPhase = '';
   const items = prog.steps.map(step => {
     const a = s.answers[step.id], done = isAnswered(step, a), locked = closed || (step.needsProduct && !atWork);
@@ -77,19 +81,19 @@ function visitPanel(state: SimState, s: Store, atWork: boolean, merchId: string)
         <div><b style="font-size:14px">${esc(step.title)}</b>${step.required ? '' : ' <span class="muted" style="font-size:12px">optional</span>'}${a?.auto ? ' <span class="muted" style="font-size:12px">auto</span>' : ''}
           ${step.detail ? `<div class="muted" style="font-size:12.5px">${esc(step.detail)}</div>` : ''}
           ${locked && !closed ? '<div class="muted" style="font-size:12px">Available once the truck is in and receiving is open</div>' : ''}</div>
-        <div class="ctl" style="gap:8px">${stepInput(s, step, a, !!locked)}${photoControl(s, step, a, !!locked)}</div>
+        <div class="ctl" style="gap:8px">${stepInput(s, step, a, !!locked, sb)}${photoControl(s, step, a, !!locked, sb)}</div>
       </div></div>`;
   }).join('');
   const playing = !!vs.playing[merchId];
   const pct = prog.required ? Math.round((prog.doneRequired / prog.required) * 100) : 100;
   return `<div class="fg" style="gap:6px">
-    <div style="display:flex;justify-content:space-between;align-items:center"><span class="lbl">Store visit</span><span class="mono muted" style="font-size:12px">${prog.doneRequired}/${prog.required} required</span></div>
+    <div style="display:flex;justify-content:space-between;align-items:center"><span class="lbl">${sb ? 'Practice visit' : 'Store visit'}</span><span class="mono muted" style="font-size:12px">${prog.doneRequired}/${prog.required} required</span></div>
     <div class="prog"><i style="width:${pct}%;background:var(--ok)"></i></div>
-    <label class="ctl" style="font-size:13px;gap:8px"><input type="checkbox" data-fchange="${ID}:play" data-m="${esc(merchId)}"${playing ? ' checked' : ''} style="width:18px;height:18px;accent-color:var(--accent)">
-      <span>I'm playing this merchandiser — keep the visit open until I close out</span></label>
+    ${sb ? '' : `<label class="ctl" style="font-size:13px;gap:8px"><input type="checkbox" data-fchange="${ID}:play" data-m="${esc(merchId)}"${playing ? ' checked' : ''} style="width:18px;height:18px;accent-color:var(--accent)">
+      <span>I'm playing this merchandiser — keep the visit open until I close out</span></label>`}
     <div>${items}</div>
-    ${closed ? `<div class="flag ok">Closed out at ${fmt(vs.closed[s.id])}</div>`
-      : `<button class="btn pri" data-act="${ID}:closeOut" data-store="${esc(s.id)}"${canCloseOut(state, s) ? '' : ' disabled'} style="justify-content:center;padding:10px">Close out visit</button>
+    ${closed ? `<div class="flag ok">${sb ? 'Practice visit closed out' : `Closed out at ${fmt(vs.closed[s.id])}`}</div>`
+      : `<button class="btn pri" data-act="${ID}:closeOut" data-store="${esc(s.id)}"${sbAttr(sb)}${(sb ? prog.complete : canCloseOut(state, s)) ? '' : ' disabled'} style="justify-content:center;padding:10px">Close out visit</button>
          ${!prog.complete ? `<div class="muted" style="font-size:12px">${prog.required - prog.doneRequired} required step${prog.required - prog.doneRequired === 1 ? '' : 's'} left before you can close out.</div>` : ''}`}
   </div>`;
 }
@@ -121,7 +125,40 @@ function nextCard(state: SimState, merchId: string): string {
     <div style="font-size:13px;opacity:.9">${esc(small)}</div></div>`;
 }
 
+/** The sandbox card at the top of the phone while a practice visit is open. */
+function practiceCard(): string {
+  if (!practice) return '';
+  const p = practice, s = p.state.stores.find(x => x.id === p.storeId)!;
+  const routed = p.state.alerts.filter(a => a.text.includes('Routed to') || a.text.includes('Out-of-stock'));
+  return `<div class="cur" style="border:2px dashed var(--accent);gap:10px">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+      <div><span class="lbl" style="color:var(--accent)">Practice · sandbox</span><h3>${esc(s.name)}</h3>
+        <div class="muted" style="font-size:12.5px">Every step is unlocked and the clock doesn't matter. Nothing here changes the simulated day.</div></div>
+      <div class="ctl" style="gap:6px;flex:none"><button class="btn sm" data-act="${ID}:practiceRestart">Restart</button><button class="btn sm" data-act="${ID}:practiceExit">Exit</button></div>
+    </div>
+    ${visitPanel(p.state, s, true, s.assign ?? '', true)}
+    ${p.closedAt != null && routed.length ? `<div class="fg" style="gap:4px"><span class="lbl">What would have been sent</span>${routed.map(a => `<div style="font-size:13px">• ${esc(a.text)}</div>`).join('')}</div>` : ''}
+  </div>`;
+}
+
 export const panels: Panel[] = [
+  { slot: 'merch.top', order: 1, render: () => practiceCard() },
+  {
+    slot: 'merch.after',
+    order: 0,
+    render({ state, selM, scope }) {
+      const m = merchById(state, selM);
+      const mine = m ? plan(state, m).stops.map(x => x.s) : [];
+      const others = state.stores.filter(s => scope.store(s) && !mine.includes(s));
+      const opt = (s: Store) => `<option value="${esc(s.id)}"${practice?.storeId === s.id ? ' selected' : ''}>${esc(s.name)}</option>`;
+      return `<div class="phone" style="border-radius:16px"><div class="pbody"><span class="lbl">Practice a store visit</span>
+        <div class="muted" style="font-size:12.5px">Click through any store's visit without running the clock. A sandbox for training and demos.</div>
+        <div class="ctl" style="gap:6px"><select id="practiceSel" aria-label="Store to practice" style="flex:1;min-width:0">
+          ${mine.length ? `<optgroup label="On ${esc(m!.name.split(' ')[0])}'s route">${mine.map(opt).join('')}</optgroup>` : ''}
+          ${others.length ? `<optgroup label="Other stores">${others.map(opt).join('')}</optgroup>` : ''}</select>
+          <button class="btn pri" data-act="${ID}:practiceStart">${practice ? 'Switch' : 'Start'}</button></div></div></div>`;
+    },
+  },
   { slot: 'merch.top', render: ({ state, selM }) => nextCard(state, selM) },
   {
     slot: 'merch.visit',
@@ -149,16 +186,18 @@ export const panels: Panel[] = [
   },
 ];
 
-const store = (app: AppApi, el: HTMLElement) => storeById(app.state, el.dataset.store ?? '');
+/** Practice inputs act on the sandbox copy; everything else on the real day. */
+const target = (app: AppApi, el: HTMLElement): SimState | null => (el.dataset.sb ? practice?.state ?? null : app.state);
+const store = (app: AppApi, el: HTMLElement) => { const st = target(app, el); return st ? storeById(st, el.dataset.store ?? '') : undefined };
 
 export const changes: Record<string, (app: AppApi, el: HTMLInputElement) => void> = {
-  check(app, el) { const s = store(app, el); if (s) { answerStep(app.state, s, el.dataset.step!, { done: el.checked }); app.refresh() } },
-  count(app, el) { const s = store(app, el); if (s && el.value !== '') { answerStep(app.state, s, el.dataset.step!, { count: Math.max(0, Number(el.value)) }); el.blur(); app.refresh() } },
-  choice(app, el) { const s = store(app, el); if (s && el.value) { answerStep(app.state, s, el.dataset.step!, { choice: el.value }); el.blur(); app.refresh() } },
+  check(app, el) { const s = store(app, el); if (s) { answerStep(target(app, el)!, s, el.dataset.step!, { done: el.checked }); app.refresh() } },
+  count(app, el) { const s = store(app, el); if (s && el.value !== '') { answerStep(target(app, el)!, s, el.dataset.step!, { count: Math.max(0, Number(el.value)) }); el.blur(); app.refresh() } },
+  choice(app, el) { const s = store(app, el); if (s && el.value) { answerStep(target(app, el)!, s, el.dataset.step!, { choice: el.value }); el.blur(); app.refresh() } },
   photo(app, el) {
     const s = store(app, el), file = el.files?.[0];
     if (!s || !file) return;
-    answerStep(app.state, s, el.dataset.step!, { photo: { name: file.name || 'photo.jpg', at: app.state.t, url: URL.createObjectURL(file) } });
+    answerStep(target(app, el)!, s, el.dataset.step!, { photo: { name: file.name || 'photo.jpg', at: app.state.t, url: URL.createObjectURL(file) } });
     app.toast('Photo attached');
     app.refresh();
   },
@@ -173,7 +212,7 @@ export const actions: Record<string, (app: AppApi, el: HTMLElement) => void> = {
   addEntry(app, el) {
     const s = store(app, el);
     if (!s) return;
-    const key = draftKey(s.id, el.dataset.step!), box = el.closest(`[data-entries]`);
+    const key = (el.dataset.sb ? 'sb|' : '') + draftKey(s.id, el.dataset.step!), box = el.closest(`[data-entries]`);
     const row: Record<string, string> = {};
     for (const sel of box?.querySelectorAll<HTMLSelectElement>('select[data-field]') ?? []) {
       if (!sel.value) { app.toast(`Pick ${sel.getAttribute('aria-label')?.toLowerCase()}`); return }
@@ -185,14 +224,35 @@ export const actions: Record<string, (app: AppApi, el: HTMLElement) => void> = {
   submitEntries(app, el) {
     const s = store(app, el);
     if (!s) return;
-    const key = draftKey(s.id, el.dataset.step!), rows = drafts.get(key) ?? [];
-    answerStep(app.state, s, el.dataset.step!, { done: true, entries: rows });
+    const key = (el.dataset.sb ? 'sb|' : '') + draftKey(s.id, el.dataset.step!), rows = drafts.get(key) ?? [];
+    answerStep(target(app, el)!, s, el.dataset.step!, { done: true, entries: rows });
     drafts.delete(key);
     app.toast(rows.length ? `${rows.length} reported` : 'Marked none found');
     app.refresh();
   },
   closeOut(app, el) {
     const s = store(app, el);
-    if (s && closeOut(app.state, s)) { app.toast(`${s.name} closed out`); app.refresh() }
+    if (!s) return;
+    if (el.dataset.sb ? practice && practiceCloseOut(practice) : closeOut(app.state, s)) { app.toast(`${s.name} closed out${el.dataset.sb ? ' (practice)' : ''}`); app.refresh() }
+  },
+  practiceStart(app) {
+    const id = (document.getElementById('practiceSel') as HTMLSelectElement | null)?.value;
+    if (!id) return;
+    for (const k of [...drafts.keys()]) if (k.startsWith('sb|')) drafts.delete(k);
+    practice = startPractice(app.state, id);
+    app.toast('Practice visit — nothing here changes the day');
+    app.refresh();
+    document.querySelector('.pbody')?.scrollIntoView({ block: 'start', behavior: 'smooth' });
+  },
+  practiceRestart(app) {
+    if (!practice) return;
+    for (const k of [...drafts.keys()]) if (k.startsWith('sb|')) drafts.delete(k);
+    practice = startPractice(app.state, practice.storeId);
+    app.refresh();
+  },
+  practiceExit(app) {
+    practice = null;
+    for (const k of [...drafts.keys()]) if (k.startsWith('sb|')) drafts.delete(k);
+    app.refresh();
   },
 };
