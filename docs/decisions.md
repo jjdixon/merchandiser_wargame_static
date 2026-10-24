@@ -47,3 +47,12 @@ Format: ID · date · decision — why.
   running over.
 - **D-013** · 2026-10-23 · Per-store standards scale the global standard by class
   percentage rather than replacing it, so one global edit still moves everything.
+- **D-014** · 2026-10-23 · Visit steps are a core contract (phases, generic input
+  kinds, answers on the store) so each step owner is its own folder. Phases follow
+  the business MVP order: backstock → displays → aisles → validate → out-of-stocks.
+- **D-015** · 2026-10-23 · "Play this merchandiser": a played visit stays open until
+  the person closes out, so real human speed becomes labor time; every other visit
+  is auto-completed at its planned end. Lets one facilitator plus a few players run
+  a full market.
+- **D-016** · 2026-10-23 · Photos stay in browser memory (object URLs) and are never
+  uploaded. Recognition is simulated to test the review loop, not accuracy.

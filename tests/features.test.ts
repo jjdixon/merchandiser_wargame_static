@@ -2,7 +2,7 @@
 // what it plugs into — the contract every feature folder relies on.
 import { describe, expect, it } from 'vitest';
 import {
-  adjustDrive, adjustWork, enableFeatures, featureState, getRule, newDay, plan, readyAt, setRule, tick, workMin,
+  adjustDrive, adjustWork, answerStep, enableFeatures, featureState, getRule, hash01, isAnswered, newDay, plan, readyAt, setRule, tick, visitProgress, visitSteps, workMin,
   type EngineFeature, type Seed,
 } from '../src/engine';
 import { FEATURES } from '../src/features';
@@ -132,5 +132,69 @@ describe('core: every registered feature together', () => {
       while (s.t < 23 * 60) tick(s, 5);
       expect(s.stores.filter(x => x.assign).every(x => x.lock && x.lock.end <= s.t)).toBe(true);
     }
+  });
+});
+
+describe('core: store visit steps (M2)', () => {
+  const stepsFeature: EngineFeature = {
+    id: 'test-visit', title: 't', description: 't', requirements: [], defaultOn: true,
+    visitSteps: (_st, s) => [
+      { id: 'test-visit:oos', featureId: 'test-visit', phase: 'oos', title: 'OOS', kind: 'entries', required: true },
+      { id: 'test-visit:back', featureId: 'test-visit', phase: 'backstock', title: `Backstock at ${s.name}`, kind: 'count', required: true },
+      { id: 'test-visit:opt', featureId: 'test-visit', phase: 'aisle', title: 'Optional', kind: 'check', required: false },
+    ],
+  };
+  const photoPolicy: EngineFeature = {
+    id: 'test-photo', title: 't', description: 't', requirements: [], defaultOn: true,
+    adjustStep: (_st, _s, step) => (step.phase === 'oos' ? { ...step, photo: 'required' } : step),
+  };
+
+  it('collects steps from features in phase order', () => {
+    const s = newDay(tiny(), 'base', { features: [stepsFeature] });
+    expect(visitSteps(s, s.stores[0]).map(x => x.phase)).toEqual(['backstock', 'aisle', 'oos']);
+  });
+
+  it('tracks progress and the next step; optional steps never block close-out', () => {
+    const s = newDay(tiny(), 'base', { features: [stepsFeature] }), st = s.stores[0];
+    expect(visitProgress(s, st)).toMatchObject({ required: 2, doneRequired: 0, complete: false });
+    expect(visitProgress(s, st).next!.id).toBe('test-visit:back');
+    answerStep(s, st, 'test-visit:back', { count: 12 });
+    answerStep(s, st, 'test-visit:oos', { done: true, entries: [] });
+    expect(visitProgress(s, st).complete).toBe(true);
+    expect(visitProgress(s, st).next!.id).toBe('test-visit:opt');
+  });
+
+  it('adjustStep hooks can change another feature\'s step (photo now required)', () => {
+    const s = newDay(tiny(), 'base', { features: [stepsFeature, photoPolicy] }), st = s.stores[0];
+    answerStep(s, st, 'test-visit:oos', { done: true });
+    expect(isAnswered(visitSteps(s, st).find(x => x.phase === 'oos')!, st.answers['test-visit:oos'])).toBe(false);
+    answerStep(s, st, 'test-visit:oos', { photo: { name: 'a.jpg', at: s.t } });
+    expect(st.answers['test-visit:oos'].done).toBe(true);
+    expect(isAnswered(visitSteps(s, st).find(x => x.phase === 'oos')!, st.answers['test-visit:oos'])).toBe(true);
+  });
+
+  it('onStepAnswered hooks hear every answer; unknown steps are ignored', () => {
+    const heard: string[] = [];
+    const listener: EngineFeature = { id: 'l', title: 't', description: 't', requirements: [], defaultOn: true, onStepAnswered: (_st, _s, step) => { heard.push(step.id) } };
+    const s = newDay(tiny(), 'base', { features: [stepsFeature, listener] });
+    answerStep(s, s.stores[0], 'test-visit:back', { count: 3 });
+    answerStep(s, s.stores[0], 'nope', { done: true });
+    expect(heard).toEqual(['test-visit:back']);
+    expect(s.stores[0].answers.nope).toBeUndefined();
+  });
+
+  it('hash01 is repeatable and within 0..1', () => {
+    expect(hash01('x')).toBe(hash01('x'));
+    for (const k of ['a', 'b', 'c|d']) { expect(hash01(k)).toBeGreaterThanOrEqual(0); expect(hash01(k)).toBeLessThan(1) }
+  });
+});
+
+describe('core: guided visit with every feature on', () => {
+  it('every simulated visit ends complete, with displays, out-of-stocks and photos recorded', async () => {
+    const { seed } = await import('../src/data');
+    const s = newDay(seed, 'normal', { features: FEATURES });
+    while (s.t < 23 * 60) tick(s, 5);
+    for (const st of s.stores) expect(visitProgress(s, st).complete).toBe(true);
+    expect(Object.keys(s.fx)).toEqual(expect.arrayContaining(['br-002-guided-visit', 'br-020-oos-root-cause', 'br-039-photo-capture']));
   });
 });

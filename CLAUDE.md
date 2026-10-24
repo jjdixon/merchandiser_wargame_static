@@ -51,6 +51,10 @@ src/
     br-009-store-hours/     receiving + merch hours (readyAt hook, alerts)
     br-001-role-access/     "Viewing as" picker (access plug-in, header slot)
     br-012-planned-vs-actual/ engineered vs actual drift (onTick + fx state)
+    br-002-guided-visit/    step-by-step visit, close-out, "play this merchandiser", Next card
+    br-022-display-awareness/ store displays → visit steps
+    br-020-oos-root-cause/  out-of-stock step, routed to cause owner
+    br-039-photo-capture/   photo policy (adjustStep), photo records, simulated recognition
   main.ts        app shell: registry wiring, tabs, curveball bar, events, clock loop
 tests/           core tests (engine + plug-in points). Feature tests live in each folder.
 scripts/         check-boundaries.mjs, new-feature.mjs
@@ -62,7 +66,8 @@ Rules:
   feature's `engine.ts` (pure, tested); screen bits in its `ui.ts`.
 - Features plug in through `readyAt`, `workMinutes`, `onTick`, `curveballs`,
   `settings`, `panels` (slots incl. `header`), `views` (tabs, `public`),
-  `actions`/`changes`, `access` (viewer scope), and `featureState` (day state). Table in
+  `actions`/`changes`, `access` (viewer scope), `featureState` (day state), and
+  visit steps (`visitSteps`, `adjustStep`, `onStepAnswered`). Table in
   `docs/architecture.md`. Need a new plug-in point? Add it to the core once, with a
   test in `tests/features.test.ts`, and say so in the PR.
 - Features **never import each other**; only `main.ts` and `features/index.ts` import
@@ -107,12 +112,15 @@ Rules:
 
 ## Status
 
-- v0.3 (M1) — per-store work standards (BR-024), store hours (BR-009), roles and
+- v0.4 (M2) — guided store visit (BR-002/015/021) with gated close-out and "play this
+  merchandiser"; displays as visit steps (BR-022); out-of-stocks routed by cause
+  (BR-020); photo policy, metadata and simulated recognition (BR-039). 93 tests.
+- v0.3 (M1, merged #2) — per-store work standards (BR-024), store hours (BR-009), roles and
   the "Viewing as" picker (BR-001), planned vs actual with real-world drift (BR-012).
   Seed adds route types, markets, a vacation relief and a route jumper. 68 tests.
 - v0.2 (M0) — feature architecture (merged #1).
 - Requirements: `docs/requirements.md` (41 BRs). Build order: `docs/backlog.md`
-  (M2 next: guided store visit).
+  (M3 next: day-of disruptions).
 - Findings are browser-local (localStorage); export via "Copy for backlog.md".
 - Repo is **public** and auto-deploys to GitHub Pages on push to `main`
   (`.github/workflows/pages.yml`). **Never commit real store, employee or pay data

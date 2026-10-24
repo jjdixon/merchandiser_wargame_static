@@ -1,0 +1,11 @@
+{
+  "byChain": {
+    "ValuMart": ["Aisle 7 — bread", "Aisle 8 — buns & rolls", "Front — snack cakes"],
+    "Fresh Fare": ["Bread aisle", "Bakery table"],
+    "Corner Stop": ["Bread rack"],
+    "Pantry Plus": ["Aisle 4 — bread", "Snack cakes"],
+    "Dollar Daily": ["Bread & snacks"],
+    "Hometown Grocer": ["Aisle 3 — bread", "Deli — rolls"]
+  },
+  "default": ["Bread aisle"]
+}

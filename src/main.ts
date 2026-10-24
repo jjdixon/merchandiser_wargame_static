@@ -264,7 +264,6 @@ V.addEventListener('change', e => {
     return;
   }
   if (t.dataset.assign !== undefined) { assign(state, storeById(state, t.dataset.assign)!, t.value || null); t.blur() }
-  else if (t.dataset.task) { storeById(state, t.dataset.task)!.tasks[Number(t.dataset.i)] = t.checked }
   else if (t.dataset.issue) {
     if (t.value) raise(state, 'warn', `${merchById(state, app.selM)!.name} at ${storeById(state, t.dataset.issue)!.name}: ${t.value}.`);
     toast('Sent to supervisor'); t.blur();

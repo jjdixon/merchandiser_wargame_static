@@ -1,13 +1,4 @@
 {
-  "tasks": [
-    "Check in with receiving",
-    "Work truck to shelf",
-    "Rotate / FIFO",
-    "Work backstock",
-    "Build or refresh display",
-    "Shelf photo (after)",
-    "Log out-of-stocks"
-  ],
   "issues": [
     "No room for backstock",
     "Store manager wants a different set",

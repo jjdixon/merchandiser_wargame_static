@@ -9,6 +9,8 @@ import type { EngineFeature, Merchandiser, Setting, SimState, Store } from '../e
 export type Slot =
   | 'header'           // header bar, right of the title (keep it small)
   | 'sched.after'      // below the Scheduler view
+  | 'merch.top'        // top of the phone screen (e.g. "next action")
+  | 'merch.visit'      // inside the current-stop card (the store visit workflow)
   | 'merch.after'      // below the merchandiser phone
   | 'super.main'       // left column of the Supervisor view, after crew cards
   | 'super.aside'      // right column of the Supervisor view, after the map

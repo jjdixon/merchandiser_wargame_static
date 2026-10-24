@@ -88,8 +88,8 @@ export interface Store {
   /** Extra minutes added during the day (running long, etc.). */
   extra: Minutes;
   lock: Lock | null;
-  /** Task checklist state, keyed by task index. */
-  tasks: Record<number, boolean>;
+  /** Answers to today's visit steps, keyed by step id (see VisitStep). */
+  answers: Record<string, StepAnswer>;
 }
 
 export type Severity = 'bad' | 'warn' | 'info';
@@ -225,6 +225,79 @@ export interface EngineFeature {
   settings?: Setting[];
   /** Defaults for feature-owned settings (merged into rules.feature). */
   ruleDefaults?: Record<string, number | boolean>;
+  /** Steps this feature adds to a store visit (BR-002 guided visit). */
+  visitSteps?: (state: SimState, s: Store) => VisitStep[];
+  /** Adjust any feature's step before it's shown (e.g. require a photo). */
+  adjustStep?: (state: SimState, s: Store, step: VisitStep) => VisitStep;
+  /** Called after any step is answered (by a person or the simulation). */
+  onStepAnswered?: (state: SimState, s: Store, step: VisitStep, answer: StepAnswer) => void;
+}
+
+/* ---------- store visit steps (core contract for the guided visit) ----------
+ * Any feature can add steps to a visit; the guided-visit feature shows them in
+ * phase order and gates close-out on the required ones. Answers live on the
+ * store (store.answers) so every feature can read them.
+ */
+export type VisitPhase = 'backstock' | 'display' | 'aisle' | 'validate' | 'oos';
+export const PHASE_ORDER: VisitPhase[] = ['backstock', 'display', 'aisle', 'validate', 'oos'];
+
+/**
+ * check: tick it off · count: enter a number · choice: pick one option ·
+ * entries: add rows of choices (e.g. out-of-stock product + cause) or confirm none.
+ */
+export type StepKind = 'check' | 'count' | 'choice' | 'entries';
+
+export interface EntryField { id: string; label: string; options: string[] }
+
+export interface VisitStep {
+  /** Unique per store visit. Convention: "<feature id>:<local id>". */
+  id: string;
+  /** Feature that owns the step. */
+  featureId: string;
+  phase: VisitPhase;
+  /** Order within the phase (lower first). */
+  order?: number;
+  title: string;
+  detail?: string;
+  kind: StepKind;
+  required: boolean;
+  /** Photo needed before the step counts as done. */
+  photo?: 'required' | 'optional';
+  /** For 'choice'. */
+  options?: string[];
+  /** For 'entries'. */
+  fields?: EntryField[];
+  /** For 'count': unit label, e.g. "cases". */
+  unit?: string;
+  /** Only once work has started (product is available); else also while waiting on the truck. */
+  needsProduct?: boolean;
+  /**
+   * How a simulated (not human-played) merchandiser answers this step. Default:
+   * tick it / count 0 / first option / no entries.
+   */
+  autoAnswer?: (state: SimState, s: Store) => Omit<StepAnswer, 'at'>;
+}
+
+export interface PhotoRef {
+  /** Display name, e.g. file name. */
+  name: string;
+  /** Sim time it was taken. */
+  at: Minutes;
+  /** Browser-only preview URL (object URL); absent for simulated photos. */
+  url?: string;
+  simulated?: boolean;
+}
+
+export interface StepAnswer {
+  /** Sim time answered. */
+  at: Minutes;
+  /** Filled in by the simulation rather than a person. */
+  auto?: boolean;
+  done?: boolean;
+  count?: number;
+  choice?: string;
+  entries?: Array<Record<string, string>>;
+  photo?: PhotoRef;
 }
 
 export interface Extensions {
@@ -233,4 +306,7 @@ export interface Extensions {
   onTick: Array<(state: SimState) => void>;
   curveballs: Curveball[];
   settings: Setting[];
+  visitSteps: Array<NonNullable<EngineFeature['visitSteps']>>;
+  adjustStep: Array<NonNullable<EngineFeature['adjustStep']>>;
+  onStepAnswered: Array<NonNullable<EngineFeature['onStepAnswered']>>;
 }
