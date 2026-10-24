@@ -28,6 +28,11 @@ import { br005ReliefCoverage } from './br-005-relief-coverage';
 import { br003RouteBidding } from './br-003-route-bidding';
 import { nr002Backstock } from './nr-002-backstock';
 import { nr003OrderFeedback } from './nr-003-order-feedback';
+import { br036PromotionFeed } from './br-036-promotion-feed';
+import { br037DisplayTasks } from './br-037-display-tasks';
+import { br040DisplayCompliance } from './br-040-display-compliance';
+import { br041StoreProfile } from './br-041-store-profile';
+import { br043PhotoReview } from './br-043-photo-review';
 // <feature-imports>
 
 export const FEATURES: Feature[] = [
@@ -57,5 +62,10 @@ export const FEATURES: Feature[] = [
   br003RouteBidding,
   nr002Backstock,
   nr003OrderFeedback,
+  br036PromotionFeed,
+  br037DisplayTasks,
+  br040DisplayCompliance,
+  br041StoreProfile,
+  br043PhotoReview,
   // <feature-list>
 ];

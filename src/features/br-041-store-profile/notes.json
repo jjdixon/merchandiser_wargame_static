@@ -1,0 +1,58 @@
+{
+ "_note": "Starting notes (fictional). day = days relative to Monday of the simulated week.",
+ "categories": [
+  "Backroom",
+  "Store contact",
+  "Display",
+  "Issue",
+  "Relationship",
+  "Other"
+ ],
+ "notes": [
+  {
+   "storeId": "s1",
+   "category": "Backroom",
+   "text": "Our rack is the second one on the left; the first belongs to another vendor.",
+   "author": "Ana Ruiz",
+   "visibility": "everyone",
+   "followUp": false,
+   "day": -1
+  },
+  {
+   "storeId": "s2",
+   "category": "Store contact",
+   "text": "Receiving asks us to check in at the service desk after 10:00a.",
+   "author": "MSL North",
+   "visibility": "everyone",
+   "followUp": false,
+   "day": -2
+  },
+  {
+   "storeId": "s5",
+   "category": "Display",
+   "text": "Manager wants the endcap header changed before Saturday's ad.",
+   "author": "MSL North",
+   "visibility": "everyone",
+   "followUp": true,
+   "day": -1
+  },
+  {
+   "storeId": "s11",
+   "category": "Issue",
+   "text": "Pallet spot in the action alley is often blocked by another vendor's shipper.",
+   "author": "Luis Trevi\u00f1o",
+   "visibility": "everyone",
+   "followUp": true,
+   "day": -3
+  },
+  {
+   "storeId": "s12",
+   "category": "Relationship",
+   "text": "New store manager started this month \u2014 introduce yourself.",
+   "author": "MSL South",
+   "visibility": "leaders",
+   "followUp": false,
+   "day": -4
+  }
+ ]
+}

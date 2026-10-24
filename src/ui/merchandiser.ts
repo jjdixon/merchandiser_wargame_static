@@ -17,7 +17,7 @@ export function merchandiserView(ctx: ViewCtx): string {
     curHtml = `<div class="cur"><h3>You're off today</h3><div class="muted">Your stops were released to your supervisor for coverage.</div></div>`;
   } else if (!cur) {
     const nx = p.stops.find(x => state.t < x.end);
-    curHtml = `<div class="cur"><span class="lbl">${s.k === 'done' ? 'All done' : 'Next up'}</span><h3>${nx ? esc(nx.s.name) : 'Day complete'}</h3>
+    curHtml = `<div class="cur"><span class="lbl">${s.k === 'done' ? 'All done' : 'Next up'}</span><h3>${nx ? ctx.storeLink(nx.s) : 'Day complete'}</h3>
       <div class="muted">${nx ? 'Leave by ' + fmt(nx.depart) + ' · truck ready ' + fmt(readyAt(state, nx.s)) : 'Clocked out ' + fmt(p.clockOut) + '. Mileage logged: ' + p.miles.toFixed(1) + ' mi.'}</div></div>`;
   } else {
     const sx = cur.s;
@@ -41,7 +41,7 @@ export function merchandiserView(ctx: ViewCtx): string {
   const route = p.stops.map((x, i) => {
     const cls = state.t >= x.end ? 'done' : cur && cur.s.id === x.s.id ? 'cur' : '';
     return `<div class="st ${cls}"><span class="dot">${state.t >= x.end ? '✓' : i + 1}</span>
-      <div><div style="font-weight:600">${esc(x.s.name)}</div><div class="muted" style="font-size:12.5px">${x.s.trays} trays · ${x.s.cases} cases · truck ${fmt(x.s.eta)}${x.wait > 3 ? ` · <span class="flag wait">wait ${Math.round(x.wait)}m</span>` : ''}${x.end > x.s.win ? ' · <span class="flag late">late</span>' : ''}</div></div>
+      <div><div style="font-weight:600">${ctx.storeLink(x.s)}</div><div class="muted" style="font-size:12.5px">${x.s.trays} trays · ${x.s.cases} cases · truck ${fmt(x.s.eta)}${x.wait > 3 ? ` · <span class="flag wait">wait ${Math.round(x.wait)}m</span>` : ''}${x.end > x.s.win ? ' · <span class="flag late">late</span>' : ''}</div></div>
       <div class="mono" style="font-size:12.5px;text-align:right">${fmt(x.start)}<br><span class="muted">${fmt(x.end)}</span></div></div>`;
   }).join('');
 

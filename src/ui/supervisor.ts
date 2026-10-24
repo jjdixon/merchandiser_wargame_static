@@ -19,7 +19,7 @@ export function supervisorView(ctx: ViewCtx): string {
       const { plan: pp, stop: x } = previewAssign(state, s, m);
       return `<button class="btn sm" data-act="give" data-id="${s.id}" data-m="${m.id}">${esc(firstName(m.name))} · done ${fmt(x?.end)}${pp.weekProj > r.ot ? ' · OT' : ''}${x && x.end > s.win ? ' · late' : ''}</button>`;
     }).join('');
-    return `<div class="u"><div><b>${esc(s.name)}</b> <span class="muted">${s.trays} trays · ${s.cases} cases · truck ${fmt(s.eta)} · done by ${fmt(s.win)}</span></div><div class="opts">${opts || '<span class="muted">Nobody available.</span>'}</div></div>`;
+    return `<div class="u"><div><b>${ctx.storeLink(s)}</b> <span class="muted">${s.trays} trays · ${s.cases} cases · truck ${fmt(s.eta)} · done by ${fmt(s.win)}</span></div><div class="opts">${opts || '<span class="muted">Nobody available.</span>'}</div></div>`;
   }).join('') : '<div class="muted">Every stop has someone on it.</div>';
 
   const px = (v: number) => v * SCALE + 10;

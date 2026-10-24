@@ -65,6 +65,13 @@ export interface ViewCtx {
   projectDay(day: number): SimState;
   /** Every registered feature and whether it's on (for the rules view). */
   catalog: FeatureSummary[];
+  /** Store chosen for the store page (BR-041), if any. */
+  selStore: string | null;
+  /**
+   * A store's name as a link to the store page when a feature provides one
+   * (a view with opensStore); otherwise just the escaped name.
+   */
+  storeLink(s: { id: string; name: string }): string;
 }
 
 /** Services the app shell offers to feature screen code. */
@@ -78,6 +85,10 @@ export interface AppApi {
   readonly viewer: string | null;
   /** The same projection the Week view uses (see ViewCtx.projectDay). */
   projectDay(day: number): SimState;
+  /** Store chosen for the store page, if any. */
+  readonly selStore: string | null;
+  /** Open the store page for this store (if a feature provides one). */
+  openStore(id: string): void;
   /** Re-render now (after changing state). */
   refresh(): void;
   toast(message: string): void;
@@ -99,6 +110,8 @@ export interface ViewDef {
   badge?(): string;
   /** Visible to every role (e.g. the Findings log). */
   public?: boolean;
+  /** This is the store page: store links open it with ctx.selStore set. */
+  opensStore?: boolean;
   render(ctx: ViewCtx): string;
 }
 

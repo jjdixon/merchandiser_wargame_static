@@ -96,3 +96,23 @@ Format: ID · date · decision — why.
   override; the MSL sees both the call and the app's suggestion. Average sales are
   fictional per-store numbers in the feature folder until real data is allowed (D-007).
 - **D-028** · 2026-10-24 · Ordering out-of-stocks route to the MSL (BR-020 data change).
+- **D-029** · 2026-10-24 · Display tracking is a core model (`src/engine/display.ts`):
+  promotions → one task per store → display events (setup, check, remove, review)
+  with a compliance result. Six requirements share it, so it can't live in any one
+  folder. Days are relative to Monday of the simulated week. Displays that started
+  before the first simulated day are "carried in" as up and compliant, and get
+  checked on the first visit. BR-022 now reads the model (its sample displays moved
+  into BR-036's promotions and its visit steps into BR-037).
+- **D-030** · 2026-10-24 · Display steps are single-choice answers with standard
+  reason codes built in ("Not built — No product on the truck"), so one tap gives
+  both the result and the reason. Simulated merchandisers get it right ~75% of the
+  time (a dial), which lands near the 80% goal so the gap is visible.
+- **D-031** · 2026-10-24 · Store names on core screens link to the store page
+  through a core helper (`ctx.storeLink`, `ViewDef.opensStore`). With no store-page
+  feature on, names are plain text.
+- **D-032** · 2026-10-24 · The photo feature (BR-039) puts its simulated recognition
+  on the photo itself (`photo.recognition`), so the review queue (BR-043) can rank
+  suspected non-compliance without importing BR-039.
+- **D-033** · 2026-10-24 · New tabs per role (BR-001): Promotions for schedulers and
+  managers; Displays for schedulers, managers and MSLs; Photo review for managers and
+  MSLs; Stores for everyone.

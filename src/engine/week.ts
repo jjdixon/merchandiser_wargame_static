@@ -67,12 +67,13 @@ export function endDay(state: SimState): void {
   const merch: Record<string, { paid: number; stops: number; cases: number; trays: number }> = {};
   for (const p of allPlans(state)) merch[p.m.id] = { paid: p.paid, stops: p.stops.length, cases: p.cases, trays: p.trays };
   state.week.history.push({ day: state.day, scenario: state.scenario, merch });
+  (state.week.displayEvents ??= []).push(...state.displays.events);
   state.week.day = Math.min(6, state.day + 1);
 }
 
 /** A future (or today's starting) day as planned, without touching the real week. */
 export function projectDay(seed: Seed, week: WeekState, day: number, scenarioId: string, opts: BuildOptions = {}): SimState {
-  const copy: WeekState = { ...week, day, fx: JSON.parse(JSON.stringify(week.fx)), master: { ...week.master }, history: [...week.history] };
+  const copy: WeekState = { ...week, day, fx: JSON.parse(JSON.stringify(week.fx)), master: { ...week.master }, history: [...week.history], displayEvents: [...(week.displayEvents ?? [])] };
   return buildDay(seed, copy, scenarioId, opts);
 }
 

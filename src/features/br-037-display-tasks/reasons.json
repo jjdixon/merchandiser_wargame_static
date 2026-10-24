@@ -1,0 +1,6 @@
+{
+  "_note": "Standard reason codes (generic). Absence = the display isn't there; removal = it couldn't come down.",
+  "absence": ["No product on the truck", "Fixture or shipper missing", "Store said no / no space", "Store manager not available", "Out of time"],
+  "check": ["Store took it down", "Product sold through", "Area blocked"],
+  "removal": ["Store asked to keep it", "Out of time"]
+}

@@ -134,6 +134,62 @@ export interface SimState {
   day: number;
   /** The week this day belongs to (shared across days; see engine/week.ts). */
   week: WeekState;
+  /**
+   * Display tracking (engine/display.ts): today's display tasks (from promotions)
+   * and today's display events. Events roll into week.displayEvents at endDay.
+   */
+  displays: { tasks: DisplayTask[]; events: DisplayEvent[] };
+}
+
+/* ---------- display tracking (core; see engine/display.ts) ---------- */
+/** A promotion or display standard (BR-036). Store selectors are ANDed; none = all stores. */
+export interface Promotion {
+  id: string;
+  /** Bumped when the same promotion is loaded again with changes. */
+  version: number;
+  name: string;
+  brand: string;
+  productGroup: string;
+  displayType: string;
+  fixture: string;
+  location: string;
+  products: string[];
+  instructions: string;
+  /** First and last day (0 = Mon of the simulated week). */
+  start: number;
+  end: number;
+  /** Check it every N visit days after setup (1 = every visit). */
+  checkEvery: number;
+  delivery?: string;
+  stores?: string[];
+  banners?: string[];
+  markets?: string[];
+  routeTypes?: RouteType[];
+}
+/** One promotion at one store. */
+export interface DisplayTask extends Omit<Promotion, 'id' | 'stores' | 'banners' | 'markets' | 'routeTypes'> {
+  /** "<promotion id>@<store id>". */
+  id: string;
+  promoId: string;
+  storeId: string;
+}
+export type DisplayAction = 'setup' | 'check' | 'remove';
+/** Compliance states (BR-040). */
+export type DisplayResult = 'compliant' | 'partially compliant' | 'non-compliant' | 'absent' | 'not applicable' | 'unable to verify';
+export interface DisplayEvent {
+  taskId: string;
+  storeId: string;
+  day: number;
+  t: Minutes;
+  action: DisplayAction | 'review';
+  result: DisplayResult;
+  /** Absence or other reason code. */
+  reason?: string;
+  /** Who recorded it (merchandiser name, or the reviewer). */
+  by: string;
+  photo?: PhotoRef;
+  auto?: boolean;
+  note?: string;
 }
 
 /** One finished day, as rolled up by endDay(). */
@@ -158,6 +214,8 @@ export interface WeekState {
   master: Record<string, string | null>;
   /** Week-scoped state owned by features (see weekState()). */
   fx: Record<string, unknown>;
+  /** Display events from finished days (engine/display.ts). */
+  displayEvents?: DisplayEvent[];
 }
 
 export interface Stop {
@@ -342,6 +400,8 @@ export interface PhotoRef {
   /** Browser-only preview URL (object URL); absent for simulated photos. */
   url?: string;
   simulated?: boolean;
+  /** Simulated image recognition, attached by the photo feature (BR-039). */
+  recognition?: { productGroup: string; displayType: string; compliance: DisplayResult; confidence: number };
 }
 
 export interface StepAnswer {

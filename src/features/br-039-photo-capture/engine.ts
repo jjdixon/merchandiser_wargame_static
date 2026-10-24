@@ -74,5 +74,7 @@ export const br039PhotoCaptureEngine: EngineFeature = {
       suggestion: suggest(`${state.scenario}|${s.id}|${step.id}`, `${step.title} ${step.detail ?? ''}`),
     };
     if (i >= 0) list[i] = rec; else list.push(rec);
+    // Share the suggestion on the photo itself, so display records (BR-037/040/043) carry it.
+    answer.photo.recognition = rec.suggestion;
   },
 };
