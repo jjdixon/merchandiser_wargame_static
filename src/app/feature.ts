@@ -68,6 +68,8 @@ export interface AppApi {
   /** Display name of the current view, e.g. "Supervisor". */
   readonly viewName: string;
   readonly scenarioLabel: string;
+  /** Who is viewing, from the access plug-in (e.g. "MSL · North market · mobile"); null = facilitator. */
+  readonly viewer: string | null;
   /** Re-render now (after changing state). */
   refresh(): void;
   toast(message: string): void;

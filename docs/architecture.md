@@ -43,6 +43,8 @@ screen-side ones in `src/app/feature.ts` (`Feature`).
 | `visitSteps(state, store)` | add steps to a store visit (phase, kind, required, photo) | displays, out-of-stocks (M2) |
 | `adjustStep(state, store, step)` | change any feature's step before it's shown | photo policy (BR-039) |
 | `onStepAnswered(state, store, step, answer)` | react to any answer, by a person or the sim | route out-of-stocks, record photos |
+| `hash01(key)` / `pickShare(ids, salt, pct)` | repeatable "random" choices; exactly pct% of items | late trucks, load changes, geofence problems |
+| `app.viewer` | who's viewing (from the access plug-in), for "sent as" etc. | messaging |
 | `featureState(state, id, init)` | a feature's own day-scoped state in `state.fx[id]` | baselines, recorded times (BR-012) |
 | `mount(app)` | once at startup — **locked features only** | floating findings button |
 

@@ -56,3 +56,12 @@ Format: ID · date · decision — why.
   a full market.
 - **D-016** · 2026-10-23 · Photos stay in browser memory (object URLs) and are never
   uploaded. Recognition is simulated to test the review loop, not accuracy.
+- **D-017** · 2026-10-23 · "X% of stores" settings pick exactly that share
+  (`pickShare`), repeatably per scenario, so a Normal Thursday always has the same
+  few late trucks, load cuts and geofence problems to react to. The core `hash01`
+  got a better mixing step so similar keys don't clump.
+- **D-018** · 2026-10-23 · Late-truck options are offered only for the *next* stop,
+  before leaving; a late first stop just means leaving home later. Who may choose
+  (merchandiser vs MSL/scheduler) is an open question against BR-010.
+- **D-019** · 2026-10-23 · Rejected geofence minutes are recorded but don't change
+  today's paid hours yet; the timesheet/payroll step (BR-013, M6) will apply them.

@@ -144,12 +144,13 @@ business document. For each one:
 
 ### A3. Workforce time, location and pay
 
-**BR-011 Automatic store presence and geofence exceptions** · 🟡 Partial
+**BR-011 Automatic store presence and geofence exceptions** · ✅ Covered (M3) · `br-011-geofence-exceptions`
 - **Story:** Detect store entry and exit automatically, with exact timestamps, no
   manual check-in. Flag missing or broken geofence events for review.
 - **War-game check:** a curveball that drops an entry or exit event; it shows up in a
   review queue that a manager resolves.
-- **Today:** check-in is simulated as automatic. No exceptions.
+- **Today:** automatic entry/exit, a share of visits with missing/late events, review
+  queue with accept/reject, curveball to drop an event, check-in record on the phone.
 - **Open questions:** Privacy, consent and device-location policy review.
 
 **BR-012 Time and mileage capture** · 🟡 Partial (M1) · `br-012-planned-vs-actual`
@@ -170,7 +171,7 @@ business document. For each one:
 
 ### A4. Route execution and delivery
 
-**BR-009 Store hours and delivery-aware start times** · 🟡 Partial (M1) · `br-009-store-hours`
+**BR-009 Store hours and delivery-aware start times** · ✅ Covered (M1 + M3) · `br-009-store-hours`, `br-009-late-truck-options`
 - **Story:** Store each store's merchandising and invoicing hours, set start times
   from expected delivery, and when a truck is late, guide the worker to wait,
   resequence, or move on to the next store.
@@ -179,15 +180,18 @@ business document. For each one:
   shows the effect of each on their day.
 - **Today:** receiving (invoicing) and merchandising hours per store, editable; start
   waits for receiving; alerts when a truck lands after receiving closes or work runs
-  past merch hours. Missing: the late-truck decision prompt (T-302, M3).
+  past merch hours. When the next stop's truck isn't in, the merchandiser (or
+  supervisor) compares wait / go to the next store first / do it last, each with
+  finish time, paid wait and late stops.
 
-**BR-014 Truck delivery visibility** · 🟡 Partial
+**BR-014 Truck delivery visibility** · ✅ Covered (M3) · `br-014-truck-visibility`
 - **Story:** Workers see expected arrival, delays and completed delivery before
   leaving for or entering a store. Affected workers and managers are notified.
 - **War-game check:** each stop shows delivery status (scheduled / en route / late /
   delivered); a late truck notifies the merchandiser *before* they leave.
-- **Today:** ETAs and late-truck curveballs exist; the merchandiser only finds out
-  on arrival.
+- **Today:** status per stop vs scheduled time, carrier delays revealed ~45 min
+  ahead, heads-up to the merchandiser before leaving with the new leave time, driver
+  messages. Real carrier/tracking feeds are simulated.
 
 **BR-016 Daily route playbook and priorities** · ⬜ Not yet
 - **Story:** Each worker gets a playbook for the day: ordered work, expected units,
@@ -198,12 +202,13 @@ business document. For each one:
 - **Note:** The source asks for an AI/data-warehouse-generated playbook. The
   prototype uses hand-written seed data to test what the playbook should contain.
 
-**BR-017 Order and load adjustment visibility** · 🔌 Simulate only
+**BR-017 Order and load adjustment visibility** · 🔌 Simulated (M3) · `br-017-load-adjustments`
 - **Story:** Show expected orders, delivered vs. ordered quantities, order fill, and
   cuts/adds made after load validation, automatically sent to the right people.
 - **War-game check:** a "load cut/add" curveball that changes a store's cases and
   notifies the merchandiser and MSL.
-- **Today:** "Heavier load" curveball covers adds; no cuts, no ordered-vs-delivered.
+- **Today:** warehouse cuts/adds after validation (share of stores, plus a curveball),
+  notifications to merchandiser and MSL, ordered vs delivered and fill rate.
 
 ### A5. In-store workflow
 
@@ -297,13 +302,14 @@ business document. For each one:
   supervisor view covers relief and down-day runs.
 - **Today:** live status and map for LF merchandisers on a single day.
 
-**BR-028 Operational messaging and escalation** · 🟡 Partial
+**BR-028 Operational messaging and escalation** · 🟡 Partial (M3) · `br-028-messaging`
 - **Story:** Role-based messaging (or enterprise chat/email) for late trucks, route
   changes, stock risks, extra work, priorities and escalations, linked to the
   affected route, store or visit.
 - **War-game check:** two-way messages between merchandiser, MSL, scheduler and
   driver, each tied to a stop.
-- **Today:** merchandiser issues become one-way supervisor alerts.
+- **Today:** role-to-role messages tied to a store (Messages tab + phone), automatic
+  driver updates, simulated replies. Missing: escalation rules and real channel.
 - **Open questions:** Preferred channel and retention policy.
 
 **BR-031 Manager market leadership and remote oversight** · 🟡 Partial
@@ -433,6 +439,11 @@ Updated as features land. To change a requirement, edit only its folder
 | BR-022 (display awareness) | `src/features/br-022-display-awareness` | Full Display Tracking is M5 |
 | BR-020 (out-of-stocks) | `src/features/br-020-oos-root-cause` | |
 | BR-039 (photos) | `src/features/br-039-photo-capture` | Photo review queue is BR-043, M5 |
+| BR-014 (truck visibility) | `src/features/br-014-truck-visibility` | |
+| BR-009 (late-truck options) | `src/features/br-009-late-truck-options` | Store hours stay in `br-009-store-hours` |
+| BR-017 (load cuts/adds) | `src/features/br-017-load-adjustments` | |
+| BR-028 (messaging) | `src/features/br-028-messaging` | |
+| BR-011 (geofence) | `src/features/br-011-geofence-exceptions` | |
 | War-game findings | `src/features/findings` | Not a business requirement |
 
 ## Open questions (consolidated)
@@ -454,8 +465,8 @@ Updated as features land. To change a requirement, edit only its folder
 
 | Status | Count | IDs |
 |---|---|---|
-| ✅ Covered | 3 | 001, 002, 022 |
-| 🟡 Partial | 19 | 004, 006, 007, 008, 009, 010, 011, 012, 014, 015, 020, 021, 024, 026, 027, 028, 031, 038, 039 |
+| ✅ Covered | 6 | 001, 002, 009, 011, 014, 022 |
+| 🟡 Partial | 16 | 004, 006, 007, 008, 010, 012, 015, 020, 021, 024, 026, 027, 028, 031, 038, 039 |
 | ⬜ Not yet | 9 | 003, 005, 016, 025, 030, 037, 040, 041, 043 |
 | 🔌 Simulate only | 3 | 013, 017, 036 |
 | 🚫 Out of scope | 7 | 029, 033, 034, 035, 042, 044, 045 |

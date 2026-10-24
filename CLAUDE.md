@@ -55,6 +55,11 @@ src/
     br-022-display-awareness/ store displays → visit steps
     br-020-oos-root-cause/  out-of-stock step, routed to cause owner
     br-039-photo-capture/   photo policy (adjustStep), photo records, simulated recognition
+    br-014-truck-visibility/   truck status, carrier delays, heads-up before leaving
+    br-009-late-truck-options/ wait / next store first / do it last, with effects
+    br-017-load-adjustments/   load cuts/adds, ordered vs delivered
+    br-028-messaging/          Messages tab, driver updates, simulated replies
+    br-011-geofence-exceptions/ automatic entry/exit, exceptions review queue
   main.ts        app shell: registry wiring, tabs, curveball bar, events, clock loop
 tests/           core tests (engine + plug-in points). Feature tests live in each folder.
 scripts/         check-boundaries.mjs, new-feature.mjs
@@ -112,7 +117,11 @@ Rules:
 
 ## Status
 
-- v0.4 (M2) — guided store visit (BR-002/015/021) with gated close-out and "play this
+- v0.5 (M3) — day-of disruptions: truck visibility (BR-014), late-truck options
+  (BR-009), load cuts/adds (BR-017), messaging (BR-028), geofence exceptions
+  (BR-011). A Normal Thursday now has a few late trucks, load cuts and a geofence
+  problem built in. 118 tests.
+- v0.4 (M2, merged #3) — guided store visit (BR-002/015/021) with gated close-out and "play this
   merchandiser"; displays as visit steps (BR-022); out-of-stocks routed by cause
   (BR-020); photo policy, metadata and simulated recognition (BR-039). 93 tests.
 - v0.3 (M1, merged #2) — per-store work standards (BR-024), store hours (BR-009), roles and
@@ -120,7 +129,7 @@ Rules:
   Seed adds route types, markets, a vacation relief and a route jumper. 68 tests.
 - v0.2 (M0) — feature architecture (merged #1).
 - Requirements: `docs/requirements.md` (41 BRs). Build order: `docs/backlog.md`
-  (M3 next: day-of disruptions).
+  (M4 next: scheduling, starting with the week model).
 - Findings are browser-local (localStorage); export via "Copy for backlog.md".
 - Repo is **public** and auto-deploys to GitHub Pages on push to `main`
   (`.github/workflows/pages.yml`). **Never commit real store, employee or pay data
