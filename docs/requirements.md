@@ -1,10 +1,12 @@
 # Requirements outline
 
-> **Status: DRAFT for business review.** Merged from the business requirements
+> **Status: working draft, approved to build against (2026-10-23).** Open
+> questions at the end still need business answers. Merged from the business requirements
 > workbook (v1.1, "Requirements" sheet) with the prototype as it stands today.
 > Company, vendor and system names are replaced with generic terms while this repo
-> is public (D-007). Priorities and releases are blank in the source and are set in
-> `docs/backlog.md` after review.
+> is public (D-007). Priorities and releases are blank in the source; build order lives in
+> `docs/backlog.md`. Each BR is built as its own feature folder under
+> `src/features/` (see `docs/architecture.md`).
 
 ## How to read this
 

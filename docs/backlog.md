@@ -1,34 +1,117 @@
 # Backlog
 
-Two sources feed this file:
-1. **Findings** from war-game sessions — paste from the Findings tab ("Copy for
-   backlog.md") under a dated heading in *Inbox*, then triage.
-2. **Known gaps** we already know about.
+Build order for the prototype, traced to `docs/requirements.md` (BR IDs).
 
-Triage each item into Now / Next / Later, rewrite it as a story if it's real, or
-strike it with a reason if it isn't.
+**How this works**
+- Work is grouped into milestones. Each milestone is one branch and one pull request,
+  reviewed (and war-gamed if useful) before the next merges.
+- Each requirement is built as its own feature folder, `src/features/br-0xx-<name>/`,
+  so changing one requirement later touches only that folder
+  (see `docs/architecture.md`).
+- Tick the box and add the PR number when an item merges.
+- War-game findings go in *Inbox* at the bottom, then get triaged into a milestone.
 
-## Now
+Sizes are rough: **S** ≈ a short session, **M** ≈ one full session, **L** ≈ split
+across sessions.
 
-- [ ] Load real data: delivery manifest (store, ETA, cases) and roster for one real
-      route area. Write the converter in `scripts/`.
-- [ ] Per-store receiving windows and buffer (some chains won't let us start until
-      receiving opens).
+---
 
-## Next
+## M0 — Feature architecture (foundation, no new behavior)
 
-- [ ] Meal / rest breaks in the engine and timeline (state-dependent; see pay-rules.md).
-- [ ] Shared findings across devices (D-004) so merchandisers can log from their phones.
-- [ ] Multi-day view: build a week, carry hours forward, show OT before it happens.
-- [ ] Real coordinates (lat/long) + road distances.
+- [ ] **T-001** Feature plug-in contract, registry and on/off switches · M
+- [ ] **T-002** Move existing pieces into features: pay & labor rules, curveballs,
+      day alerts, findings · M
+- [ ] **T-003** Boundary check (features can't import each other; engine stays pure),
+      new-feature scaffold, `docs/architecture.md` · S
 
-## Later
+## M1 — Foundation for the requirements
 
-- [ ] Multiplayer clock (SignalR or similar): facilitator runs the day, players on phones.
-- [ ] VROOM-backed auto-assign (D-003).
-- [ ] Photo capture and planogram compliance.
-- [ ] Driver ↔ merchandiser handoff (driver marks "delivered", merchandiser gets notified).
-- [ ] Payroll export format.
+- [ ] **T-101** Per-store labor standards with defaults; scheduler sees the effect
+      · BR-024 · `br-024-work-standards` · M
+- [ ] **T-102** Store merchandising and invoicing hours; start times respect them
+      · BR-009 · `br-009-store-hours` · M
+- [ ] **T-103** Route types (LF, Traditional, Xpress) and roles (merchandiser, MSL,
+      vacation relief, route jumper, scheduler, manager) in the data · BR-001, BR-005 · S
+- [ ] **T-104** Role picker that limits which screens and stores you see · BR-001 · M
+- [ ] **T-105** Planned vs. actual time per stop and per day (actuals drift from plan
+      with realistic variation) · BR-012 · `br-012-planned-vs-actual` · M
+
+## M2 — Guided store visit (the BR-002 MVP)
+
+- [ ] **T-201** Step-by-step visit: note backstock → each display → each aisle →
+      validate → out-of-stocks; can't close out until required steps are done
+      · BR-002, BR-015, BR-021 · `br-002-guided-visit` · L
+- [ ] **T-202** Displays per store feed visit steps · BR-022 · `br-022-display-awareness` · M
+- [ ] **T-203** Out-of-stock capture with root cause, routed to the owning role
+      · BR-020 · `br-020-oos-root-cause` · M
+- [ ] **T-204** Photo step (upload), auto-filled metadata, simulated recognition
+      suggestion · BR-039 · `br-039-photo-capture` · M
+- [ ] **T-205** "Next action" home screen on the phone · BR-015 · S
+
+## M3 — Day-of disruptions
+
+- [ ] **T-301** Delivery status per stop; late-truck notice *before* leaving
+      · BR-014 · `br-014-truck-visibility` · M
+- [ ] **T-302** Late-truck decision prompt: wait / go to next store / swap order, with
+      the effect on the day · BR-009 · M
+- [ ] **T-303** Load cuts and adds curveball, ordered vs. delivered, notifications
+      · BR-017 · `br-017-load-adjustments` · S
+- [ ] **T-304** Two-way messages tied to a stop (merchandiser, MSL, scheduler,
+      driver) · BR-028 · `br-028-messaging` · M
+- [ ] **T-305** Geofence exceptions (missing entry/exit) and a review queue
+      · BR-011 · `br-011-geofence-exceptions` · M
+
+## M4 — Scheduling (starts with the week model)
+
+- [ ] **T-400** Week model: simulate several days, carry hours forward, down-days
+      (Wed/Sun) with pull-up runs · architecture · L
+- [ ] **T-401** Draft vs. published schedules, change history, flag changes to a
+      store's usual service time · BR-010, BR-004 · `br-010-schedule-governance` · M
+- [ ] **T-402** Today-only vs. permanent reassignment; split a store's work · BR-004 · M
+- [ ] **T-403** Weekly guaranteed and maximum hours; "why unfinished" at the
+      maximum · BR-007 · `br-007-hours-guarantees` · M
+- [ ] **T-404** Planned second visits and holiday service patterns
+      · BR-008 · `br-008-multi-visit-holiday` · M
+- [ ] **T-405** Route jumper role and "send help here" recommendations
+      · BR-006 · `br-006-route-jumping` · M
+- [ ] **T-406** Vacation booking and relief pool with route-type qualifications
+      · BR-005 · `br-005-relief-coverage` · M
+- [ ] **T-407** Route/run bidding: window, eligibility, award, publish
+      · BR-003 · `br-003-route-bidding` · L
+
+## M5 — Display tracking
+
+- [ ] **T-501** Promotions and display standards from seed data or pasted
+      spreadsheet; generate store tasks · BR-036 · `br-036-promotion-feed` · M
+- [ ] **T-502** Display task lifecycle: setup, recurring checks, expiry, absence
+      reasons, overdue, escalation · BR-037 · `br-037-display-tasks` · L
+- [ ] **T-503** Compliance states (compliant … unable to verify) with manager review
+      · BR-040 · `br-040-display-compliance` · M
+- [ ] **T-504** Store page with structured notes · BR-041 · `br-041-store-profile` · M
+- [ ] **T-505** Photo review queue and display compliance dashboard
+      · BR-043 · `br-043-photo-review` · M
+
+## M6 — Reporting and oversight
+
+- [ ] **T-601** End-of-day scorecard per merchandiser and manager comparison
+      · BR-025 · `br-025-scorecards` · M
+- [ ] **T-602** Exceptions report grouped by type with drill-down · BR-026 · M
+- [ ] **T-603** Scheduled vs. actual across LF, relief and down-day work · BR-027 · M
+- [ ] **T-604** Timesheet approval and payroll/mileage export preview
+      · BR-013 · `br-013-timesheet-export` · M
+- [ ] **T-605** First-run tips per screen · BR-030 · S
+
+## Not planned for the prototype
+
+BR-029, BR-033, BR-034, BR-035, BR-042, BR-044, BR-045 — see `docs/requirements.md`
+for why. One exception worth adding later: an "offline in the back room" scenario
+(BR-034).
+
+## Data
+
+- [ ] Load real data for one route area — **only after the repo is private** (D-007).
+
+---
 
 ## Inbox (untriaged findings)
 
