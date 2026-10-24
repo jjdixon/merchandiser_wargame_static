@@ -8,7 +8,7 @@ import {
 } from './engine';
 import { seed } from './data';
 import { FEATURES } from './features';
-import type { AppApi, Feature, FeatureSummary, Slot, ViewCtx, ViewDef } from './app/feature';
+import type { AppApi, Feature, FeatureSummary, Scope, Slot, ViewCtx, ViewDef } from './app/feature';
 import { esc } from './ui/shared';
 import { schedulerView } from './ui/scheduler';
 import { merchandiserView } from './ui/merchandiser';
@@ -34,12 +34,26 @@ const CORE_VIEWS: ViewDef[] = [
   { id: 'super', label: 'Supervisor', render: supervisorView },
   { id: 'rules', label: 'Pay & labor rules', render: rulesView },
 ];
-const allViews = () => [...CORE_VIEWS, ...enabledFeatures().flatMap(f => f.views ?? [])];
+const everyView = () => [...CORE_VIEWS, ...enabledFeatures().flatMap(f => f.views ?? [])];
+
+/* ---------- access (who is looking) ---------- */
+// The first enabled feature that returns access decides; none = see everything.
+function currentAccess() {
+  for (const f of enabledFeatures()) { const a = f.access?.(app); if (a) return a }
+  return null;
+}
+function scope(): Scope {
+  const a = currentAccess();
+  return { merch: a?.merch ?? (() => true), store: a?.store ?? (() => true), lockMerch: a?.lockMerch ?? null, label: a?.label ?? null };
+}
+const allViews = () => {
+  const allowed = currentAccess()?.views;
+  return everyView().filter(v => !allowed || v.public || allowed.includes(v.id));
+};
 
 /* ---------- app state ---------- */
 let state: SimState = newDay(seed, seed.scenarios[0].id, { features: enabledFeatures() });
 let view = location.hash.slice(1);
-if (!allViews().some(v => v.id === view)) view = 'sched';
 let selM = state.merch[0].id;
 let running = false, speed = 10, holding = false;
 
@@ -49,8 +63,10 @@ const currentView = () => allViews().find(v => v.id === view) ?? CORE_VIEWS[0];
 function ctx(): ViewCtx {
   const on = enabledFeatures();
   const catalog: FeatureSummary[] = FEATURES.map(f => ({ id: f.id, title: f.title, description: f.description, requirements: f.requirements, locked: !!f.locked, on: isOn(f) }));
+  const sc = scope();
   return {
-    state, selM,
+    scope: sc,
+    state, selM: sc.lockMerch ?? selM,
     settings: state.ext.settings,
     catalog,
     slot: (name: Slot) => on.flatMap(f => f.panels ?? []).filter(p => p.slot === name)
@@ -60,7 +76,7 @@ function ctx(): ViewCtx {
 
 const app: AppApi = {
   get state() { return state },
-  get selM() { return selM },
+  get selM() { return scope().lockMerch ?? selM },
   get viewName() { return currentView().label },
   get scenarioLabel() { return scenarioLabel() },
   refresh: () => changed(),
@@ -82,10 +98,24 @@ function renderTabs(): void {
     return `<button role="tab" data-v="${esc(v.id)}" aria-selected="${v.id === view}">${esc(v.label)}${badge ? ` <span class="mono">${esc(badge)}</span>` : ''}</button>`;
   }).join('');
 }
+/** Keep the current tab (and phone selection) within what the viewer may see. */
+function clampToAccess(): void {
+  const vs = allViews();
+  if (!vs.some(v => v.id === view)) {
+    // Prefer the role's first listed tab (e.g. Supervisor for an MSL).
+    const preferred = currentAccess()?.views?.find(id => vs.some(v => v.id === id));
+    view = preferred ?? vs[0]?.id ?? 'sched';
+  }
+  const sc = scope();
+  if (!sc.merch(merchById(state, selM)!)) selM = state.merch.find(sc.merch)?.id ?? selM;
+}
 function render(force = false): void {
   $('#clk').textContent = fmt(state.t);
   if (!force && holding) return;
+  clampToAccess();
   renderTabs();
+  const hdr = $('#hdrSlot');
+  if (force || !hdr.contains(document.activeElement)) hdr.innerHTML = ctx().slot('header');
   if (!force && busy()) return;
   $('#view').innerHTML = currentView().render(ctx());
 }
@@ -185,6 +215,21 @@ $('#evGo').addEventListener('click', () => {
 });
 
 /* ---------- view wiring (delegated) ---------- */
+// Feature elements can live in the view or the header slot.
+for (const host of [$('#hdrSlot')]) {
+  host.addEventListener('click', e => {
+    const b = (e.target as HTMLElement).closest<HTMLElement>('[data-act*=":"]');
+    if (!b) return;
+    const [fid, name] = b.dataset.act!.split(':');
+    enabledFeatures().find(x => x.id === fid)?.actions?.[name]?.(app, b);
+  });
+  host.addEventListener('change', e => {
+    const t = e.target as HTMLInputElement;
+    if (!t.dataset.fchange) return;
+    const [fid, name] = t.dataset.fchange.split(':');
+    enabledFeatures().find(x => x.id === fid)?.changes?.[name]?.(app, t);
+  });
+}
 const V = $('#view');
 V.addEventListener('click', e => {
   const b = (e.target as HTMLElement).closest<HTMLElement>('[data-act]');
@@ -204,8 +249,8 @@ V.addEventListener('click', e => {
     case 'dn': if (s) move(state, s, 1); break;
     case 'auto': autoAssign(state); toast('Open stops re-assigned'); break;
     case 'give': if (s) { assign(state, s, b.dataset.m!); raise(state, 'info', `${s.name} covered by ${merchById(state, b.dataset.m!)!.name}.`) } break;
-    case 'trucknot': if (s) { delayTruck(state, s, 30); raise(state, 'warn', `${merchById(state, selM)!.name} at ${s.name}: truck not here. Pushed ready time to ${fmt(readyAt(state, s))}.`) } break;
-    case 'long': if (s) { addWork(state, s, 15); raise(state, 'warn', `${merchById(state, selM)!.name} running long at ${s.name} (+15 min).`) } break;
+    case 'trucknot': if (s) { delayTruck(state, s, 30); raise(state, 'warn', `${merchById(state, app.selM)!.name} at ${s.name}: truck not here. Pushed ready time to ${fmt(readyAt(state, s))}.`) } break;
+    case 'long': if (s) { addWork(state, s, 15); raise(state, 'warn', `${merchById(state, app.selM)!.name} running long at ${s.name} (+15 min).`) } break;
     case 'rreset': state.rules = withFeatureDefaults(rulesFrom(seed.rules), enabledFeatures()); break;
     case 'feature-toggle': toggleFeature(id); break;
   }
@@ -221,7 +266,7 @@ V.addEventListener('change', e => {
   if (t.dataset.assign !== undefined) { assign(state, storeById(state, t.dataset.assign)!, t.value || null); t.blur() }
   else if (t.dataset.task) { storeById(state, t.dataset.task)!.tasks[Number(t.dataset.i)] = t.checked }
   else if (t.dataset.issue) {
-    if (t.value) raise(state, 'warn', `${merchById(state, selM)!.name} at ${storeById(state, t.dataset.issue)!.name}: ${t.value}.`);
+    if (t.value) raise(state, 'warn', `${merchById(state, app.selM)!.name} at ${storeById(state, t.dataset.issue)!.name}: ${t.value}.`);
     toast('Sent to supervisor'); t.blur();
   } else if (t.dataset.k) {
     setRule(state.rules, t.dataset.k, t.type === 'checkbox' ? t.checked : Number(t.value) || 0);

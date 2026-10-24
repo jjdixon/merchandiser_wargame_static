@@ -16,24 +16,24 @@ across sessions.
 
 ---
 
-## M0 — Feature architecture (foundation, no new behavior) · branch `m0-feature-architecture`
+## M0 — Feature architecture (foundation, no new behavior) · merged #1
 
-- [x] **T-001** Feature plug-in contract, registry and on/off switches · M
-- [x] **T-002** Move existing pieces into features: pay & labor rules, curveballs,
+- [x] **T-001** (#1) Feature plug-in contract, registry and on/off switches · M
+- [x] **T-002** (#1) Move existing pieces into features: pay & labor rules, curveballs,
       day alerts, findings · M
-- [x] **T-003** Boundary check (features can't import each other; engine stays pure),
+- [x] **T-003** (#1) Boundary check (features can't import each other; engine stays pure),
       new-feature scaffold, `docs/architecture.md` · S
 
-## M1 — Foundation for the requirements
+## M1 — Foundation for the requirements · branch `m1-foundation`
 
-- [ ] **T-101** Per-store labor standards with defaults; scheduler sees the effect
+- [x] **T-101** Per-store labor standards with defaults; scheduler sees the effect
       · BR-024 · `br-024-work-standards` · M
-- [ ] **T-102** Store merchandising and invoicing hours; start times respect them
+- [x] **T-102** Store merchandising and invoicing hours; start times respect them
       · BR-009 · `br-009-store-hours` · M
-- [ ] **T-103** Route types (LF, Traditional, Xpress) and roles (merchandiser, MSL,
+- [x] **T-103** Route types (LF, Traditional, Xpress) and roles (merchandiser, MSL,
       vacation relief, route jumper, scheduler, manager) in the data · BR-001, BR-005 · S
-- [ ] **T-104** Role picker that limits which screens and stores you see · BR-001 · M
-- [ ] **T-105** Planned vs. actual time per stop and per day (actuals drift from plan
+- [x] **T-104** Role picker that limits which screens and stores you see · BR-001 · M
+- [x] **T-105** Planned vs. actual time per stop and per day (actuals drift from plan
       with realistic variation) · BR-012 · `br-012-planned-vs-actual` · M
 
 ## M2 — Guided store visit (the BR-002 MVP)

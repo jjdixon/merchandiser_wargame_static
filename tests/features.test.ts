@@ -2,7 +2,7 @@
 // what it plugs into — the contract every feature folder relies on.
 import { describe, expect, it } from 'vitest';
 import {
-  enableFeatures, getRule, newDay, plan, readyAt, setRule, tick, workMin,
+  adjustDrive, adjustWork, enableFeatures, featureState, getRule, newDay, plan, readyAt, setRule, tick, workMin,
   type EngineFeature, type Seed,
 } from '../src/engine';
 import { FEATURES } from '../src/features';
@@ -80,5 +80,57 @@ describe('core: feature plug-in points', () => {
   it('every feature setting has a default value once enabled', () => {
     const s = newDay(tiny(), 'base', { features: FEATURES });
     for (const x of s.ext.settings) expect(getRule(s.rules, x.key)).not.toBeUndefined();
+  });
+});
+
+describe('core: M1 additions', () => {
+  it('featureState gives each feature its own day-scoped slot', () => {
+    const s = newDay(tiny(), 'base');
+    const a = featureState(s, 'one', () => ({ n: 1 }));
+    a.n = 5;
+    expect(featureState(s, 'one', () => ({ n: 1 })).n).toBe(5);
+    expect(featureState(s, 'two', () => ({ n: 1 })).n).toBe(1);
+    expect(newDay(tiny(), 'base').fx).toEqual({});
+  });
+
+  it('adjustDrive shifts a locked stop before arrival, and the rest of the day follows', () => {
+    const s = newDay(tiny(), 'base');
+    tick(s, 361 - s.t);
+    adjustDrive(s, s.stores[0], 15);
+    const [x1, x2] = plan(s, s.merch[0]).stops;
+    expect(x1.arrive).toBe(385);
+    expect(x1.wait).toBe(0);
+    expect(x1.end).toBe(445);
+    expect(x2.arrive).toBe(455);
+    tick(s, 390 - s.t);
+    adjustDrive(s, s.stores[0], 15);            // after arrival: ignored
+    expect(plan(s, s.merch[0]).stops[0].arrive).toBe(385);
+  });
+
+  it('adjustWork changes a locked stop without touching added scope', () => {
+    const s = newDay(tiny(), 'base');
+    tick(s, 380 - s.t);
+    adjustWork(s, s.stores[0], -10);
+    expect(plan(s, s.merch[0]).stops[0].end).toBe(420);
+    expect(s.stores[0].extra).toBe(0);
+    adjustWork(s, s.stores[0], -500);           // never below 1 minute
+    expect(s.stores[0].lock!.work).toBe(1);
+  });
+
+  it('seed rows without role/market/route type get safe defaults', () => {
+    const s = newDay(tiny(), 'base');
+    expect(s.merch[0]).toMatchObject({ role: 'merchandiser', market: '', routeTypes: ['LF'] });
+    expect(s.stores[0]).toMatchObject({ routeType: 'LF', market: '' });
+  });
+});
+
+describe('core: every registered feature together', () => {
+  it('runs every scenario to the end of the day with all features on', async () => {
+    const { seed } = await import('../src/data');
+    for (const scn of seed.scenarios) {
+      const s = newDay(seed, scn.id, { features: FEATURES });
+      while (s.t < 23 * 60) tick(s, 5);
+      expect(s.stores.filter(x => x.assign).every(x => x.lock && x.lock.end <= s.t)).toBe(true);
+    }
   });
 });

@@ -6,6 +6,10 @@ import { payLaborRules } from './pay-labor-rules';
 import { curveballs } from './curveballs';
 import { dayAlerts } from './day-alerts';
 import { findings } from './findings';
+import { br024WorkStandards } from './br-024-work-standards';
+import { br009StoreHours } from './br-009-store-hours';
+import { br001RoleAccess } from './br-001-role-access';
+import { br012PlannedVsActual } from './br-012-planned-vs-actual';
 // <feature-imports>
 
 export const FEATURES: Feature[] = [
@@ -13,5 +17,9 @@ export const FEATURES: Feature[] = [
   curveballs,
   dayAlerts,
   findings,
+  br024WorkStandards,
+  br009StoreHours,
+  br001RoleAccess,
+  br012PlannedVsActual,
   // <feature-list>
 ];

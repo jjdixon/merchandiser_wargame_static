@@ -30,6 +30,8 @@
 | doneBy | "HH:MM" | Store's requested completion time. |
 | assignedTo | string \| null | Merchandiser id, or null for uncovered. |
 | order | number | Route order within that merchandiser's day. |
+| routeType | "LF" \| "Traditional" \| "Xpress" | Optional, default LF. |
+| market | string | MSL area, e.g. "North". Optional. |
 
 ### merchandisers.json
 
@@ -38,6 +40,13 @@
 | id, name | string | |
 | x, y | number | Home location (km grid). |
 | hoursThisWeek | number | Paid hours already worked before the simulated day. Drives OT projection. |
+| role | "merchandiser" \| "relief" \| "jumper" | Optional, default merchandiser. |
+| market | string | MSL area. Optional. |
+| routeTypes | array of route types | Route types this person is qualified for. Default ["LF"]. |
+
+Feature-owned data lives in its feature folder, e.g. store hours in
+`src/features/br-009-store-hours/hours.json` and complexity classes in
+`src/features/br-024-work-standards/standards.json`.
 
 ### rules.json
 

@@ -1,0 +1,15 @@
+{
+  "classes": [
+    { "id": "simple",   "label": "Simple",   "note": "Small store, short aisles, little backstock" },
+    { "id": "standard", "label": "Standard", "note": "Uses the global labor standard as-is" },
+    { "id": "complex",  "label": "Complex",  "note": "Big set, long walk to the backroom, displays" }
+  ],
+  "factorDefaults": {
+    "simple":  { "casePct": 85,  "fixedPct": 70 },
+    "complex": { "casePct": 120, "fixedPct": 160 }
+  },
+  "stores": {
+    "s1": "complex", "s5": "complex", "s11": "complex",
+    "s3": "simple", "s10": "simple", "s13": "simple", "s7": "simple", "s14": "simple"
+  }
+}

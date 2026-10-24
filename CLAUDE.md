@@ -47,6 +47,10 @@ src/
     curveballs/       the header curveball bar's four disruptions
     day-alerts/       automatic alerts + the Supervisor alert feed
     findings/         "This won't work because…" button, Findings tab, storage
+    br-024-work-standards/  per-store complexity classes (workMinutes hook)
+    br-009-store-hours/     receiving + merch hours (readyAt hook, alerts)
+    br-001-role-access/     "Viewing as" picker (access plug-in, header slot)
+    br-012-planned-vs-actual/ engineered vs actual drift (onTick + fx state)
   main.ts        app shell: registry wiring, tabs, curveball bar, events, clock loop
 tests/           core tests (engine + plug-in points). Feature tests live in each folder.
 scripts/         check-boundaries.mjs, new-feature.mjs
@@ -57,7 +61,8 @@ Rules:
 - **New behavior goes in a feature folder**, not the core. Business logic goes in the
   feature's `engine.ts` (pure, tested); screen bits in its `ui.ts`.
 - Features plug in through `readyAt`, `workMinutes`, `onTick`, `curveballs`,
-  `settings`, `panels` (slots), `views` (tabs), `actions`/`changes`. Table in
+  `settings`, `panels` (slots incl. `header`), `views` (tabs, `public`),
+  `actions`/`changes`, `access` (viewer scope), and `featureState` (day state). Table in
   `docs/architecture.md`. Need a new plug-in point? Add it to the core once, with a
   test in `tests/features.test.ts`, and say so in the PR.
 - Features **never import each other**; only `main.ts` and `features/index.ts` import
@@ -66,6 +71,8 @@ Rules:
 - Name each feature's test `describe('<feature-id> [BR-0xx …]')` so
   `npm run test:one -- BR-0xx` finds it.
 - New features start `defaultOn: false`. Turn on when they work.
+- Core views filter people and stores with `ctx.scope` (set by the role feature);
+  new core screens must do the same.
 - Views return HTML strings. Core interactive elements use `data-act="…"` handled in
   `main.ts`; feature elements use `data-act="<feature-id>:<action>"` handled by that
   feature's `actions`.
@@ -100,11 +107,12 @@ Rules:
 
 ## Status
 
-- v0.2 (M0) — feature architecture in place: plug-in contract, registry, on/off
-  switches, boundary check, scaffold script. Existing behavior moved into four
-  feature folders, no behavior change. 39 tests. Sample data only.
+- v0.3 (M1) — per-store work standards (BR-024), store hours (BR-009), roles and
+  the "Viewing as" picker (BR-001), planned vs actual with real-world drift (BR-012).
+  Seed adds route types, markets, a vacation relief and a route jumper. 68 tests.
+- v0.2 (M0) — feature architecture (merged #1).
 - Requirements: `docs/requirements.md` (41 BRs). Build order: `docs/backlog.md`
-  (M1 next).
+  (M2 next: guided store visit).
 - Findings are browser-local (localStorage); export via "Copy for backlog.md".
 - Repo is **public** and auto-deploys to GitHub Pages on push to `main`
   (`.github/workflows/pages.yml`). **Never commit real store, employee or pay data

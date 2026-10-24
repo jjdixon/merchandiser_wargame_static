@@ -3,10 +3,11 @@
 // A Feature = its pure engine part (EngineFeature, from src/engine) plus
 // optional screen parts declared here. The app shell (src/main.ts) reads these
 // from the registry in src/features/index.ts; core views only expose slots.
-import type { EngineFeature, Setting, SimState } from '../engine';
+import type { EngineFeature, Merchandiser, Setting, SimState, Store } from '../engine';
 
 /** Named places in the core views where features can add a panel. */
 export type Slot =
+  | 'header'           // header bar, right of the title (keep it small)
   | 'sched.after'      // below the Scheduler view
   | 'merch.after'      // below the merchandiser phone
   | 'super.main'       // left column of the Supervisor view, after crew cards
@@ -18,8 +19,35 @@ export interface FeatureSummary {
   locked: boolean; on: boolean;
 }
 
+/**
+ * What the current viewer may see (BR-001). Null fields mean "no limit".
+ * Provided by a feature's `access` plug-in; core views apply it.
+ */
+export interface Access {
+  /** Tab ids this viewer may open. Public tabs are always allowed. */
+  views?: string[];
+  /** People this viewer may see. */
+  merch?: (m: Merchandiser) => boolean;
+  /** Stores this viewer may see. */
+  store?: (s: Store) => boolean;
+  /** Phone view is locked to this person. */
+  lockMerch?: string;
+  /** Short description shown to the viewer, e.g. "MSL · North market". */
+  label?: string;
+}
+
+/** Access with every filter filled in (no limit = allow all). */
+export interface Scope {
+  merch: (m: Merchandiser) => boolean;
+  store: (s: Store) => boolean;
+  lockMerch: string | null;
+  label: string | null;
+}
+
 /** What every view render function receives. */
 export interface ViewCtx {
+  /** Who is looking and what they may see. Core views filter by this. */
+  scope: Scope;
   state: SimState;
   /** Merchandiser selected on the phone view. */
   selM: string;
@@ -57,6 +85,8 @@ export interface ViewDef {
   label: string;
   /** Small text after the label, e.g. a count. */
   badge?(): string;
+  /** Visible to every role (e.g. the Findings log). */
+  public?: boolean;
   render(ctx: ViewCtx): string;
 }
 
@@ -72,6 +102,11 @@ export interface Feature extends EngineFeature {
    * Change handlers (inputs, selects). Trigger with data-fchange="<feature id>:<name>".
    */
   changes?: Record<string, (app: AppApi, el: HTMLInputElement) => void>;
+  /**
+   * Limits what the current viewer sees (role-based access, BR-001). If several
+   * enabled features return access, the first non-null one wins.
+   */
+  access?(app: AppApi): Access | null;
   /**
    * Runs once at startup. Only for locked features (it can't be undone when a
    * feature is switched off). Use for things outside the view, like a floating button.

@@ -64,14 +64,15 @@ business document. For each one:
 
 ### A1. Roles and access
 
-**BR-001 Role-based access and workforce roles** · 🟡 Partial
+**BR-001 Role-based access and workforce roles** · ✅ Covered (M1) · `br-001-role-access`
 - **Story:** Managers, schedulers and admins use a portal; merchandisers, MSLs,
   vacation relief and route jumpers use a mobile app. Each sees only their area,
   route, stores and responsibilities.
 - **War-game check:** pick a role at the start and see only that role's screens and
   scope (e.g. a merchandiser sees only their own day; an MSL sees their market).
-- **Today:** separate Scheduler / Merchandiser / Supervisor views, but anyone can open
-  any view and see everything. No MSL, relief or jumper roles.
+- **Today:** a *Viewing as* picker (facilitator, scheduler, manager, MSL per market,
+  each merchandiser / relief / jumper) limits tabs, people and stores. Admin and
+  identity/approval workflow are not modeled.
 - **Open questions:** Which roles exist on day one? Can an MSL also act as scheduler?
 
 ### A2. Scheduling and coverage
@@ -151,13 +152,14 @@ business document. For each one:
 - **Today:** check-in is simulated as automatic. No exceptions.
 - **Open questions:** Privacy, consent and device-location policy review.
 
-**BR-012 Time and mileage capture** · 🟡 Partial
+**BR-012 Time and mileage capture** · 🟡 Partial (M1) · `br-012-planned-vs-actual`
 - **Story:** Track time from the first store to leaving the last store, capture
   mileage and drive segments, and compare engineered (planned) against actual time.
 - **War-game check:** each stop shows planned vs. actual drive and work time; the
   day summary shows the variance.
-- **Today:** paid time, mileage and commute rules are modeled. Missing: planned vs.
-  actual (the sim currently runs exactly to plan unless a curveball hits).
+- **Today:** paid time, mileage and commute rules; engineered vs. actual drive and
+  work per stop with repeatable real-world drift, planned vs. actual start, day
+  totals. Missing: GPS-based mileage (with geofencing, M3).
 - **Open questions:** Home-to-first-store and last-store-to-home rules.
 
 **BR-013 Payroll and expense integration** · 🔌 Simulate only
@@ -168,15 +170,16 @@ business document. For each one:
 
 ### A4. Route execution and delivery
 
-**BR-009 Store hours and delivery-aware start times** · 🟡 Partial
+**BR-009 Store hours and delivery-aware start times** · 🟡 Partial (M1) · `br-009-store-hours`
 - **Story:** Store each store's merchandising and invoicing hours, set start times
   from expected delivery, and when a truck is late, guide the worker to wait,
   resequence, or move on to the next store.
 - **War-game check:** per-store receiving/merchandising windows; when a truck is
   late, the merchandiser's phone offers Wait / Go to next store / Swap order, and
   shows the effect of each on their day.
-- **Today:** start times follow truck ETA plus a buffer; one done-by time per store.
-  Missing: store hours, invoicing hours, the late-truck decision prompt.
+- **Today:** receiving (invoicing) and merchandising hours per store, editable; start
+  waits for receiving; alerts when a truck lands after receiving closes or work runs
+  past merch hours. Missing: the late-truck decision prompt (T-302, M3).
 
 **BR-014 Truck delivery visibility** · 🟡 Partial
 - **Story:** Workers see expected arrival, delays and completed delivery before
@@ -253,12 +256,14 @@ business document. For each one:
 
 ### A6. Standards, reporting and oversight
 
-**BR-024 Engineered work standards and capacity** · 🟡 Partial
+**BR-024 Engineered work standards and capacity** · 🟡 Partial (M1) · `br-024-work-standards`
 - **Story:** Planned drive time, merchandising time, expected units/cases, units per
   hour and workload assumptions are set **per store/route**, not one universal rate.
 - **War-game check:** labor standards editable per store (with a default), and the
   scheduler sees how store complexity changes the plan.
-- **Today:** one universal minutes-per-case and fixed-minutes rule.
+- **Today:** store complexity classes (simple / standard / complex) scale the global
+  standard; class editable per store; cases per hour shown. Missing: route-level
+  standards and an agreed method for setting them.
 - **Open questions:** What's the numerator (units or cases)? How is store complexity
   defined? Who sets standards, and how?
 
@@ -412,6 +417,10 @@ Updated as features land. To change a requirement, edit only its folder
 | BR-007, BR-012, BR-024 (settings) | `src/features/pay-labor-rules` | Pay math itself is core (`src/engine/plan.ts`) |
 | BR-004, BR-008, BR-014, BR-017 (disruptions) | `src/features/curveballs` | Event primitives are core (`src/engine/sim.ts`) |
 | BR-007, BR-014, BR-026 (alerts) | `src/features/day-alerts` | |
+| BR-001 (roles, access) | `src/features/br-001-role-access` | Roles/markets/route types are core data |
+| BR-009 (store hours) | `src/features/br-009-store-hours` | Late-truck prompt is M3 |
+| BR-012 (planned vs actual) | `src/features/br-012-planned-vs-actual` | |
+| BR-024 (work standards) | `src/features/br-024-work-standards` | |
 | War-game findings | `src/features/findings` | Not a business requirement |
 
 ## Open questions (consolidated)
@@ -433,8 +442,8 @@ Updated as features land. To change a requirement, edit only its folder
 
 | Status | Count | IDs |
 |---|---|---|
-| ✅ Covered | 0 | — |
-| 🟡 Partial | 19 | 001, 002, 004, 006, 007, 008, 009, 010, 011, 012, 014, 015, 021, 024, 026, 027, 028, 031, 038 |
+| ✅ Covered | 1 | 001 |
+| 🟡 Partial | 18 | 002, 004, 006, 007, 008, 009, 010, 011, 012, 014, 015, 021, 024, 026, 027, 028, 031, 038 |
 | ⬜ Not yet | 11 | 003, 005, 016, 020, 022, 025, 030, 037, 040, 041, 043 |
 | 🔌 Simulate only | 4 | 013, 017, 036, 039 |
 | 🚫 Out of scope | 7 | 029, 033, 034, 035, 042, 044, 045 |

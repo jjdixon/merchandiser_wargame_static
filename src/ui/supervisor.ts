@@ -5,12 +5,14 @@ const SCALE = 10; // px per km on the map
 
 export function supervisorView(ctx: ViewCtx): string {
   const { state } = ctx;
-  const r = state.rules, plans = allPlans(state), t = totals(plans);
+  const { scope } = ctx;
+  const r = state.rules, plans = allPlans(state).filter(p => scope.merch(p.m)), t = totals(plans);
+  const stores = state.stores.filter(scope.store);
   const done = plans.reduce((a, p) => a + p.stops.filter(x => state.t >= x.end).length, 0);
-  const un = state.stores.filter(s => !s.assign);
+  const un = stores.filter(s => !s.assign);
   const otRisk = plans.filter(p => p.weekProj > r.ot).length;
   const lateN = plans.reduce((a, p) => a + p.late.length, 0);
-  const avail = state.merch.filter(m => !m.out);
+  const avail = state.merch.filter(m => !m.out && scope.merch(m));
 
   const unHtml = un.length ? un.map(s => {
     const opts = avail.map(m => {
@@ -24,7 +26,7 @@ export function supervisorView(ctx: ViewCtx): string {
   let svg = `<svg viewBox="0 0 410 320" role="img" aria-label="Map of stores and merchandisers"><rect width="410" height="320" fill="var(--soft)" rx="6"/>`;
   for (let i = 1; i < 8; i++) svg += `<line x1="${i * 50}" y1="0" x2="${i * 50}" y2="320" stroke="var(--line)" stroke-width=".6"/>`;
   for (let i = 1; i < 7; i++) svg += `<line x1="0" y1="${i * 50}" x2="410" y2="${i * 50}" stroke="var(--line)" stroke-width=".6"/>`;
-  for (const s of state.stores) {
+  for (const s of stores) {
     const lk = s.lock;
     const c = !s.assign ? 'var(--late)' : lk && state.t >= lk.end ? 'var(--ok)' : lk && state.t >= lk.start ? 'var(--work)' : 'var(--panel)';
     svg += `<circle cx="${px(s.xy[0])}" cy="${px(s.xy[1])}" r="6" fill="${c}" stroke="var(--ink)" stroke-width="1.2"><title>${esc(s.name)}${!s.assign && readyAt(state, s) <= state.t ? ' — product waiting' : ''}</title></circle>
@@ -43,7 +45,7 @@ export function supervisorView(ctx: ViewCtx): string {
   const kpi = (label: string, value: string, bad = false) => `<div class="kpi${bad ? ' bad' : ''}"><span class="lbl">${label}</span><b>${value}</b></div>`;
   return `
   <section class="kpis">
-    ${kpi('Stops done', `${done}/${state.stores.length}`)}
+    ${kpi('Stops done', `${done}/${stores.length}`)}
     ${kpi('Need coverage', String(un.length), un.length > 0)}
     ${kpi('Projected late', String(lateN), lateN > 0)}
     ${kpi('Overtime risk', String(otRisk), otRisk > 0)}

@@ -1,0 +1,11 @@
+{
+  "byChain": {
+    "ValuMart":      { "receivingOpen": "05:00", "receivingClose": "11:00", "merchOpen": "05:00", "merchClose": "15:00" },
+    "Fresh Fare":    { "receivingOpen": "07:00", "receivingClose": "12:00", "merchOpen": "06:00", "merchClose": "14:00" },
+    "Corner Stop":   { "receivingOpen": "08:00", "receivingClose": "14:00", "merchOpen": "07:00", "merchClose": "19:00" },
+    "Pantry Plus":   { "receivingOpen": "07:00", "receivingClose": "12:00", "merchOpen": "06:00", "merchClose": "16:00" },
+    "Dollar Daily":  { "receivingOpen": "09:00", "receivingClose": "13:00", "merchOpen": "09:00", "merchClose": "18:00" },
+    "Hometown Grocer": { "receivingOpen": "07:00", "receivingClose": "10:30", "merchOpen": "06:00", "merchClose": "12:00" }
+  },
+  "byStore": {}
+}
