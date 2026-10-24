@@ -6,7 +6,7 @@
   "causes": [
     { "cause": "Order fill — shorted at the warehouse", "owner": "Order management" },
     { "cause": "Delivery — missed or late",             "owner": "Transportation" },
-    { "cause": "Ordering — order too low",              "owner": "Ordering team" },
+    { "cause": "Ordering — order too low",              "owner": "MSL" },
     { "cause": "Inventory — in the backroom, not worked", "owner": "MSL" },
     { "cause": "Merchandising — not filled last visit", "owner": "MSL" },
     { "cause": "Other / not sure",                      "owner": "MSL" }

@@ -82,3 +82,17 @@ Format: ID · date · decision — why.
   each day has different but repeatable disruptions.
 - **D-024** · 2026-10-24 · Hours enforcement (BR-007) releases remaining stops at the
   weekly max but lets the stop in progress finish.
+- **D-025** · 2026-10-24 · Trays and cases (NR-001) are a core concept: separate
+  minutes per tray and per case, both on every store. Cost per case became cost per
+  unit (tray or case). The seed split each store's old cases ~60/40 into trays and
+  cases, with minutes per tray set so total labor stayed about the same.
+- **D-026** · 2026-10-24 · Backstock counting moved out of the guided visit (BR-002)
+  into its own feature (NR-002), with a new core step kind (`counts`) and a last
+  visit phase (`closeout`, "Before you leave"). Granularity is a switch (totals vs.
+  by category) because the business hasn't decided. Counts go on the core
+  `store.backstock` so order feedback can read them without importing NR-002.
+- **D-027** · 2026-10-24 · Order feedback (NR-003) suggests light / about right /
+  heavy from on hand vs. sales until the next truck, per unit. The merchandiser can
+  override; the MSL sees both the call and the app's suggestion. Average sales are
+  fictional per-store numbers in the feature folder until real data is allowed (D-007).
+- **D-028** · 2026-10-24 · Ordering out-of-stocks route to the MSL (BR-020 data change).

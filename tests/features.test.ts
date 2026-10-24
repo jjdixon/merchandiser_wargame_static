@@ -183,6 +183,23 @@ describe('core: store visit steps (M2)', () => {
     expect(s.stores[0].answers.nope).toBeUndefined();
   });
 
+  it('counts steps need every field; the closeout phase sorts last (M4.5)', () => {
+    const f: EngineFeature = {
+      id: 'tc', title: 't', description: 't', requirements: [], defaultOn: true,
+      visitSteps: () => [
+        { id: 'tc:leave', featureId: 'tc', phase: 'closeout', title: 'Leaving', kind: 'counts', required: true, countFields: [{ id: 'trays', label: 'trays' }, { id: 'cases', label: 'cases' }] },
+        { id: 'tc:oos', featureId: 'tc', phase: 'oos', title: 'OOS', kind: 'check', required: true },
+      ],
+    };
+    const s = newDay(tiny(), 'base', { features: [f] }), st = s.stores[0];
+    expect(visitSteps(s, st).map(x => x.phase)).toEqual(['oos', 'closeout']);
+    const step = visitSteps(s, st).find(x => x.id === 'tc:leave')!;
+    answerStep(s, st, 'tc:leave', { counts: { trays: 4 } });
+    expect(isAnswered(step, st.answers['tc:leave'])).toBe(false);
+    answerStep(s, st, 'tc:leave', { counts: { trays: 4, cases: 0 } });
+    expect(isAnswered(step, st.answers['tc:leave'])).toBe(true);
+  });
+
   it('hash01 is repeatable and within 0..1', () => {
     expect(hash01('x')).toBe(hash01('x'));
     for (const k of ['a', 'b', 'c|d']) { expect(hash01(k)).toBeGreaterThanOrEqual(0); expect(hash01(k)).toBeLessThan(1) }

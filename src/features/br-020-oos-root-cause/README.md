@@ -11,7 +11,7 @@ or tap *None found*. Each report is routed to the role that owns the cause:
 |---|---|
 | Order fill: shorted at the warehouse | Order management |
 | Delivery: missed or late | Transportation |
-| Ordering: order too low | Ordering team |
+| Ordering: order too low | MSL (MSLs own ordering) |
 | Inventory: in the backroom, not worked | MSL |
 | Merchandising: not filled last visit | MSL |
 | Other / not sure | MSL |

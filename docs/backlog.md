@@ -84,15 +84,15 @@ across sessions.
 - [x] **T-407** Route/run bidding: window, eligibility, award, publish
       · BR-003 · `br-003-route-bidding` · L
 
-## M4.5 — Trays, backstock and order feedback (added business context)
+## M4.5 — Trays, backstock and order feedback (added business context) · branch `m45-trays-backstock`
 
-- [ ] **T-451** Trays and cases in the core: separate labor minutes, every volume
+- [x] **T-451** Trays and cases in the core: separate labor minutes, every volume
       feature handles both · NR-001 · core · M
-- [ ] **T-452** Backstock count at arrival and when leaving (totals or by category) ·
+- [x] **T-452** Backstock count at arrival and when leaving (totals or by category) ·
       NR-002 · `nr-002-backstock` · M
-- [ ] **T-453** Light / heavy order feedback with a suggestion from on-hand, next
+- [x] **T-453** Light / heavy order feedback with a suggestion from on-hand, next
       delivery and average sales; routed to the MSL · NR-003 · `nr-003-order-feedback` · M
-- [ ] **T-454** Route ordering out-of-stocks to the MSL · BR-020 · data change · S
+- [x] **T-454** Route ordering out-of-stocks to the MSL · BR-020 · data change · S
 
 ## M5 — Display tracking
 

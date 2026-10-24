@@ -11,7 +11,7 @@ import type { AppApi, Panel } from '../../app/feature';
 import { ID, canCloseOut, closeOut, practiceCloseOut, setPlaying, startPractice, visitState, type Practice } from './engine';
 
 const PHASE_LABEL: Record<VisitStep['phase'], string> = {
-  backstock: '1 · Backstock', display: '2 · Displays', aisle: '3 · Aisles', validate: '4 · Validate', oos: '5 · Out-of-stocks',
+  backstock: '1 · Backstock', display: '2 · Displays', aisle: '3 · Aisles', validate: '4 · Validate', oos: '5 · Out-of-stocks', closeout: '6 · Before you leave',
 };
 
 /** The practice (sandbox) visit open on this screen, if any. Never part of the day. */
@@ -46,6 +46,8 @@ function stepInput(s: Store, step: VisitStep, a: StepAnswer | undefined, disable
       return `<input type="checkbox" data-fchange="${ID}:check" ${data}${a?.done ? ' checked' : ''} aria-label="${esc(step.title)}" style="width:22px;height:22px;accent-color:var(--work)">`;
     case 'count':
       return `<input type="number" min="0" inputmode="numeric" placeholder="0" data-fchange="${ID}:count" ${data} value="${a?.count ?? ''}" aria-label="${esc(step.title)}" style="width:5.5em;text-align:right">${step.unit ? ` <span class="muted">${esc(step.unit)}</span>` : ''}`;
+    case 'counts':
+      return (step.countFields ?? []).map(f => `<label style="display:inline-flex;align-items:center;gap:6px"><input type="number" min="0" inputmode="numeric" placeholder="0" data-fchange="${ID}:counts" data-field="${esc(f.id)}" ${data} value="${a?.counts?.[f.id] ?? ''}" aria-label="${esc(f.label)}" style="width:5em;text-align:right"><span class="muted" style="font-size:13px">${esc(f.label)}</span></label>`).join('');
     case 'choice':
       return `<select data-fchange="${ID}:choice" ${data} aria-label="${esc(step.title)}"><option value="">Choose…</option>${(step.options ?? []).map(o => `<option${a?.choice === o ? ' selected' : ''}>${esc(o)}</option>`).join('')}</select>`;
     case 'entries': {
@@ -193,6 +195,13 @@ const store = (app: AppApi, el: HTMLElement) => { const st = target(app, el); re
 export const changes: Record<string, (app: AppApi, el: HTMLInputElement) => void> = {
   check(app, el) { const s = store(app, el); if (s) { answerStep(target(app, el)!, s, el.dataset.step!, { done: el.checked }); app.refresh() } },
   count(app, el) { const s = store(app, el); if (s && el.value !== '') { answerStep(target(app, el)!, s, el.dataset.step!, { count: Math.max(0, Number(el.value)) }); el.blur(); app.refresh() } },
+  counts(app, el) {
+    const s = store(app, el);
+    if (!s || el.value === '') return;
+    const prev = s.answers[el.dataset.step!]?.counts ?? {};
+    answerStep(target(app, el)!, s, el.dataset.step!, { counts: { ...prev, [el.dataset.field!]: Math.max(0, Math.round(Number(el.value))) } });
+    app.refresh();
+  },
   choice(app, el) { const s = store(app, el); if (s && el.value) { answerStep(target(app, el)!, s, el.dataset.step!, { choice: el.value }); el.blur(); app.refresh() } },
   photo(app, el) {
     const s = store(app, el), file = el.files?.[0];

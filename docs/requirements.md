@@ -455,8 +455,14 @@ workbook IDs.
 - **War-game check:** at the end of the visit the app suggests light / about right /
   heavy (on hand vs. sales until the next truck), separately for trays and cases; the
   merchandiser agrees or overrides; the store's MSL gets it with the numbers behind it.
+- **How the suggestion works (v1):** on hand = today's delivery + backstock found on
+  arrival; need = average daily sales × days until the next delivery (from the route
+  type's weekly pattern). Heavy if on hand is more than need + tolerance (25%) or
+  leftover backstock is more than tolerance × need; light if below need − tolerance,
+  or out-of-stocks were found and on hand is below need. Pull-ups get no feedback.
 - **Open questions:** where average sales and shelf capacity come from; how far ahead
-  the "next delivery" should look; whether merchandisers should suggest quantities.
+  the "next delivery" should look; whether merchandisers should suggest quantities;
+  whether sales should vary by day of week; whether feedback belongs on pull-ups.
 
 **Change to BR-020:** out-of-stocks caused by ordering now route to the **MSL** (MSLs
 own ordering).
@@ -477,7 +483,7 @@ Updated as features land. To change a requirement, edit only its folder
 | BR-024 (work standards) | `src/features/br-024-work-standards` | |
 | BR-002, BR-015, BR-021 (guided visit) | `src/features/br-002-guided-visit` | Steps and answers are core (`src/engine/visit.ts`) |
 | BR-022 (display awareness) | `src/features/br-022-display-awareness` | Full Display Tracking is M5 |
-| BR-020 (out-of-stocks) | `src/features/br-020-oos-root-cause` | |
+| BR-020 (out-of-stocks) | `src/features/br-020-oos-root-cause` | Ordering causes go to the MSL (`oos.json`) |
 | BR-039 (photos) | `src/features/br-039-photo-capture` | Photo review queue is BR-043, M5 |
 | BR-014 (truck visibility) | `src/features/br-014-truck-visibility` | |
 | BR-009 (late-truck options) | `src/features/br-009-late-truck-options` | Store hours stay in `br-009-store-hours` |
@@ -492,6 +498,9 @@ Updated as features land. To change a requirement, edit only its folder
 | BR-006 | `src/features/br-006-route-jumping` | |
 | BR-005 | `src/features/br-005-relief-coverage` | |
 | BR-003 | `src/features/br-003-route-bidding` | |
+| NR-001 (trays and cases) | core: `Rules.mpt`, `Store.trays`, `src/engine/plan.ts` | Every volume feature scales both |
+| NR-002 (backstock) | `src/features/nr-002-backstock` | Counts land on core `store.backstock` |
+| NR-003 (order feedback) | `src/features/nr-003-order-feedback` | Sales: `sales.json` in the folder |
 | War-game findings | `src/features/findings` | Not a business requirement |
 
 ## Open questions (consolidated)

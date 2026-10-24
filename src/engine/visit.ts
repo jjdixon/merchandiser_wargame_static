@@ -18,6 +18,7 @@ export function isAnswered(step: VisitStep, a: StepAnswer | undefined): boolean 
     case 'count': return typeof a.count === 'number' && a.count >= 0;
     case 'choice': return !!a.choice;
     case 'entries': return !!a.done;
+    case 'counts': return (step.countFields ?? []).every(f => typeof a.counts?.[f.id] === 'number' && a.counts[f.id] >= 0);
   }
 }
 

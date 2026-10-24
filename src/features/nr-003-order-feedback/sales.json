@@ -1,0 +1,61 @@
+{
+ "_note": "Average daily sales per store (fictional), in trays and cases. Used to estimate what sells before the next delivery.",
+ "byStore": {
+  "s1": {
+   "trays": 96,
+   "cases": 64
+  },
+  "s2": {
+   "trays": 62,
+   "cases": 40
+  },
+  "s3": {
+   "trays": 9,
+   "cases": 6
+  },
+  "s4": {
+   "trays": 49,
+   "cases": 34
+  },
+  "s5": {
+   "trays": 109,
+   "cases": 73
+  },
+  "s6": {
+   "trays": 40,
+   "cases": 27
+  },
+  "s7": {
+   "trays": 12,
+   "cases": 8
+  },
+  "s8": {
+   "trays": 54,
+   "cases": 37
+  },
+  "s9": {
+   "trays": 42,
+   "cases": 28
+  },
+  "s10": {
+   "trays": 6,
+   "cases": 4
+  },
+  "s11": {
+   "trays": 80,
+   "cases": 53
+  },
+  "s12": {
+   "trays": 76,
+   "cases": 51
+  },
+  "s13": {
+   "trays": 9,
+   "cases": 6
+  },
+  "s14": {
+   "trays": 12,
+   "cases": 8
+  }
+ }
+}

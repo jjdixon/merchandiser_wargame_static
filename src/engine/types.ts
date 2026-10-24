@@ -97,7 +97,15 @@ export interface Store {
   lock: Lock | null;
   /** Answers to today's visit steps, keyed by step id (see VisitStep). */
   answers: Record<string, StepAnswer>;
+  /**
+   * Backstock counted in the backroom today (NR-002): at arrival and when leaving.
+   * Written by the backstock feature; read by others (e.g. order feedback, NR-003).
+   */
+  backstock?: { start?: Units; end?: Units };
 }
+
+/** A volume of product in both units the business handles (NR-001). */
+export interface Units { trays: number; cases: number }
 
 export type Severity = 'bad' | 'warn' | 'info';
 export interface Alert { t: Minutes; sev: Severity; text: string }
@@ -282,16 +290,18 @@ export interface EngineFeature {
  * phase order and gates close-out on the required ones. Answers live on the
  * store (store.answers) so every feature can read them.
  */
-export type VisitPhase = 'backstock' | 'display' | 'aisle' | 'validate' | 'oos';
-export const PHASE_ORDER: VisitPhase[] = ['backstock', 'display', 'aisle', 'validate', 'oos'];
+export type VisitPhase = 'backstock' | 'display' | 'aisle' | 'validate' | 'oos' | 'closeout';
+export const PHASE_ORDER: VisitPhase[] = ['backstock', 'display', 'aisle', 'validate', 'oos', 'closeout'];
 
 /**
  * check: tick it off · count: enter a number · choice: pick one option ·
- * entries: add rows of choices (e.g. out-of-stock product + cause) or confirm none.
+ * entries: add rows of choices (e.g. out-of-stock product + cause) or confirm none ·
+ * counts: several numbers at once (e.g. trays and cases), every one required.
  */
-export type StepKind = 'check' | 'count' | 'choice' | 'entries';
+export type StepKind = 'check' | 'count' | 'choice' | 'entries' | 'counts';
 
 export interface EntryField { id: string; label: string; options: string[] }
+export interface CountField { id: string; label: string }
 
 export interface VisitStep {
   /** Unique per store visit. Convention: "<feature id>:<local id>". */
@@ -311,6 +321,8 @@ export interface VisitStep {
   options?: string[];
   /** For 'entries'. */
   fields?: EntryField[];
+  /** For 'counts'. */
+  countFields?: CountField[];
   /** For 'count': unit label, e.g. "cases". */
   unit?: string;
   /** Only once work has started (product is available); else also while waiting on the truck. */
@@ -341,6 +353,8 @@ export interface StepAnswer {
   count?: number;
   choice?: string;
   entries?: Array<Record<string, string>>;
+  /** For 'counts': field id → number. */
+  counts?: Record<string, number>;
   photo?: PhotoRef;
 }
 
