@@ -55,5 +55,16 @@ export function answerStep(state: SimState, s: Store, stepId: string, answer: Om
 export function hash01(key: string): number {
   let h = 2166136261;
   for (let i = 0; i < key.length; i++) { h ^= key.charCodeAt(i); h = Math.imul(h, 16777619) }
-  return ((h >>> 0) % 100000) / 100000;
+  // Final avalanche (murmur3 fmix32) so similar keys ("s1|geo", "s2|geo") spread evenly.
+  h ^= h >>> 16; h = Math.imul(h, 0x85ebca6b); h ^= h >>> 13; h = Math.imul(h, 0xc2b2ae35); h ^= h >>> 16;
+  return (h >>> 0) / 4294967296;
+}
+
+/**
+ * Repeatably pick round(pct% × n) of the given ids (the ones with the lowest hash
+ * for this salt). "20% of trucks are late" then means exactly that many, every run.
+ */
+export function pickShare(ids: string[], salt: string, pct: number): Set<string> {
+  const n = Math.round((ids.length * Math.max(0, Math.min(100, pct))) / 100);
+  return new Set([...ids].sort((a, b) => hash01(`${salt}|${a}`) - hash01(`${salt}|${b}`)).slice(0, n));
 }

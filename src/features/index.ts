@@ -14,6 +14,11 @@ import { br002GuidedVisit } from './br-002-guided-visit';
 import { br022DisplayAwareness } from './br-022-display-awareness';
 import { br020OosRootCause } from './br-020-oos-root-cause';
 import { br039PhotoCapture } from './br-039-photo-capture';
+import { br014TruckVisibility } from './br-014-truck-visibility';
+import { br009LateTruckOptions } from './br-009-late-truck-options';
+import { br017LoadAdjustments } from './br-017-load-adjustments';
+import { br028Messaging } from './br-028-messaging';
+import { br011GeofenceExceptions } from './br-011-geofence-exceptions';
 // <feature-imports>
 
 export const FEATURES: Feature[] = [
@@ -29,5 +34,10 @@ export const FEATURES: Feature[] = [
   br022DisplayAwareness,
   br020OosRootCause,
   br039PhotoCapture,
+  br014TruckVisibility,
+  br009LateTruckOptions,
+  br017LoadAdjustments,
+  br028Messaging,
+  br011GeofenceExceptions,
   // <feature-list>
 ];

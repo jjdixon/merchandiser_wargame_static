@@ -2,7 +2,7 @@
 // what it plugs into — the contract every feature folder relies on.
 import { describe, expect, it } from 'vitest';
 import {
-  adjustDrive, adjustWork, answerStep, enableFeatures, featureState, getRule, hash01, isAnswered, newDay, plan, readyAt, setRule, tick, visitProgress, visitSteps, workMin,
+  adjustDrive, adjustWork, answerStep, enableFeatures, featureState, getRule, hash01, isAnswered, pickShare, newDay, plan, readyAt, setRule, tick, visitProgress, visitSteps, workMin,
   type EngineFeature, type Seed,
 } from '../src/engine';
 import { FEATURES } from '../src/features';
@@ -196,5 +196,25 @@ describe('core: guided visit with every feature on', () => {
     while (s.t < 23 * 60) tick(s, 5);
     for (const st of s.stores) expect(visitProgress(s, st).complete).toBe(true);
     expect(Object.keys(s.fx)).toEqual(expect.arrayContaining(['br-002-guided-visit', 'br-020-oos-root-cause', 'br-039-photo-capture']));
+  });
+});
+
+describe('core: hash01 spread (M3)', () => {
+  it('similar keys spread across 0..1 (no clumping)', () => {
+    for (const k of ['geo', 'late', 'load', 'oos']) {
+      const v = Array.from({ length: 40 }, (_, i) => hash01(`normal|s${i + 1}|${k}`));
+      expect(v.filter(x => x < 0.25).length).toBeGreaterThan(4);
+      expect(v.filter(x => x > 0.75).length).toBeGreaterThan(4);
+    }
+  });
+});
+
+describe('core: pickShare (M3)', () => {
+  it('picks exactly the share, repeatably', () => {
+    const ids = Array.from({ length: 14 }, (_, i) => `s${i + 1}`);
+    expect(pickShare(ids, 'x', 20).size).toBe(3);
+    expect([...pickShare(ids, 'x', 20)]).toEqual([...pickShare(ids, 'x', 20)]);
+    expect(pickShare(ids, 'x', 0).size).toBe(0);
+    expect(pickShare(ids, 'x', 100).size).toBe(14);
   });
 });

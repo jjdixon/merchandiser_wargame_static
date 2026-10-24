@@ -36,29 +36,29 @@ across sessions.
 - [x] **T-105** (#2) Planned vs. actual time per stop and per day (actuals drift from plan
       with realistic variation) · BR-012 · `br-012-planned-vs-actual` · M
 
-## M2 — Guided store visit (the BR-002 MVP) · branch `m2-guided-visit`
+## M2 — Guided store visit (the BR-002 MVP) · merged #3
 
-- [x] **T-201** Step-by-step visit: note backstock → each display → each aisle →
+- [x] **T-201** (#3) Step-by-step visit: note backstock → each display → each aisle →
       validate → out-of-stocks; can't close out until required steps are done
       · BR-002, BR-015, BR-021 · `br-002-guided-visit` · L
-- [x] **T-202** Displays per store feed visit steps · BR-022 · `br-022-display-awareness` · M
-- [x] **T-203** Out-of-stock capture with root cause, routed to the owning role
+- [x] **T-202** (#3) Displays per store feed visit steps · BR-022 · `br-022-display-awareness` · M
+- [x] **T-203** (#3) Out-of-stock capture with root cause, routed to the owning role
       · BR-020 · `br-020-oos-root-cause` · M
-- [x] **T-204** Photo step (upload), auto-filled metadata, simulated recognition
+- [x] **T-204** (#3) Photo step (upload), auto-filled metadata, simulated recognition
       suggestion · BR-039 · `br-039-photo-capture` · M
-- [x] **T-205** "Next action" home screen on the phone · BR-015 · S
+- [x] **T-205** (#3) "Next action" home screen on the phone · BR-015 · S
 
-## M3 — Day-of disruptions
+## M3 — Day-of disruptions · branch `m3-disruptions`
 
-- [ ] **T-301** Delivery status per stop; late-truck notice *before* leaving
+- [x] **T-301** Delivery status per stop; late-truck notice *before* leaving
       · BR-014 · `br-014-truck-visibility` · M
-- [ ] **T-302** Late-truck decision prompt: wait / go to next store / swap order, with
+- [x] **T-302** Late-truck decision prompt: wait / go to next store / swap order, with
       the effect on the day · BR-009 · M
-- [ ] **T-303** Load cuts and adds curveball, ordered vs. delivered, notifications
+- [x] **T-303** Load cuts and adds curveball, ordered vs. delivered, notifications
       · BR-017 · `br-017-load-adjustments` · S
-- [ ] **T-304** Two-way messages tied to a stop (merchandiser, MSL, scheduler,
+- [x] **T-304** Two-way messages tied to a stop (merchandiser, MSL, scheduler,
       driver) · BR-028 · `br-028-messaging` · M
-- [ ] **T-305** Geofence exceptions (missing entry/exit) and a review queue
+- [x] **T-305** Geofence exceptions (missing entry/exit) and a review queue
       · BR-011 · `br-011-geofence-exceptions` · M
 
 ## M4 — Scheduling (starts with the week model)

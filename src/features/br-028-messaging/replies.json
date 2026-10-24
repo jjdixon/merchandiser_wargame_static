@@ -1,0 +1,23 @@
+{
+  "MSL": [
+    "Got it. I'll call the store manager.",
+    "Thanks. Do what you can and note it in the visit.",
+    "OK, I'll check with the scheduler and get back to you.",
+    "Understood. Take a photo so I can see it."
+  ],
+  "Scheduler": [
+    "Noted. I'll look at moving your later stops.",
+    "Thanks. I can send the route jumper if it gets worse.",
+    "Got it. Keep me posted on your finish time."
+  ],
+  "Driver": [
+    "Copy. I'm about 20 out.",
+    "Sorry, warehouse was late loading. On my way.",
+    "Dropped it at receiving. They're checking it in now."
+  ],
+  "Merchandiser": [
+    "OK, on it.",
+    "Got it. I'll adjust.",
+    "Thanks, heading there now."
+  ]
+}

@@ -79,6 +79,7 @@ const app: AppApi = {
   get selM() { return scope().lockMerch ?? selM },
   get viewName() { return currentView().label },
   get scenarioLabel() { return scenarioLabel() },
+  get viewer() { return scope().label },
   refresh: () => changed(),
   toast,
   copy,

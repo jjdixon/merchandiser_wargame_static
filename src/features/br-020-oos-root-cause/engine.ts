@@ -5,7 +5,7 @@
 // the business's "trigger a workflow in the inventory/ordering app".
 // Simulated merchandisers report one about a quarter of the time.
 import {
-  featureState, fmt, hash01, raise,
+  featureState, fmt, hash01, pickShare, raise,
   type EngineFeature, type SimState, type Store, type VisitStep,
 } from '../../engine';
 import DATA from './oos.json';
@@ -25,8 +25,8 @@ export function oosStep(): VisitStep {
     title: 'Out-of-stocks', detail: 'Any empty spots or voids? Add each with its cause, or confirm none.',
     fields: [{ id: 'product', label: 'Product', options: PRODUCTS }, { id: 'cause', label: 'Cause', options: CAUSES.map(c => c.cause) }],
     autoAnswer: (state, s) => {
-      const u = hash01(`${state.scenario}|${s.id}|oos`);
-      if (u >= 0.25) return { done: true, entries: [] };
+      const ids = state.stores.filter(x => !x.id.startsWith('x')).map(x => x.id);
+      if (!pickShare(ids, `${state.scenario}|oos`, 25).has(s.id)) return { done: true, entries: [] };
       return { done: true, entries: [{
         product: PRODUCTS[Math.floor(hash01(`${s.id}|p`) * PRODUCTS.length)],
         cause: CAUSES[Math.floor(hash01(`${s.id}|c`) * CAUSES.length)].cause,
