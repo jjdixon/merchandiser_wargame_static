@@ -1,0 +1,8 @@
+{
+  "secondVisits": [
+    { "store": "s1",  "days": "FS", "at": "14:00", "doneBy": "17:00", "share": 0.3, "assignTo": "ros", "why": "Weekend traffic empties the bread aisle by afternoon" },
+    { "store": "s11", "days": "FS", "at": "14:30", "doneBy": "17:30", "share": 0.3, "assignTo": "sam", "why": "Second pull before the evening rush" },
+    { "store": "s5",  "days": "R",  "at": "13:30", "doneBy": "16:30", "share": 0.25, "assignTo": null, "why": "Thursday promo day" }
+  ],
+  "holiday": { "beforeFactor": 1.3, "afterFactor": 1.5, "holidayPullUpShare": 0.2 }
+}

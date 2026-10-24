@@ -31,14 +31,15 @@ export function scheduledEta(state: SimState, s: Store): number {
 
 /** Minutes of carrier delay this truck will have today (0 for most). Repeatable. */
 export function carrierDelay(state: SimState, s: Store): number {
-  if (s.id.startsWith('x')) return 0;
+  if (s.id.startsWith('x') || s.pullUp) return 0;
   const ids = SEED_STORES.map(x => x.id);
   if (!pickShare(ids, `${state.scenario}|late`, ruleNum(state.rules, PCT, 20)).has(s.id)) return 0;
   return 20 + Math.floor(hash01(`${s.id}|late-min`) * 70);
 }
 
-export type TruckStatus = 'scheduled' | 'en route' | 'late' | 'delivered';
+export type TruckStatus = 'scheduled' | 'en route' | 'late' | 'delivered' | 'no truck';
 export function truckStatus(state: SimState, s: Store): { status: TruckStatus; lateBy: number } {
+  if (s.pullUp) return { status: 'no truck', lateBy: 0 };
   const lateBy = Math.max(0, Math.round(s.eta - scheduledEta(state, s)));
   if (state.t >= s.eta) return { status: 'delivered', lateBy };
   if (lateBy > 5) return { status: 'late', lateBy };
@@ -48,6 +49,7 @@ export function truckStatus(state: SimState, s: Store): { status: TruckStatus; l
 export function onTick(state: SimState): void {
   const t = trucks(state);
   for (const s of state.stores) {
+    if (s.pullUp) continue;
     const sched = scheduledEta(state, s);
     // Dispatch reveals the carrier's delay ahead of the scheduled time.
     if (!t.revealed[s.id] && state.t >= sched - REVEAL_BEFORE) {

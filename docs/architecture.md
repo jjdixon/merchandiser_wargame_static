@@ -45,6 +45,12 @@ screen-side ones in `src/app/feature.ts` (`Feature`).
 | `onStepAnswered(state, store, step, answer)` | react to any answer, by a person or the sim | route out-of-stocks, record photos |
 | `hash01(key)` / `pickShare(ids, salt, pct)` | repeatable "random" choices; exactly pct% of items | late trucks, load changes, geofence problems |
 | `app.viewer` | who's viewing (from the access plug-in), for "sent as" etc. | messaging |
+| `onDayStart(state)` | when a day is built: change who's out, which stores, volumes (read week state only) | vacations, holidays, second visits |
+| `onDayEnd(state)` | when the facilitator ends the day (write week state here) | usual service times |
+| `weekState(state, id, init)` | a feature's own week-scoped state, survives across days | bids, vacations, change log |
+| `state.week.master` | permanent store owners from the next day on | permanent reassignment, bid awards |
+| `splitWork(state, store, to, share)` | move part of a store's remaining work to a helper | split, send help |
+| `ctx.projectDay(day)` / `app.projectDay(day)` | a future day as planned, without changing anything | Week view, hours this week |
 | `featureState(state, id, init)` | a feature's own day-scoped state in `state.fx[id]` | baselines, recorded times (BR-012) |
 | `mount(app)` | once at startup — **locked features only** | floating findings button |
 
@@ -95,6 +101,10 @@ Creates the folder from a template, registers it, and starts it switched off.
   actions.
 - **The four core views** — they define the slots features fill, and apply the
   viewer's scope (`ctx.scope`) to people and stores.
+- **The week model** (`src/engine/week.ts`, `src/ui/week.ts`, `src/data/week.json`):
+  each day is a fresh SimState built from the seed (Thursday), weekly patterns
+  (delivery vs pull-up days per route type) and the week so far (hours, permanent
+  owners, week state). The header's *End day →* rolls today into the week.
 - **Store visit steps and answers** (`src/engine/visit.ts`, `store.answers`): so
   displays, out-of-stocks and photos can each be their own folder while the guided
   visit shows them all.

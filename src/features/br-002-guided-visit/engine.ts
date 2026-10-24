@@ -37,8 +37,9 @@ export function baseSteps(_state: SimState, s: Store): VisitStep[] {
     step({ id: `${ID}:backstock`, phase: 'backstock', order: 10, kind: 'count', unit: 'cases', required: true,
       title: 'Note backstock', detail: 'Count cases already in the backroom before the new delivery.',
       autoAnswer: (st, x) => ({ count: Math.round(hash01(`${st.scenario}|${x.id}|backstock`) * 24) }) }),
-    step({ id: `${ID}:receive`, phase: 'backstock', order: 20, kind: 'check', required: true, needsProduct: true,
-      title: 'Check in the delivery', detail: 'Count it in with receiving and sign the invoice.' }),
+    // Down-day pull-ups have no delivery to check in.
+    ...(s.pullUp ? [] : [step({ id: `${ID}:receive`, phase: 'backstock', order: 20, kind: 'check', required: true, needsProduct: true,
+      title: 'Check in the delivery', detail: 'Count it in with receiving and sign the invoice.' })]),
     ...aislesFor(s).map((a, i) => step({
       id: `${ID}:aisle:${i}`, phase: 'aisle', order: i, kind: 'check', required: true, needsProduct: true,
       title: `Work ${a}`, detail: 'Fill, rotate (oldest to front), face.' })),

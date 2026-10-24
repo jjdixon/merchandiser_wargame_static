@@ -1,0 +1,9 @@
+{
+  "byRole": {
+    "merchandiser": { "guarantee": 32, "max": 40 },
+    "relief":       { "guarantee": 24, "max": 40 },
+    "jumper":       { "guarantee": 30, "max": 40 }
+  },
+  "byPerson": {},
+  "reasons": ["Truck late", "Store ran long", "Extra work added", "Drive time", "Covered someone else's stops", "Other"]
+}

@@ -38,9 +38,10 @@ npm run build      # static site in dist/ (base './', host anywhere)
 ```
 src/
   engine/        CORE, pure: types, plan (route/pay math), sim (clock, event
-                 primitives, assignment), seed, feature (registry plumbing), time
+                 primitives, assignment), seed, week (days, pull-ups, roll-up),
+                 visit (store visit steps), feature (registry plumbing), time
   app/feature.ts the screen-side plug-in contract (Feature, ViewCtx, AppApi, slots)
-  ui/            CORE VIEWS: scheduler, merchandiser, supervisor, rules, shared helpers
+  ui/            CORE VIEWS: scheduler, merchandiser, supervisor, week, rules, shared helpers
   data/          seed data as JSON (stores, merchandisers, rules, scenarios, lists)
   features/      one folder per requirement (or war-game tool) + index.ts registry
     pay-labor-rules/  settings for the Pay & labor rules screen (locked on)
@@ -60,6 +61,13 @@ src/
     br-017-load-adjustments/   load cuts/adds, ordered vs delivered
     br-028-messaging/          Messages tab, driver updates, simulated replies
     br-011-geofence-exceptions/ automatic entry/exit, exceptions review queue
+    br-010-schedule-governance/ draft → published, change log, usual service time
+    br-004-reassignment/       today-only vs permanent, move route, split
+    br-007-hours-guarantees/   weekly guarantee/max, warnings, release at max + reason
+    br-008-multi-visit-holiday/ planned second visits, holiday pattern (onDayStart)
+    br-006-route-jumping/      at-risk stops, send help (jumper first)
+    br-005-relief-coverage/    vacations, relief pool coverage (onDayStart)
+    br-003-route-bidding/      open bid, eligible bids, award, publish to week.master
   main.ts        app shell: registry wiring, tabs, curveball bar, events, clock loop
 tests/           core tests (engine + plug-in points). Feature tests live in each folder.
 scripts/         check-boundaries.mjs, new-feature.mjs
@@ -71,8 +79,9 @@ Rules:
   feature's `engine.ts` (pure, tested); screen bits in its `ui.ts`.
 - Features plug in through `readyAt`, `workMinutes`, `onTick`, `curveballs`,
   `settings`, `panels` (slots incl. `header`), `views` (tabs, `public`),
-  `actions`/`changes`, `access` (viewer scope), `featureState` (day state), and
-  visit steps (`visitSteps`, `adjustStep`, `onStepAnswered`). Table in
+  `actions`/`changes`, `access` (viewer scope), `featureState` (day state),
+  `weekState` (week state), `onDayStart`/`onDayEnd`, `projectDay`, visit steps
+  (`visitSteps`, `adjustStep`, `onStepAnswered`). Table in
   `docs/architecture.md`. Need a new plug-in point? Add it to the core once, with a
   test in `tests/features.test.ts`, and say so in the PR.
 - Features **never import each other**; only `main.ts` and `features/index.ts` import
@@ -114,10 +123,19 @@ Rules:
 - `tick()` runs every enabled feature's `onTick` after each step. Alerts are raised
   with `raise()`; the automatic ones are the `day-alerts` feature.
 - `autoAssign` is a deliberately naive greedy pass. Real routing → VROOM (see D-003).
+- **Week:** `buildDay(seed, week, scenario)` builds `week.day` from the seed (Thursday =
+  every store) + `seed.week` patterns + `week.master` + hours so far; `endDay(state)`
+  rolls it into `week.history`. Down-day stores have `pullUp: true` (no truck).
+  `onDayStart` hooks may only *read* week state (the Week view projects future days).
 
 ## Status
 
-- v0.5.1 — practice visit: click through any store's visit in a sandbox copy of the
+- v0.6 (M4) — week model (days, pull-ups, End day / New week, Week tab) plus
+  schedule governance (BR-010), reassign/split (BR-004), hours guarantees (BR-007),
+  second visits/holidays (BR-008), route jumping (BR-006), vacations/relief (BR-005),
+  route bidding (BR-003). 156 tests. Finding: sample routes need ~50 h/week per
+  person against a 40 h max (see backlog).
+- v0.5.1 (merged #5) — practice visit: click through any store's visit in a sandbox copy of the
   day, no clock needed (in `br-002-guided-visit`). 121 tests.
 - v0.5 (M3, merged #4) — day-of disruptions: truck visibility (BR-014), late-truck options
   (BR-009), load cuts/adds (BR-017), messaging (BR-028), geofence exceptions
@@ -131,13 +149,13 @@ Rules:
   Seed adds route types, markets, a vacation relief and a route jumper. 68 tests.
 - v0.2 (M0) — feature architecture (merged #1).
 - Requirements: `docs/requirements.md` (41 BRs). Build order: `docs/backlog.md`
-  (M4 next: scheduling, starting with the week model).
+  (M5 next: display tracking).
 - Findings are browser-local (localStorage); export via "Copy for backlog.md".
 - Repo is **public** and auto-deploys to GitHub Pages on push to `main`
   (`.github/workflows/pages.yml`). **Never commit real store, employee or pay data
   while public** — see D-007.
-- Not yet: real store data, breaks/meal periods, multi-day/weekly scheduling,
-  shared multiplayer clock, real routing, photo capture.
+- Not yet: real store data, breaks/meal periods, shared multiplayer clock, real
+  routing.
 - Next likely work: see top of `docs/backlog.md`.
 
 ## Working agreements for AI sessions

@@ -2,7 +2,7 @@
 // what it plugs into — the contract every feature folder relies on.
 import { describe, expect, it } from 'vitest';
 import {
-  adjustDrive, adjustWork, answerStep, enableFeatures, featureState, getRule, hash01, isAnswered, pickShare, newDay, plan, readyAt, setRule, tick, visitProgress, visitSteps, workMin,
+  adjustDrive, adjustWork, answerStep, buildDay, endDay, freshWeek, projectDay, singleDayWeek, splitWork, THURSDAY, weekState, enableFeatures, featureState, getRule, hash01, isAnswered, pickShare, newDay, plan, readyAt, setRule, tick, visitProgress, visitSteps, workMin,
   type EngineFeature, type Seed,
 } from '../src/engine';
 import { FEATURES } from '../src/features';
@@ -194,7 +194,8 @@ describe('core: guided visit with every feature on', () => {
     const { seed } = await import('../src/data');
     const s = newDay(seed, 'normal', { features: FEATURES });
     while (s.t < 23 * 60) tick(s, 5);
-    for (const st of s.stores) expect(visitProgress(s, st).complete).toBe(true);
+    // Every visit that happened ends complete (BR-007 may release stops at the weekly max).
+    for (const st of s.stores.filter(x => x.lock)) expect(visitProgress(s, st).complete).toBe(true);
     expect(Object.keys(s.fx)).toEqual(expect.arrayContaining(['br-002-guided-visit', 'br-020-oos-root-cause', 'br-039-photo-capture']));
   });
 });
@@ -216,5 +217,96 @@ describe('core: pickShare (M3)', () => {
     expect([...pickShare(ids, 'x', 20)]).toEqual([...pickShare(ids, 'x', 20)]);
     expect(pickShare(ids, 'x', 0).size).toBe(0);
     expect(pickShare(ids, 'x', 100).size).toBe(14);
+  });
+});
+
+describe('core: week model (M4)', () => {
+  it('Thursday is the seed day: every store, seed hours, scenario id as the salt', async () => {
+    const { seed } = await import('../src/data');
+    const s = buildDay(seed, singleDayWeek(seed), 'normal');
+    expect(s.day).toBe(THURSDAY);
+    expect(s.stores.length).toBe(seed.stores.length);
+    expect(s.scenario).toBe('normal');
+    expect(s.merch[0].week).toBe(seed.merch[0].hoursThisWeek);
+  });
+
+  it('a down-day (Wed) is pull-ups only: LF stores, no truck, fewer cases', async () => {
+    const { seed } = await import('../src/data');
+    const w = freshWeek(seed); w.day = 2;
+    const s = buildDay(seed, w, 'normal');
+    expect(s.stores.length).toBeGreaterThan(0);
+    expect(s.stores.every(x => x.pullUp && x.routeType === 'LF')).toBe(true);
+    const s1 = s.stores.find(x => x.id === 's1')!;
+    expect(s1.cases).toBeLessThan(seed.stores[0].cases);
+    expect(s.scenario).toBe('normal@Wed');
+  });
+
+  it('ending a day carries paid hours into the next day', async () => {
+    const { seed } = await import('../src/data');
+    const w = freshWeek(seed);
+    const mon = buildDay(seed, w, 'normal');
+    while (mon.t < 23 * 60) tick(mon, 10);
+    endDay(mon);
+    expect(w.day).toBe(1);
+    const tue = buildDay(seed, w, 'normal');
+    const ana = tue.merch.find(m => m.id === 'ana')!;
+    expect(ana.week).toBeCloseTo(w.history[0].merch.ana.paid / 60);
+    expect(ana.week).toBeGreaterThan(0);
+  });
+
+  it('permanent (master) assignments apply to later days', async () => {
+    const { seed } = await import('../src/data');
+    const w = freshWeek(seed); w.master.s2 = 'ros';
+    expect(buildDay(seed, w, 'normal').stores.find(x => x.id === 's2')!.assign).toBe('ros');
+  });
+
+  it('projecting a future day never changes the real week', async () => {
+    const { seed } = await import('../src/data');
+    const w = freshWeek(seed);
+    const writer: EngineFeature = { id: 'w', title: '', description: '', requirements: [], defaultOn: true, onDayStart: st => { weekState(st, 'w', () => ({ n: 0 })).n++ } };
+    projectDay(seed, w, 4, 'normal', { features: [writer] });
+    expect(w.fx).toEqual({});
+    expect(w.day).toBe(0);
+  });
+
+  it('onDayStart and onDayEnd hooks run; weekState survives from day to day', async () => {
+    const { seed } = await import('../src/data');
+    const w = freshWeek(seed), seen: number[] = [];
+    const f: EngineFeature = { id: 'f', title: '', description: '', requirements: [], defaultOn: true,
+      onDayStart: st => { seen.push(st.day) }, onDayEnd: st => { weekState(st, 'f', () => ({ ends: 0 })).ends++ } };
+    const d0 = buildDay(seed, w, 'normal', { features: [f] }); endDay(d0);
+    const d1 = buildDay(seed, w, 'normal', { features: [f] }); endDay(d1);
+    expect(seen).toEqual([0, 1]);
+    expect((w.fx.f as { ends: number }).ends).toBe(2);
+  });
+
+  it('splitWork moves a share of a store to a helper; the rest of the day follows', () => {
+    const s = newDay(tiny(), 'base');
+    const st = s.stores[0];
+    const helper = splitWork(s, st, 'a', 0.5)!;
+    expect(helper.cases + st.cases).toBe(50);
+    expect(helper.assign).toBe('a');
+    expect(helper.xy).toEqual(st.xy);
+    expect(splitWork(s, st, 'a', 0)).toBeNull();
+  });
+});
+
+describe('core: a full week with every feature on (M4)', () => {
+  it('runs Monday to Sunday, rolling hours forward, with pull-ups on down-days', async () => {
+    const { seed } = await import('../src/data');
+    const w = freshWeek(seed);
+    const days: number[] = [];
+    for (let d = 0; d < 7; d++) {
+      const s = buildDay(seed, w, 'normal', { features: FEATURES });
+      expect(s.day).toBe(d);
+      if (d === 2 || d === 6) expect(s.stores.filter(x => !x.id.includes('~')).every(x => x.pullUp)).toBe(true);
+      while (s.t < 23 * 60) tick(s, 10);
+      days.push(s.stores.length);
+      endDay(s);
+    }
+    expect(w.history.map(h => h.day)).toEqual([0, 1, 2, 3, 4, 5, 6]);
+    const ana = w.history.reduce((h, d) => h + (d.merch.ana?.paid ?? 0), 0) / 60;
+    expect(ana).toBeGreaterThan(20);
+    expect(ana).toBeLessThanOrEqual(42);              // BR-007 stops at the max (finishes the stop in progress)
   });
 });

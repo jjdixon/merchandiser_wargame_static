@@ -1,0 +1,11 @@
+{
+  "days": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+  "letters": "MTWRFSU",
+  "patterns": {
+    "LF":          { "delivery": "MTRFS", "pullUp": "WU" },
+    "Traditional": { "delivery": "MRS",   "pullUp": "" },
+    "Xpress":      { "delivery": "TRS",   "pullUp": "" }
+  },
+  "pullUpShare": 0.3,
+  "notes": "Thursday is the canonical seed day: every store is visited and stores.json describes it. Other days follow these patterns. Down-days (Wed, Sun) are pull-up runs: no truck, merchandising from backstock at pullUpShare of the normal cases."
+}

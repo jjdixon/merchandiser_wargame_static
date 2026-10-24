@@ -3,8 +3,9 @@
 // views are pure render functions. See docs/architecture.md.
 import './styles.css';
 import {
-  addWork, assign, autoAssign, delayTruck, enableFeatures, fmt, merchById, move, newDay,
-  raise, readyAt, rulesFrom, setRule, storeById, tick, withFeatureDefaults, END_OF_DAY, type SimState,
+  addWork, assign, autoAssign, buildDay, delayTruck, enableFeatures, endDay, fmt, freshWeek, merchById, move,
+  projectDay, raise, readyAt, rulesFrom, setRule, singleDayWeek, storeById, tick, withFeatureDefaults,
+  DAYS, END_OF_DAY, type SimState, type WeekState,
 } from './engine';
 import { seed } from './data';
 import { FEATURES } from './features';
@@ -14,6 +15,7 @@ import { schedulerView } from './ui/scheduler';
 import { merchandiserView } from './ui/merchandiser';
 import { supervisorView } from './ui/supervisor';
 import { rulesView } from './ui/rules';
+import { weekView } from './ui/week';
 
 const $ = <T extends HTMLElement = HTMLElement>(sel: string) => document.querySelector(sel) as T;
 
@@ -32,6 +34,7 @@ const CORE_VIEWS: ViewDef[] = [
   { id: 'sched', label: 'Scheduler', render: schedulerView },
   { id: 'merch', label: 'Merchandiser', render: merchandiserView },
   { id: 'super', label: 'Supervisor', render: supervisorView },
+  { id: 'week', label: 'Week', render: weekView },
   { id: 'rules', label: 'Pay & labor rules', render: rulesView },
 ];
 const everyView = () => [...CORE_VIEWS, ...enabledFeatures().flatMap(f => f.views ?? [])];
@@ -52,7 +55,17 @@ const allViews = () => {
 };
 
 /* ---------- app state ---------- */
-let state: SimState = newDay(seed, seed.scenarios[0].id, { features: enabledFeatures() });
+// A session starts on the seed's Thursday; "New week" starts a Monday-to-Sunday run.
+let week: WeekState = singleDayWeek(seed);
+let state: SimState = buildDay(seed, week, seed.scenarios[0].id, { features: enabledFeatures() });
+const scenarioId = () => $<HTMLSelectElement>('#scn').value || seed.scenarios[0].id;
+// Future days only change when the week, rules or features change (all via user
+// actions), so projections are cached until the next change.
+const projCache = new Map<number, SimState>();
+const project = (day: number) => {
+  if (!projCache.has(day)) projCache.set(day, projectDay(seed, week, day, scenarioId(), { rules: state.rules, features: enabledFeatures() }));
+  return projCache.get(day)!;
+};
 let view = location.hash.slice(1);
 let selM = state.merch[0].id;
 let running = false, speed = 10, holding = false;
@@ -68,6 +81,7 @@ function ctx(): ViewCtx {
     scope: sc,
     state, selM: sc.lockMerch ?? selM,
     settings: state.ext.settings,
+    projectDay: project,
     catalog,
     slot: (name: Slot) => on.flatMap(f => f.panels ?? []).filter(p => p.slot === name)
       .sort((a, b) => (a.order ?? 100) - (b.order ?? 100)).map(p => p.render(ctx())).join(''),
@@ -80,6 +94,7 @@ const app: AppApi = {
   get viewName() { return currentView().label },
   get scenarioLabel() { return scenarioLabel() },
   get viewer() { return scope().label },
+  projectDay: project,
   refresh: () => changed(),
   toast,
   copy,
@@ -112,6 +127,9 @@ function clampToAccess(): void {
 }
 function render(force = false): void {
   $('#clk').textContent = fmt(state.t);
+  $('#dow').textContent = DAYS[state.day];
+  ($('#endDay') as HTMLButtonElement).disabled = state.day >= 6;
+  $('#endDay').textContent = state.day >= 6 ? 'Week done' : `End day → ${DAYS[state.day + 1]}`;
   if (!force && holding) return;
   clampToAccess();
   renderTabs();
@@ -145,7 +163,7 @@ function fillTargets(): void {
     `<select data-param="${esc(p.id)}" aria-label="${esc(p.label)}">${p.options.map(o => `<option value="${esc(o.value)}"${(prevParams[p.id] ?? p.default) === o.value ? ' selected' : ''}>${esc(o.label)}</option>`).join('')}</select>`).join('');
 }
 
-function changed(): void { fillCurveballs(); render(true) }
+function changed(): void { projCache.clear(); fillCurveballs(); render(true) }
 function toast(msg: string): void {
   const el = document.createElement('div');
   el.className = 'toast'; el.setAttribute('role', 'status'); el.textContent = msg;
@@ -169,7 +187,7 @@ function setRunning(on: boolean): void {
 }
 function loadScenario(id: string): void {
   setRunning(false);
-  state = newDay(seed, id, { rules: state.rules, features: enabledFeatures() });
+  state = buildDay(seed, week, id, { rules: state.rules, features: enabledFeatures() });
   if (!merchById(state, selM)) selM = state.merch[0].id;
   changed();
 }
@@ -201,6 +219,18 @@ $('#tabs').addEventListener('click', e => {
 $('#play').addEventListener('click', () => setRunning(!running));
 $<HTMLSelectElement>('#spd').addEventListener('change', e => (speed = Number((e.target as HTMLSelectElement).value)));
 $('#reset').addEventListener('click', () => loadScenario($<HTMLSelectElement>('#scn').value));
+$('#endDay').addEventListener('click', () => {
+  if (state.day >= 6) return;
+  const done = DAYS[state.day];
+  endDay(state);
+  loadScenario(scenarioId());
+  toast(`${done} rolled into the week — now ${DAYS[state.day]}`);
+});
+$('#newWeek').addEventListener('click', () => {
+  week = freshWeek(seed);
+  loadScenario(scenarioId());
+  toast('New week — Monday, nobody has hours yet');
+});
 $<HTMLSelectElement>('#scn').addEventListener('change', e => {
   const sel = e.target as HTMLSelectElement;
   loadScenario(sel.value); toast('Loaded: ' + sel.selectedOptions[0].text);

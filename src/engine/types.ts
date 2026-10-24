@@ -75,6 +75,8 @@ export interface Store {
   id: string;
   name: string;
   routeType: RouteType;
+  /** Down-day pull-up visit: no truck today; work from backstock (week model). */
+  pullUp: boolean;
   market: string;
   xy: Point;
   cases: number;
@@ -114,6 +116,34 @@ export interface SimState {
    * Day-scoped state owned by features, keyed by feature id. Reset by newDay().
    * Read/write through featureState() so each feature only sees its own slot.
    */
+  fx: Record<string, unknown>;
+  /** Day of the week, 0 = Mon … 6 = Sun. The seed describes Thursday (3). */
+  day: number;
+  /** The week this day belongs to (shared across days; see engine/week.ts). */
+  week: WeekState;
+}
+
+/** One finished day, as rolled up by endDay(). */
+export interface DayRecord {
+  day: number;
+  scenario: string;
+  merch: Record<string, { paid: Minutes; stops: number; cases: number }>;
+}
+
+/**
+ * The week around the simulated day. Survives from day to day; each day is a fresh
+ * SimState built from the seed, the weekly patterns and this.
+ */
+export interface WeekState {
+  /** Today, 0 = Mon … 6 = Sun. */
+  day: number;
+  /** Paid hours each person had before the first simulated day of this week. */
+  startHours: Record<string, number>;
+  /** Finished days, in order. */
+  history: DayRecord[];
+  /** Permanent store owner (overrides the seed's assignedTo from the next day on). */
+  master: Record<string, string | null>;
+  /** Week-scoped state owned by features (see weekState()). */
   fx: Record<string, unknown>;
 }
 
@@ -231,6 +261,14 @@ export interface EngineFeature {
   adjustStep?: (state: SimState, s: Store, step: VisitStep) => VisitStep;
   /** Called after any step is answered (by a person or the simulation). */
   onStepAnswered?: (state: SimState, s: Store, step: VisitStep, answer: StepAnswer) => void;
+  /**
+   * Runs when a day is built, before the clock starts: adjust which stores are
+   * visited, who's out, volumes. Read week state here; don't write to it (the Week
+   * view builds future days to project them).
+   */
+  onDayStart?: (state: SimState) => void;
+  /** Runs when the facilitator ends the day, before it's rolled up. Write week state here. */
+  onDayEnd?: (state: SimState) => void;
 }
 
 /* ---------- store visit steps (core contract for the guided visit) ----------
@@ -307,6 +345,8 @@ export interface Extensions {
   curveballs: Curveball[];
   settings: Setting[];
   visitSteps: Array<NonNullable<EngineFeature['visitSteps']>>;
+  onDayStart: Array<(state: SimState) => void>;
+  onDayEnd: Array<(state: SimState) => void>;
   adjustStep: Array<NonNullable<EngineFeature['adjustStep']>>;
   onStepAnswered: Array<NonNullable<EngineFeature['onStepAnswered']>>;
 }

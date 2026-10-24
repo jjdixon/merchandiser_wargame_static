@@ -19,6 +19,13 @@ import { br009LateTruckOptions } from './br-009-late-truck-options';
 import { br017LoadAdjustments } from './br-017-load-adjustments';
 import { br028Messaging } from './br-028-messaging';
 import { br011GeofenceExceptions } from './br-011-geofence-exceptions';
+import { br010ScheduleGovernance } from './br-010-schedule-governance';
+import { br004Reassignment } from './br-004-reassignment';
+import { br007HoursGuarantees } from './br-007-hours-guarantees';
+import { br008MultiVisitHoliday } from './br-008-multi-visit-holiday';
+import { br006RouteJumping } from './br-006-route-jumping';
+import { br005ReliefCoverage } from './br-005-relief-coverage';
+import { br003RouteBidding } from './br-003-route-bidding';
 // <feature-imports>
 
 export const FEATURES: Feature[] = [
@@ -39,5 +46,12 @@ export const FEATURES: Feature[] = [
   br017LoadAdjustments,
   br028Messaging,
   br011GeofenceExceptions,
+  br010ScheduleGovernance,
+  br004Reassignment,
+  br007HoursGuarantees,
+  br008MultiVisitHoliday,
+  br006RouteJumping,
+  br005ReliefCoverage,
+  br003RouteBidding,
   // <feature-list>
 ];

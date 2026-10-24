@@ -4,7 +4,7 @@ import { esc } from '../../ui/shared';
 import type { Panel } from '../../app/feature';
 import { scheduledEta, truckStatus, trucks, type TruckStatus } from './engine';
 
-const TONE: Record<TruckStatus, string> = { scheduled: 'muted', 'en route': '', late: 'late', delivered: 'ok' };
+const TONE: Record<TruckStatus, string> = { scheduled: 'muted', 'en route': '', late: 'late', delivered: 'ok', 'no truck': 'muted' };
 const pill = (st: TruckStatus, lateBy: number) =>
   `<span class="flag ${TONE[st]}"${st === 'en route' ? ' style="color:var(--work)"' : ''}>${st}${st === 'late' || (st === 'delivered' && lateBy > 5) ? ` +${lateBy}m` : ''}</span>`;
 

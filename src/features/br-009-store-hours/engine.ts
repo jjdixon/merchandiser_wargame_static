@@ -54,7 +54,7 @@ export function conflicts(state: SimState): Conflict[] {
   for (const p of allPlans(state)) for (const x of p.stops) {
     const h = hoursOf(state, x.s);
     if (!h) continue;
-    if (x.s.eta > h.receivingClose)
+    if (!x.s.pullUp && x.s.eta > h.receivingClose)
       out.push({ storeId: x.s.id, kind: 'receivingClosed', text: `${x.s.name}: truck due ${fmt(x.s.eta)}, after receiving closes at ${fmt(h.receivingClose)}.` });
     if (x.end > h.merchClose)
       out.push({ storeId: x.s.id, kind: 'pastMerchHours', text: `${x.s.name}: ${p.m.name} projects finishing ${fmt(x.end)}, past merchandising hours (${fmt(h.merchClose)}).` });
@@ -77,7 +77,8 @@ export const br009StoreHoursEngine: EngineFeature = {
   readyAt(state, s, base) {
     const h = hoursOf(state, s);
     if (!h) return base;
-    return Math.max(base, h.merchOpen, ruleBool(state.rules, RESPECT, true) ? h.receivingOpen : 0);
+    // Pull-ups (no delivery) only need merchandising hours, not receiving.
+    return Math.max(base, h.merchOpen, ruleBool(state.rules, RESPECT, true) && !s.pullUp ? h.receivingOpen : 0);
   },
   onTick(state) {
     for (const c of conflicts(state)) {
