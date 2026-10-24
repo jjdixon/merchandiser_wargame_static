@@ -68,9 +68,18 @@ const project = (day: number) => {
 };
 let view = location.hash.slice(1);
 let selM = state.merch[0].id;
+let selStore: string | null = null;
 let running = false, speed = 10, holding = false;
 
 const scenarioLabel = () => $<HTMLSelectElement>('#scn').selectedOptions[0]?.text ?? '';
+const storePage = () => allViews().find(v => v.opensStore);
+function openStore(id: string): void {
+  const v = storePage();
+  if (!v) return;
+  selStore = id;
+  view = v.id;
+  changed();
+}
 const currentView = () => allViews().find(v => v.id === view) ?? CORE_VIEWS[0];
 
 function ctx(): ViewCtx {
@@ -83,6 +92,8 @@ function ctx(): ViewCtx {
     settings: state.ext.settings,
     projectDay: project,
     catalog,
+    selStore,
+    storeLink: s => (storePage() ? `<a href="#" class="slink" data-act="open-store" data-store="${esc(s.id)}">${esc(s.name)}</a>` : esc(s.name)),
     slot: (name: Slot) => on.flatMap(f => f.panels ?? []).filter(p => p.slot === name)
       .sort((a, b) => (a.order ?? 100) - (b.order ?? 100)).map(p => p.render(ctx())).join(''),
   };
@@ -95,6 +106,8 @@ const app: AppApi = {
   get scenarioLabel() { return scenarioLabel() },
   get viewer() { return scope().label },
   projectDay: project,
+  get selStore() { return selStore },
+  openStore,
   refresh: () => changed(),
   toast,
   copy,
@@ -266,6 +279,7 @@ V.addEventListener('click', e => {
   const b = (e.target as HTMLElement).closest<HTMLElement>('[data-act]');
   if (!b || (b as HTMLButtonElement).disabled) return;
   const a = b.dataset.act!, id = b.dataset.id ?? '';
+  if (a === 'open-store') { e.preventDefault(); openStore(b.dataset.store!); return }
   // Feature actions: data-act="<feature id>:<action>"
   if (a.includes(':')) {
     const [fid, name] = a.split(':');

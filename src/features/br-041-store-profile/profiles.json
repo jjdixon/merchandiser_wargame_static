@@ -1,0 +1,302 @@
+{
+ "_note": "Fictional store profile details (addresses, contacts) for the war game only.",
+ "profiles": {
+  "s1": {
+   "address": "100 Oak St, Northville",
+   "storeNumber": "1042",
+   "contacts": [
+    {
+     "role": "Store manager",
+     "name": "Pat (fictional)"
+    },
+    {
+     "role": "Receiving",
+     "name": "Taylor (fictional)"
+    }
+   ],
+   "constraints": [
+    "Back door only before 9:00a; pallet jack in receiving",
+    "Store manager must sign off on new displays"
+   ],
+   "brands": [
+    "Hearthside",
+    "Sunny Bake"
+   ]
+  },
+  "s2": {
+   "address": "137 Maple Ave, Northville",
+   "storeNumber": "214",
+   "contacts": [
+    {
+     "role": "Store manager",
+     "name": "Jordan (fictional)"
+    },
+    {
+     "role": "Receiving",
+     "name": "Jamie (fictional)"
+    }
+   ],
+   "constraints": [
+    "Back door only before 9:00a; pallet jack in receiving"
+   ],
+   "brands": [
+    "Hearthside",
+    "Sunny Bake"
+   ]
+  },
+  "s3": {
+   "address": "174 Main St, Northville",
+   "storeNumber": "88",
+   "contacts": [
+    {
+     "role": "Store manager",
+     "name": "Casey (fictional)"
+    },
+    {
+     "role": "Receiving",
+     "name": "Avery (fictional)"
+    }
+   ],
+   "constraints": [
+    "One backroom shelf for our product; park on the side street"
+   ],
+   "brands": [
+    "Hearthside",
+    "Sunny Bake"
+   ]
+  },
+  "s4": {
+   "address": "211 Elm Rd, Northville",
+   "storeNumber": "31",
+   "contacts": [
+    {
+     "role": "Store manager",
+     "name": "Riley (fictional)"
+    },
+    {
+     "role": "Receiving",
+     "name": "Quinn (fictional)"
+    }
+   ],
+   "constraints": [
+    "Back door only before 9:00a; pallet jack in receiving",
+    "Store manager must sign off on new displays"
+   ],
+   "brands": [
+    "Hearthside",
+    "Sunny Bake"
+   ]
+  },
+  "s5": {
+   "address": "248 Cedar Blvd, Northville",
+   "storeNumber": "1107",
+   "contacts": [
+    {
+     "role": "Store manager",
+     "name": "Morgan (fictional)"
+    },
+    {
+     "role": "Receiving",
+     "name": "Drew (fictional)"
+    }
+   ],
+   "constraints": [
+    "Back door only before 9:00a; pallet jack in receiving"
+   ],
+   "brands": [
+    "Hearthside",
+    "Sunny Bake"
+   ]
+  },
+  "s6": {
+   "address": "285 Pine St, Northville",
+   "storeNumber": "230",
+   "contacts": [
+    {
+     "role": "Store manager",
+     "name": "Taylor (fictional)"
+    },
+    {
+     "role": "Receiving",
+     "name": "Rowan (fictional)"
+    }
+   ],
+   "constraints": [
+    "Back door only before 9:00a; pallet jack in receiving"
+   ],
+   "brands": [
+    "Hearthside",
+    "Sunny Bake"
+   ]
+  },
+  "s7": {
+   "address": "322 Lake Dr, Northville",
+   "storeNumber": "512",
+   "contacts": [
+    {
+     "role": "Store manager",
+     "name": "Jamie (fictional)"
+    },
+    {
+     "role": "Receiving",
+     "name": "Sky (fictional)"
+    }
+   ],
+   "constraints": [
+    "No backroom \u2014 work straight from the truck or tote",
+    "Store manager must sign off on new displays"
+   ],
+   "brands": [
+    "Hearthside"
+   ]
+  },
+  "s8": {
+   "address": "359 Hill Rd, Southville",
+   "storeNumber": "HG-8",
+   "contacts": [
+    {
+     "role": "Store manager",
+     "name": "Avery (fictional)"
+    },
+    {
+     "role": "Receiving",
+     "name": "Reese (fictional)"
+    }
+   ],
+   "constraints": [
+    "Back door only before 9:00a; pallet jack in receiving"
+   ],
+   "brands": [
+    "Hearthside",
+    "Sunny Bake"
+   ]
+  },
+  "s9": {
+   "address": "396 River Rd, Southville",
+   "storeNumber": "44",
+   "contacts": [
+    {
+     "role": "Store manager",
+     "name": "Quinn (fictional)"
+    },
+    {
+     "role": "Receiving",
+     "name": "Blake (fictional)"
+    }
+   ],
+   "constraints": [
+    "Back door only before 9:00a; pallet jack in receiving"
+   ],
+   "brands": [
+    "Hearthside",
+    "Sunny Bake"
+   ]
+  },
+  "s10": {
+   "address": "433 Park Ave, Southville",
+   "storeNumber": "91",
+   "contacts": [
+    {
+     "role": "Store manager",
+     "name": "Drew (fictional)"
+    },
+    {
+     "role": "Receiving",
+     "name": "Pat (fictional)"
+    }
+   ],
+   "constraints": [
+    "One backroom shelf for our product; park on the side street",
+    "Store manager must sign off on new displays"
+   ],
+   "brands": [
+    "Hearthside",
+    "Sunny Bake"
+   ]
+  },
+  "s11": {
+   "address": "470 Mill St, Southville",
+   "storeNumber": "1180",
+   "contacts": [
+    {
+     "role": "Store manager",
+     "name": "Rowan (fictional)"
+    },
+    {
+     "role": "Receiving",
+     "name": "Jordan (fictional)"
+    }
+   ],
+   "constraints": [
+    "Back door only before 9:00a; pallet jack in receiving"
+   ],
+   "brands": [
+    "Hearthside",
+    "Sunny Bake"
+   ]
+  },
+  "s12": {
+   "address": "507 Center St, Southville",
+   "storeNumber": "245",
+   "contacts": [
+    {
+     "role": "Store manager",
+     "name": "Sky (fictional)"
+    },
+    {
+     "role": "Receiving",
+     "name": "Casey (fictional)"
+    }
+   ],
+   "constraints": [
+    "Back door only before 9:00a; pallet jack in receiving"
+   ],
+   "brands": [
+    "Hearthside",
+    "Sunny Bake"
+   ]
+  },
+  "s13": {
+   "address": "544 Grove Ave, Southville",
+   "storeNumber": "97",
+   "contacts": [
+    {
+     "role": "Store manager",
+     "name": "Reese (fictional)"
+    },
+    {
+     "role": "Receiving",
+     "name": "Riley (fictional)"
+    }
+   ],
+   "constraints": [
+    "One backroom shelf for our product; park on the side street",
+    "Store manager must sign off on new displays"
+   ],
+   "brands": [
+    "Hearthside",
+    "Sunny Bake"
+   ]
+  },
+  "s14": {
+   "address": "581 Bridge St, Southville",
+   "storeNumber": "520",
+   "contacts": [
+    {
+     "role": "Store manager",
+     "name": "Blake (fictional)"
+    },
+    {
+     "role": "Receiving",
+     "name": "Morgan (fictional)"
+    }
+   ],
+   "constraints": [
+    "No backroom \u2014 work straight from the truck or tote"
+   ],
+   "brands": [
+    "Hearthside"
+   ]
+  }
+ }
+}

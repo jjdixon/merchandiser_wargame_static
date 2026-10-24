@@ -263,7 +263,7 @@ business document. For each one:
   planogram compliance and the business's detailed task standards.
 - **Open questions:** Detailed task standards are still to be defined.
 
-**BR-022 Display awareness and assignment** · ✅ Covered (M2) · `br-022-display-awareness`
+**BR-022 Display awareness and assignment** · ✅ Covered (M2, fed by M5) · `br-022-display-awareness`
 - **Story:** Merchandisers see upcoming and active displays for each store: sold-in
   status, fixture, products, timing, delivery method, required actions. Fed by the
   Display Tracking module.
@@ -354,7 +354,7 @@ business document. For each one:
 - **War-game check (light):** seed data carries market and route so display tasks
   follow temporary coverage when a store is reassigned.
 
-**BR-036 Promotion and display data feed** · 🔌 Simulate only
+**BR-036 Promotion and display data feed** · 🔌 Simulated (M5) · `br-036-promotion-feed`
 - **Story:** Load promotions and display standards (stores, banners, brands, product
   groups, display types, locations, dates, instructions, reference images, reason
   codes), with spreadsheet upload as a fallback, automatic task creation and
@@ -362,7 +362,7 @@ business document. For each one:
 - **War-game check:** promotions defined in seed JSON (or a pasted spreadsheet) that
   generate store display tasks.
 
-**BR-037 Store-level display task assignment and workflow** · ⬜ Not yet
+**BR-037 Store-level display task assignment and workflow** · ✅ Covered (M5) · `br-037-display-tasks`
 - **Story:** Create and assign display tasks per store from promotions and routes:
   setup, photo evidence, recurring checks, expiration, completion, reassignment,
   standard absence reasons, gating, reminders, overdue status, escalation and
@@ -388,7 +388,7 @@ business document. For each one:
   with confirm / wrong. Real recognition is out of scope until accuracy is proven.
 - **Open questions:** Accuracy thresholds, human review and correction process.
 
-**BR-040 Display lifecycle, compliance and exceptions** · ⬜ Not yet
+**BR-040 Display lifecycle, compliance and exceptions** · ✅ Covered (M5) · `br-040-display-compliance`
 - **Story:** Keep each store's display history from setup to removal, with expected
   vs. actual dates, location, brand, type, status, duration, photos and compliance
   result. States: compliant, partially compliant, non-compliant, absent, not
@@ -396,7 +396,7 @@ business document. For each one:
 - **War-game check:** display records move through those states during the sim;
   managers can review and override.
 
-**BR-041 Store profile, notes and supporting context** · ⬜ Not yet
+**BR-041 Store profile, notes and supporting context** · ✅ Covered (M5) · `br-041-store-profile`
 - **Story:** A store page with identifiers, address, banner, route/brand coverage,
   contacts, constraints, open tasks, recent history and performance, plus searchable
   structured notes (category, author, visibility, follow-up, photos).
@@ -407,7 +407,7 @@ business document. For each one:
 - Needs real daily store sales. Could be mocked later to show what the analysis
   would look like, but it can't be war-gamed meaningfully on fake data.
 
-**BR-043 Reporting, dashboards and centralized photo review** · ⬜ Not yet
+**BR-043 Reporting, dashboards and centralized photo review** · 🟡 Partial (M5: displays) · `br-043-photo-review`
 - **Story:** Role-based dashboards and one place to review photos for planned,
   assigned, completed, overdue, absent, compliant and non-compliant tasks, with rates
   across user, route, store, banner, market and time; suspected non-compliance first.
@@ -482,9 +482,9 @@ Updated as features land. To change a requirement, edit only its folder
 | BR-012 (planned vs actual) | `src/features/br-012-planned-vs-actual` | |
 | BR-024 (work standards) | `src/features/br-024-work-standards` | |
 | BR-002, BR-015, BR-021 (guided visit) | `src/features/br-002-guided-visit` | Steps and answers are core (`src/engine/visit.ts`) |
-| BR-022 (display awareness) | `src/features/br-022-display-awareness` | Full Display Tracking is M5 |
+| BR-022 (display awareness) | `src/features/br-022-display-awareness` | Reads the core display model |
 | BR-020 (out-of-stocks) | `src/features/br-020-oos-root-cause` | Ordering causes go to the MSL (`oos.json`) |
-| BR-039 (photos) | `src/features/br-039-photo-capture` | Photo review queue is BR-043, M5 |
+| BR-039 (photos) | `src/features/br-039-photo-capture` | Puts its recognition on the photo; review queue is BR-043 |
 | BR-014 (truck visibility) | `src/features/br-014-truck-visibility` | |
 | BR-009 (late-truck options) | `src/features/br-009-late-truck-options` | Store hours stay in `br-009-store-hours` |
 | BR-017 (load cuts/adds) | `src/features/br-017-load-adjustments` | |
@@ -501,6 +501,12 @@ Updated as features land. To change a requirement, edit only its folder
 | NR-001 (trays and cases) | core: `Rules.mpt`, `Store.trays`, `src/engine/plan.ts` | Every volume feature scales both |
 | NR-002 (backstock) | `src/features/nr-002-backstock` | Counts land on core `store.backstock` |
 | NR-003 (order feedback) | `src/features/nr-003-order-feedback` | Sales: `sales.json` in the folder |
+| Display model (M5) | core: `src/engine/display.ts` | Promotions → tasks → events; shared by BR-022/036/037/040/041/043 |
+| BR-036 | `src/features/br-036-promotion-feed` | Promotions tab, paste a spreadsheet |
+| BR-037 | `src/features/br-037-display-tasks` | Visit steps, reasons, escalation |
+| BR-040 | `src/features/br-040-display-compliance` | Displays tab, override |
+| BR-041 | `src/features/br-041-store-profile` | Stores tab; store links are core (`ctx.storeLink`) |
+| BR-043 | `src/features/br-043-photo-review` | Photo review tab; other dashboards are M6 |
 | War-game findings | `src/features/findings` | Not a business requirement |
 
 ## Open questions (consolidated)

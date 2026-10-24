@@ -94,16 +94,16 @@ across sessions.
       delivery and average sales; routed to the MSL · NR-003 · `nr-003-order-feedback` · M
 - [x] **T-454** Route ordering out-of-stocks to the MSL · BR-020 · data change · S
 
-## M5 — Display tracking
+## M5 — Display tracking · branch `m5-display-tracking`
 
-- [ ] **T-501** Promotions and display standards from seed data or pasted
+- [x] **T-501** Promotions and display standards from seed data or pasted
       spreadsheet; generate store tasks · BR-036 · `br-036-promotion-feed` · M
-- [ ] **T-502** Display task lifecycle: setup, recurring checks, expiry, absence
+- [x] **T-502** Display task lifecycle: setup, recurring checks, expiry, absence
       reasons, overdue, escalation · BR-037 · `br-037-display-tasks` · L
-- [ ] **T-503** Compliance states (compliant … unable to verify) with manager review
+- [x] **T-503** Compliance states (compliant … unable to verify) with manager review
       · BR-040 · `br-040-display-compliance` · M
-- [ ] **T-504** Store page with structured notes · BR-041 · `br-041-store-profile` · M
-- [ ] **T-505** Photo review queue and display compliance dashboard
+- [x] **T-504** Store page with structured notes · BR-041 · `br-041-store-profile` · M
+- [x] **T-505** Photo review queue and display compliance dashboard
       · BR-043 · `br-043-photo-review` · M
 
 ## M6 — Reporting and oversight

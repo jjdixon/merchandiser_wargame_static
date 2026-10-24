@@ -48,6 +48,8 @@ screen-side ones in `src/app/feature.ts` (`Feature`).
 | `onDayStart(state)` | when a day is built: change who's out, which stores, volumes (read week state only) | vacations, holidays, second visits |
 | `onDayEnd(state)` | when the facilitator ends the day (write week state here) | usual service times |
 | `weekState(state, id, init)` | a feature's own week-scoped state, survives across days | bids, vacations, change log |
+| `state.displays` + `src/engine/display.ts` | display tasks (from promotions) and events; `dueAction`, `displayStatus`, `recordDisplay`, `reviewDisplay` | display feed, tasks, compliance, store page, photo review |
+| `ctx.storeLink(s)` / `ViewDef.opensStore` / `app.openStore(id)` | store names that open the store page | store page (BR-041) |
 | `store.backstock` | arrival / leaving backstock (trays, cases), written by NR-002 | order feedback (NR-003) |
 | `state.week.master` | permanent store owners from the next day on | permanent reassignment, bid awards |
 | `splitWork(state, store, to, share)` | move part of a store's remaining work to a helper | split, send help |

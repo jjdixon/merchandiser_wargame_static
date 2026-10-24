@@ -2,8 +2,8 @@
 // what it plugs into — the contract every feature folder relies on.
 import { describe, expect, it } from 'vitest';
 import {
-  adjustDrive, adjustWork, answerStep, buildDay, endDay, freshWeek, projectDay, singleDayWeek, splitWork, THURSDAY, weekState, enableFeatures, featureState, getRule, hash01, isAnswered, pickShare, newDay, plan, readyAt, setRule, tick, visitProgress, visitSteps, workMin,
-  type EngineFeature, type Seed,
+  adjustDrive, adjustWork, answerStep, buildDay, endDay, freshWeek, projectDay, singleDayWeek, splitWork, THURSDAY, weekState, enableFeatures, featureState, getRule, hash01, isAnswered, pickShare, newDay, plan, readyAt, setRule, tick, visitProgress, visitSteps, workMin, bannerOf, dueAction, displayStatus, overdueDays, recordDisplay, reviewDisplay, tasksFromPromotions, DISPLAY_RESULTS,
+  type EngineFeature, type Promotion, type Seed,
 } from '../src/engine';
 import { FEATURES } from '../src/features';
 
@@ -325,5 +325,60 @@ describe('core: a full week with every feature on (M4)', () => {
     const ana = w.history.reduce((h, d) => h + (d.merch.ana?.paid ?? 0), 0) / 60;
     expect(ana).toBeGreaterThan(20);
     expect(ana).toBeLessThanOrEqual(42);              // BR-007 stops at the max (finishes the stop in progress)
+  });
+});
+
+describe('core: display tracking (M5)', () => {
+  const promo = (over: Partial<Promotion> = {}): Promotion => ({
+    id: 'p1', version: 1, name: 'Promo', brand: 'B', productGroup: 'Bread', displayType: 'Endcap', fixture: 'Endcap',
+    location: 'Aisle 7', products: ['x'], instructions: '', start: 3, end: 5, checkEvery: 1, ...over,
+  });
+  const stores = [{ id: 'a', name: 'ValuMart #1', market: 'North', routeType: 'LF' }, { id: 'b', name: 'Fresh Fare #2', market: 'South', routeType: 'Xpress' }];
+
+  it('promotions match stores by id, banner, market and route type', () => {
+    expect(tasksFromPromotions([promo()], stores).map(t => t.id)).toEqual(['p1@a', 'p1@b']);
+    expect(tasksFromPromotions([promo({ banners: ['ValuMart'] })], stores).map(t => t.storeId)).toEqual(['a']);
+    expect(tasksFromPromotions([promo({ markets: ['South'], routeTypes: ['Xpress'] })], stores).map(t => t.storeId)).toEqual(['b']);
+    expect(bannerOf({ name: 'Fresh Fare #214' })).toBe('Fresh Fare');
+  });
+
+  it('setup is due from the start day until done, then checks, then removal after the end', () => {
+    const w = freshWeek(tiny());
+    w.day = 3;
+    let s = buildDay(tiny(), w, 'base');
+    const st = s.stores[0];
+    s.displays.tasks = tasksFromPromotions([promo({ start: 3, end: 4, checkEvery: 1 })], s.stores.map(x => ({ id: x.id, name: x.name })));
+    const t = () => s.displays.tasks.find(x => x.storeId === st.id)!;
+    expect(dueAction(s, t())).toBe('setup');
+    recordDisplay(s, { taskId: t().id, storeId: st.id, action: 'setup', result: 'absent', reason: 'No product', by: 'x' });
+    expect(dueAction(s, t())).toBe('setup');          // today's answer doesn't change today's step
+    endDay(s);
+    s = buildDay(tiny(), w, 'base');
+    s.displays.tasks = tasksFromPromotions([promo({ start: 3, end: 4, checkEvery: 1 })], s.stores.map(x => ({ id: x.id, name: x.name })));
+    expect(dueAction(s, t())).toBe('setup');          // still not built: overdue
+    expect(overdueDays(s, t())).toBe(1);
+    recordDisplay(s, { taskId: t().id, storeId: st.id, action: 'setup', result: 'compliant', by: 'x' });
+    expect(displayStatus(s, t())).toMatchObject({ setUpDay: 4, result: 'compliant' });
+    endDay(s);
+    s = buildDay(tiny(), w, 'base');
+    s.displays.tasks = tasksFromPromotions([promo({ start: 3, end: 4, checkEvery: 1 })], s.stores.map(x => ({ id: x.id, name: x.name })));
+    expect(dueAction(s, t())).toBe('remove');
+  });
+
+  it('displays that started before the first simulated day are carried in as set up', () => {
+    const s = newDay(tiny(), 'base');          // single Thursday
+    s.displays.tasks = tasksFromPromotions([promo({ start: 0, end: 6 })], s.stores.map(x => ({ id: x.id, name: x.name })));
+    expect(displayStatus(s, s.displays.tasks[0])).toMatchObject({ carriedIn: true, result: 'compliant' });
+    expect(dueAction(s, s.displays.tasks[0])).toBe('check');
+  });
+
+  it('reviews override the latest result', () => {
+    const s = newDay(tiny(), 'base');
+    s.displays.tasks = tasksFromPromotions([promo()], s.stores.map(x => ({ id: x.id, name: x.name })));
+    const t = s.displays.tasks[0];
+    recordDisplay(s, { taskId: t.id, storeId: t.storeId, action: 'setup', result: 'compliant', by: 'x' });
+    reviewDisplay(s, t.id, 'non-compliant', 'MSL');
+    expect(displayStatus(s, t).result).toBe('non-compliant');
+    expect(DISPLAY_RESULTS).toHaveLength(6);
   });
 });

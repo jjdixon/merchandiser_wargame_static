@@ -84,6 +84,7 @@ export function newDay(seed: Seed, scenarioId: string, opts: DayOptions = {}): S
     ext: emptyExtensions(),
     enabled: [],
     fx: {},
+    displays: { tasks: [], events: [] },
   };
   // Features first, so scenario setup (e.g. call-outs) sees their hooks.
   enableFeatures(state, opts.features ?? []);

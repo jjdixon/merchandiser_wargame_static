@@ -131,6 +131,8 @@ export function sandboxOf(state: SimState): SimState {
     fired: {},
     // Feature day-state is plain data; a JSON copy keeps it separate.
     fx: JSON.parse(JSON.stringify(state.fx)),
+    // Display events recorded in practice stay in the copy (tasks are shared, read-only).
+    displays: { tasks: state.displays.tasks, events: [...state.displays.events] },
   };
 }
 

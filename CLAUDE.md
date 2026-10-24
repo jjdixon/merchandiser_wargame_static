@@ -39,7 +39,8 @@ npm run build      # static site in dist/ (base './', host anywhere)
 src/
   engine/        CORE, pure: types, plan (route/pay math), sim (clock, event
                  primitives, assignment), seed, week (days, pull-ups, roll-up),
-                 visit (store visit steps), feature (registry plumbing), time
+                 visit (store visit steps), display (promotions → tasks → events),
+                 feature (registry plumbing), time
   app/feature.ts the screen-side plug-in contract (Feature, ViewCtx, AppApi, slots)
   ui/            CORE VIEWS: scheduler, merchandiser, supervisor, week, rules, shared helpers
   data/          seed data as JSON (stores, merchandisers, rules, scenarios, lists)
@@ -70,6 +71,11 @@ src/
     br-003-route-bidding/      open bid, eligible bids, award, publish to week.master
     nr-002-backstock/          backstock counts on arrival + leaving (totals or by category)
     nr-003-order-feedback/     light / about right / heavy to the MSL, with a suggestion
+    br-036-promotion-feed/     promotions (seed or pasted sheet, versions) → display tasks
+    br-037-display-tasks/      display setup / check / remove steps, reasons, escalation
+    br-040-display-compliance/ Displays tab: lifecycle, compliance states, override
+    br-041-store-profile/      Stores tab (store links everywhere), structured notes
+    br-043-photo-review/       photo review queue, display compliance dashboard
   main.ts        app shell: registry wiring, tabs, curveball bar, events, clock loop
 tests/           core tests (engine + plug-in points). Feature tests live in each folder.
 scripts/         check-boundaries.mjs, new-feature.mjs
@@ -132,6 +138,11 @@ Rules:
 
 ## Status
 
+- v0.7 (M5) — display tracking: core display model (promotions → store tasks →
+  events), promotion feed with pasted spreadsheets (BR-036), display steps with
+  reason codes and escalation (BR-037), lifecycle and compliance with override
+  (BR-040), store page and notes linked from every screen (BR-041), photo review
+  queue and compliance dashboard (BR-043). BR-022 now reads the model.
 - v0.6.5 (M4.5) — added business context: trays and cases with separate labor
   minutes (NR-001, core), backstock counts at arrival and leaving (NR-002), light /
   heavy order feedback to the MSL (NR-003), ordering out-of-stocks to the MSL
@@ -156,7 +167,7 @@ Rules:
   Seed adds route types, markets, a vacation relief and a route jumper. 68 tests.
 - v0.2 (M0) — feature architecture (merged #1).
 - Requirements: `docs/requirements.md` (41 BRs). Build order: `docs/backlog.md`
-  (M5 next: display tracking).
+  (M6 next: reporting and oversight).
 - Findings are browser-local (localStorage); export via "Copy for backlog.md".
 - Repo is **public** and auto-deploys to GitHub Pages on push to `main`
   (`.github/workflows/pages.yml`). **Never commit real store, employee or pay data

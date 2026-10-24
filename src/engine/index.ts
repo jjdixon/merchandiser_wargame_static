@@ -7,3 +7,4 @@ export * from './seed';
 export * from './feature';
 export * from './visit';
 export * from './week';
+export * from './display';

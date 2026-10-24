@@ -179,3 +179,7 @@ tr.un td{background:color-mix(in srgb,var(--late) 7%,transparent)}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(76px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:6px;z-index:40;font-size:13px}
 .note{font-size:12.5px;color:var(--muted);max-width:75ch}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* store links (BR-041 store page) */
+.slink{color:inherit;text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:2px}
+.slink:hover{text-decoration-color:currentColor}

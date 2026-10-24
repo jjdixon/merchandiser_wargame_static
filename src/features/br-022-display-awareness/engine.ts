@@ -1,50 +1,39 @@
 // BR-022 Display awareness and assignment.
-// Each store's sold-in and active displays (fixture, products, timing, delivery
-// method, required action) become steps in the guided visit:
-//   build    → "Build" then "Validate built" (the business asked for build-then-validate)
-//   maintain → "Check & refill"
-//   remove   → "Remove expired"
-// The full Display Tracking module (promotion feed, lifecycle, compliance) is M5;
-// this is the merchandiser's view of what's due today.
-import type { EngineFeature, SimState, Store, VisitStep } from '../../engine';
-import DATA from './displays.json';
+// What displays each store has and what's due today, for the merchandiser's route
+// and the scheduler. The data comes from the core display model (engine/display.ts),
+// loaded by the promotion feed (BR-036); the visit steps for setup / check / remove
+// are the display task workflow (BR-037). This feature is the "playbook" view.
+import {
+  displayStatus, dueAction, tasksFor,
+  type DisplayAction, type DisplayResult, type DisplayTask, type EngineFeature, type SimState, type Store,
+} from '../../engine';
 
 export const ID = 'br-022-display-awareness';
 
-export interface Display {
-  id: string; name: string; fixture: string; location: string; products: string[];
-  status: 'sold-in' | 'active' | 'expired'; action: 'build' | 'maintain' | 'remove';
-  delivery: string; until: string;
+export type Phase = 'sold-in' | 'active' | 'expired' | 'removed' | 'not applicable';
+export interface StoreDisplay { task: DisplayTask; phase: Phase; due: DisplayAction | null; doneToday: boolean; result: DisplayResult | null }
+
+export function phaseOf(state: SimState, t: DisplayTask): Phase {
+  const st = displayStatus(state, t);
+  if (st.removedDay != null) return 'removed';
+  if (st.closed) return 'not applicable';
+  if (state.day > t.end) return 'expired';
+  return st.setUpDay != null ? 'active' : 'sold-in';
 }
 
-export function displaysFor(s: Store): Display[] {
-  return ((DATA as Record<string, Display[]>)[s.id] ?? []);
+/** Displays at this store worth showing today: due today, live, or not yet taken down. */
+export function displaysFor(state: SimState, s: Store): StoreDisplay[] {
+  return tasksFor(state, s.id).map(task => {
+    const due = dueAction(state, task), st = displayStatus(state, task);
+    const doneToday = st.events.some(e => e.day === state.day && e.action !== 'review');
+    return { task, phase: phaseOf(state, task), due, doneToday, result: st.result };
+  }).filter(d => d.due || d.doneToday || (state.day >= d.task.start && state.day <= d.task.end));
 }
-
-export const stepIds = (d: Display) =>
-  d.action === 'build' ? [`${ID}:${d.id}:build`, `${ID}:${d.id}:validate`] : [`${ID}:${d.id}:${d.action}`];
-
-export function displaySteps(_state: SimState, s: Store): VisitStep[] {
-  return displaysFor(s).flatMap((d, i): VisitStep[] => {
-    const base = { featureId: ID, phase: 'display' as const, kind: 'check' as const, required: true, needsProduct: true };
-    const where = `${d.fixture} · ${d.location} · ${d.products.join(', ')}`;
-    if (d.action === 'build') return [
-      { ...base, id: `${ID}:${d.id}:build`, order: i * 10, title: `Build display: ${d.name}`, detail: `${where}. ${d.delivery}.` },
-      { ...base, id: `${ID}:${d.id}:validate`, order: i * 10 + 1, title: `Validate built: ${d.name}`, detail: 'Full, signed, priced, in the sold-in location.', photo: 'optional' },
-    ];
-    if (d.action === 'remove') return [{ ...base, id: `${ID}:${d.id}:remove`, order: i * 10, title: `Remove expired: ${d.name}`, detail: `${where}. Ended ${d.until.replace(/^ended /, '')}.` }];
-    return [{ ...base, id: `${ID}:${d.id}:maintain`, order: i * 10, title: `Check & refill: ${d.name}`, detail: `${where}. Runs until ${d.until}.`, photo: 'optional' }];
-  });
-}
-
-/** Display is done today when all of its steps are answered. */
-export const displayDone = (s: Store, d: Display) => stepIds(d).every(id => s.answers[id]?.done);
 
 export const br022DisplayAwarenessEngine: EngineFeature = {
   id: ID,
   title: 'Display awareness',
-  description: 'Each store\'s sold-in and active displays (build / maintain / remove) show up as visit steps and on the route.',
+  description: 'Each store\'s displays (sold in, active, expired) and what\'s due today, on the route and the scheduler.',
   requirements: ['BR-022'],
   defaultOn: true,
-  visitSteps: displaySteps,
 };
