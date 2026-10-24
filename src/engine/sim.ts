@@ -116,7 +116,7 @@ export function heavierLoad(state: SimState, s: Store, fraction = 0.4): number {
 export function extraVisit(state: SimState, base: Store, cases = 45, windowMin = 240): Store {
   const n: Store = {
     id: 'x' + ++state.nextId, name: base.name + ' · extra visit', xy: base.xy, cases,
-    eta: state.t, win: state.t + windowMin, assign: null, seq: 99, extra: 0, lock: null, tasks: {},
+    eta: state.t, win: state.t + windowMin, assign: null, seq: 99, extra: 0, lock: null, answers: {},
     routeType: base.routeType, market: base.market,
   };
   state.stores.push(n);

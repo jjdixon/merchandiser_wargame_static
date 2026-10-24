@@ -2,7 +2,7 @@
 // Features plug into the core through SimState.ext; see docs/architecture.md.
 import type { EngineFeature, Extensions, Rules, SimState } from './types';
 
-export const emptyExtensions = (): Extensions => ({ readyAt: [], workMinutes: [], onTick: [], curveballs: [], settings: [] });
+export const emptyExtensions = (): Extensions => ({ readyAt: [], workMinutes: [], onTick: [], curveballs: [], settings: [], visitSteps: [], adjustStep: [], onStepAnswered: [] });
 
 /** Combine the plug-ins of the given (enabled) features, in order. */
 export function buildExtensions(features: EngineFeature[]): Extensions {
@@ -13,6 +13,9 @@ export function buildExtensions(features: EngineFeature[]): Extensions {
     if (f.onTick) ext.onTick.push(f.onTick);
     if (f.curveballs) ext.curveballs.push(...f.curveballs);
     if (f.settings) ext.settings.push(...f.settings);
+    if (f.visitSteps) ext.visitSteps.push(f.visitSteps);
+    if (f.adjustStep) ext.adjustStep.push(f.adjustStep);
+    if (f.onStepAnswered) ext.onStepAnswered.push(f.onStepAnswered);
   }
   return ext;
 }

@@ -12,5 +12,4 @@ export const seed: Seed = {
   rules: rules as RulesRow,
   scenarios: scenarios as Scenario[],
 };
-export const TASKS: string[] = lists.tasks;
 export const ISSUES: string[] = lists.issues;

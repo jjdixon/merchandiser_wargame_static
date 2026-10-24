@@ -207,7 +207,7 @@ business document. For each one:
 
 ### A5. In-store workflow
 
-**BR-002 Merchandising visit execution (operating model)** · 🟡 Partial
+**BR-002 Merchandising visit execution (operating model)** · ✅ Covered (M2) · `br-002-guided-visit`
 - **Story:** Support the LF Merchandiser's in-store work under the new model, where
   ordering is central and the old LFSP work becomes hourly invoice, inventory and
   merchandising activities.
@@ -218,36 +218,42 @@ business document. For each one:
   "validate built").
 - **War-game check:** the phone view becomes a step-by-step guided visit in that
   order, with gating (can't close out until required steps are done).
-- **Today:** a flat checklist of seven tasks. No ordered steps, displays, aisles or
-  gating.
+- **Today:** guided visit in the MVP order (backstock → displays → aisles → validate →
+  out-of-stocks), gated close-out, out-of-stocks routed as the stand-in for the
+  inventory/ordering workflow. "Play this merchandiser" makes a person's real speed
+  the labor time.
 - **Open questions:** Does every step need a photo, or only some? What else besides
   displays and invoicing/inventory does the merchandiser own in-store?
 
-**BR-015 Guided single-app mobile workflow** · 🟡 Partial
+**BR-015 Guided single-app mobile workflow** · 🟡 Partial (M2) · `br-002-guided-visit`
 - **Story:** For a high-turnover workforce: an app that tells the worker the next
   best action, minimizes choices and duplicate entry, and puts core work in one app.
 - **War-game check:** the phone home screen shows one "Next" action at a time
   (drive to X / wait / start step Y), and a new player can run a day with no
   training.
-- **Today:** phone view shows current stop and route; actions are manual buttons.
+- **Today:** a "Next" card always shows the one thing to do now; steps are guided.
+  Not yet measured: whether a new player can run a day with no training (BR-030).
 
-**BR-020 Out-of-stock and void root-cause capture** · ⬜ Not yet
+**BR-020 Out-of-stock and void root-cause capture** · 🟡 Partial (M2) · `br-020-oos-root-cause`
 - **Story:** Record out-of-stocks and voids with a root cause (order fill, delivery,
   inventory, merchandising, ordering, other) and notify the responsible role,
   ideally before the stockout.
 - **War-game check:** logging an out-of-stock asks for product and cause; it routes
   an alert to the role that owns that cause.
+- **Today:** done as above, with a Supervisor list by owner. Missing: automatic
+  detection and warning before a projected stockout.
 - **Today:** "Log out-of-stocks" is just a checkbox.
 
-**BR-021 Merchandising visit execution (standards)** · 🟡 Partial
+**BR-021 Merchandising visit execution (standards)** · 🟡 Partial (M2) · `br-002-guided-visit`
 - **Story:** Guide store-specific tasks, planogram/shelf compliance, display tracking,
   pull-ups, completion confirmation, photo capture where required, and closeout.
 - **War-game check:** store-specific task lists; a photo step (upload) where
   required; visit closeout summary.
-- **Today:** one generic task list; photos simulated.
+- **Today:** store-specific aisles and displays, photo steps, gated close-out. Missing:
+  planogram compliance and the business's detailed task standards.
 - **Open questions:** Detailed task standards are still to be defined.
 
-**BR-022 Display awareness and assignment** · ⬜ Not yet
+**BR-022 Display awareness and assignment** · ✅ Covered (M2) · `br-022-display-awareness`
 - **Story:** Merchandisers see upcoming and active displays for each store: sold-in
   status, fixture, products, timing, delivery method, required actions. Fed by the
   Display Tracking module.
@@ -361,12 +367,14 @@ business document. For each one:
   typing. Aspirational capture time: about 20 minutes per user per week.
 - **War-game check:** time how long a player takes to record a day's displays.
 
-**BR-039 Photo capture, geolocation and image recognition** · ⬜ / 🔌
+**BR-039 Photo capture, geolocation and image recognition** · 🟡 Partial (M2) · `br-039-photo-capture`
 - **Story:** Display photos carry store, task, time, user/route and location; image
   recognition identifies product group/brand, display type/location and likely
   non-compliance (SKU-level not required at first).
 - **War-game check:** photo upload on a display step with auto-filled metadata;
   recognition simulated (e.g. a "suggested result" the user confirms or corrects).
+- **Today:** switchable photo policy, photos with metadata, simulated recognition
+  with confirm / wrong. Real recognition is out of scope until accuracy is proven.
 - **Open questions:** Accuracy thresholds, human review and correction process.
 
 **BR-040 Display lifecycle, compliance and exceptions** · ⬜ Not yet
@@ -421,6 +429,10 @@ Updated as features land. To change a requirement, edit only its folder
 | BR-009 (store hours) | `src/features/br-009-store-hours` | Late-truck prompt is M3 |
 | BR-012 (planned vs actual) | `src/features/br-012-planned-vs-actual` | |
 | BR-024 (work standards) | `src/features/br-024-work-standards` | |
+| BR-002, BR-015, BR-021 (guided visit) | `src/features/br-002-guided-visit` | Steps and answers are core (`src/engine/visit.ts`) |
+| BR-022 (display awareness) | `src/features/br-022-display-awareness` | Full Display Tracking is M5 |
+| BR-020 (out-of-stocks) | `src/features/br-020-oos-root-cause` | |
+| BR-039 (photos) | `src/features/br-039-photo-capture` | Photo review queue is BR-043, M5 |
 | War-game findings | `src/features/findings` | Not a business requirement |
 
 ## Open questions (consolidated)
@@ -442,9 +454,9 @@ Updated as features land. To change a requirement, edit only its folder
 
 | Status | Count | IDs |
 |---|---|---|
-| ✅ Covered | 1 | 001 |
-| 🟡 Partial | 18 | 002, 004, 006, 007, 008, 009, 010, 011, 012, 014, 015, 021, 024, 026, 027, 028, 031, 038 |
-| ⬜ Not yet | 11 | 003, 005, 016, 020, 022, 025, 030, 037, 040, 041, 043 |
-| 🔌 Simulate only | 4 | 013, 017, 036, 039 |
+| ✅ Covered | 3 | 001, 002, 022 |
+| 🟡 Partial | 19 | 004, 006, 007, 008, 009, 010, 011, 012, 014, 015, 020, 021, 024, 026, 027, 028, 031, 038, 039 |
+| ⬜ Not yet | 9 | 003, 005, 016, 025, 030, 037, 040, 041, 043 |
+| 🔌 Simulate only | 3 | 013, 017, 036 |
 | 🚫 Out of scope | 7 | 029, 033, 034, 035, 042, 044, 045 |
 | **Total** | **41** | |

@@ -51,7 +51,7 @@ export function newDay(seed: Seed, scenarioId: string, opts: DayOptions = {}): S
     stores: seed.stores.map(s => ({
       id: s.id, name: s.name, routeType: s.routeType ?? 'LF', market: s.market ?? '', xy: [s.x, s.y], cases: s.cases,
       eta: parseHHMM(s.truckEta), win: parseHHMM(s.doneBy),
-      assign: s.assignedTo, seq: s.order, extra: 0, lock: null, tasks: {},
+      assign: s.assignedTo, seq: s.order, extra: 0, lock: null, answers: {},
     })),
     alerts: [],
     fired: {},

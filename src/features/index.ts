@@ -10,6 +10,10 @@ import { br024WorkStandards } from './br-024-work-standards';
 import { br009StoreHours } from './br-009-store-hours';
 import { br001RoleAccess } from './br-001-role-access';
 import { br012PlannedVsActual } from './br-012-planned-vs-actual';
+import { br002GuidedVisit } from './br-002-guided-visit';
+import { br022DisplayAwareness } from './br-022-display-awareness';
+import { br020OosRootCause } from './br-020-oos-root-cause';
+import { br039PhotoCapture } from './br-039-photo-capture';
 // <feature-imports>
 
 export const FEATURES: Feature[] = [
@@ -21,5 +25,9 @@ export const FEATURES: Feature[] = [
   br009StoreHours,
   br001RoleAccess,
   br012PlannedVsActual,
+  br002GuidedVisit,
+  br022DisplayAwareness,
+  br020OosRootCause,
+  br039PhotoCapture,
   // <feature-list>
 ];

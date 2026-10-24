@@ -5,3 +5,4 @@ export * from './plan';
 export * from './sim';
 export * from './seed';
 export * from './feature';
+export * from './visit';

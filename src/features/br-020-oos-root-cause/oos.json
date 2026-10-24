@@ -1,0 +1,14 @@
+{
+  "products": [
+    "Sandwich white 20oz", "Wheat 24oz", "Multigrain 24oz", "Hamburger buns 8ct",
+    "Hot dog buns 8ct", "Hoagie rolls 6ct", "English muffins 6ct", "Snack cakes 12ct"
+  ],
+  "causes": [
+    { "cause": "Order fill — shorted at the warehouse", "owner": "Order management" },
+    { "cause": "Delivery — missed or late",             "owner": "Transportation" },
+    { "cause": "Ordering — order too low",              "owner": "Ordering team" },
+    { "cause": "Inventory — in the backroom, not worked", "owner": "MSL" },
+    { "cause": "Merchandising — not filled last visit", "owner": "MSL" },
+    { "cause": "Other / not sure",                      "owner": "MSL" }
+  ]
+}

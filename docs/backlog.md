@@ -24,29 +24,29 @@ across sessions.
 - [x] **T-003** (#1) Boundary check (features can't import each other; engine stays pure),
       new-feature scaffold, `docs/architecture.md` · S
 
-## M1 — Foundation for the requirements · branch `m1-foundation`
+## M1 — Foundation for the requirements · merged #2
 
-- [x] **T-101** Per-store labor standards with defaults; scheduler sees the effect
+- [x] **T-101** (#2) Per-store labor standards with defaults; scheduler sees the effect
       · BR-024 · `br-024-work-standards` · M
-- [x] **T-102** Store merchandising and invoicing hours; start times respect them
+- [x] **T-102** (#2) Store merchandising and invoicing hours; start times respect them
       · BR-009 · `br-009-store-hours` · M
-- [x] **T-103** Route types (LF, Traditional, Xpress) and roles (merchandiser, MSL,
+- [x] **T-103** (#2) Route types (LF, Traditional, Xpress) and roles (merchandiser, MSL,
       vacation relief, route jumper, scheduler, manager) in the data · BR-001, BR-005 · S
-- [x] **T-104** Role picker that limits which screens and stores you see · BR-001 · M
-- [x] **T-105** Planned vs. actual time per stop and per day (actuals drift from plan
+- [x] **T-104** (#2) Role picker that limits which screens and stores you see · BR-001 · M
+- [x] **T-105** (#2) Planned vs. actual time per stop and per day (actuals drift from plan
       with realistic variation) · BR-012 · `br-012-planned-vs-actual` · M
 
-## M2 — Guided store visit (the BR-002 MVP)
+## M2 — Guided store visit (the BR-002 MVP) · branch `m2-guided-visit`
 
-- [ ] **T-201** Step-by-step visit: note backstock → each display → each aisle →
+- [x] **T-201** Step-by-step visit: note backstock → each display → each aisle →
       validate → out-of-stocks; can't close out until required steps are done
       · BR-002, BR-015, BR-021 · `br-002-guided-visit` · L
-- [ ] **T-202** Displays per store feed visit steps · BR-022 · `br-022-display-awareness` · M
-- [ ] **T-203** Out-of-stock capture with root cause, routed to the owning role
+- [x] **T-202** Displays per store feed visit steps · BR-022 · `br-022-display-awareness` · M
+- [x] **T-203** Out-of-stock capture with root cause, routed to the owning role
       · BR-020 · `br-020-oos-root-cause` · M
-- [ ] **T-204** Photo step (upload), auto-filled metadata, simulated recognition
+- [x] **T-204** Photo step (upload), auto-filled metadata, simulated recognition
       suggestion · BR-039 · `br-039-photo-capture` · M
-- [ ] **T-205** "Next action" home screen on the phone · BR-015 · S
+- [x] **T-205** "Next action" home screen on the phone · BR-015 · S
 
 ## M3 — Day-of disruptions
 

@@ -40,6 +40,9 @@ screen-side ones in `src/app/feature.ts` (`Feature`).
 | `actions` / `changes` | clicks/changes on `data-act="<id>:<name>"` / `data-fchange="<id>:<name>"` | buttons inside a feature's panel |
 | `access(app)` | who is looking: allowed tabs, people, stores, locked phone | role picker (BR-001) |
 | `views[].public` | tab visible to every role | Findings |
+| `visitSteps(state, store)` | add steps to a store visit (phase, kind, required, photo) | displays, out-of-stocks (M2) |
+| `adjustStep(state, store, step)` | change any feature's step before it's shown | photo policy (BR-039) |
+| `onStepAnswered(state, store, step, answer)` | react to any answer, by a person or the sim | route out-of-stocks, record photos |
 | `featureState(state, id, init)` | a feature's own day-scoped state in `state.fx[id]` | baselines, recorded times (BR-012) |
 | `mount(app)` | once at startup — **locked features only** | floating findings button |
 
@@ -90,5 +93,8 @@ Creates the folder from a template, registers it, and starts it switched off.
   actions.
 - **The four core views** — they define the slots features fill, and apply the
   viewer's scope (`ctx.scope`) to people and stores.
+- **Store visit steps and answers** (`src/engine/visit.ts`, `store.answers`): so
+  displays, out-of-stocks and photos can each be their own folder while the guided
+  visit shows them all.
 - **People and store attributes many features need**: role, market, route types
   (people); route type, market (stores).

@@ -1,5 +1,5 @@
 import { KM_TO_MI, fmt, hrs, merchById, paidSoFar, plan, readyAt, status } from '../engine';
-import { ISSUES, TASKS } from '../data';
+import { ISSUES } from '../data';
 import { esc, firstName, type ViewCtx } from './shared';
 
 export function merchandiserView(ctx: ViewCtx): string {
@@ -20,7 +20,7 @@ export function merchandiserView(ctx: ViewCtx): string {
     curHtml = `<div class="cur"><span class="lbl">${s.k === 'done' ? 'All done' : 'Next up'}</span><h3>${nx ? esc(nx.s.name) : 'Day complete'}</h3>
       <div class="muted">${nx ? 'Leave by ' + fmt(nx.depart) + ' · truck ready ' + fmt(readyAt(state, nx.s)) : 'Clocked out ' + fmt(p.clockOut) + '. Mileage logged: ' + p.miles.toFixed(1) + ' mi.'}</div></div>`;
   } else {
-    const sx = cur.s, done = TASKS.filter((_, i) => sx.tasks[i]).length, inStore = s.k !== 'drive';
+    const sx = cur.s;
     const sub = s.k === 'drive' ? `Arrive ${fmt(cur.arrive)} · ${(cur.km * KM_TO_MI).toFixed(1)} mi`
       : s.k === 'wait' ? `Checked in ${fmt(cur.arrive)} (geofence OK) · truck ready ${fmt(readyAt(state, sx))} · paid idle so far ${Math.round(state.t - cur.arrive)} min`
       : `${sx.cases} cases · est. done ${fmt(cur.end)} · store wants done by ${fmt(sx.win)}`;
@@ -29,8 +29,7 @@ export function merchandiserView(ctx: ViewCtx): string {
       <h3>${esc(sx.name)}</h3>
       <div class="muted" style="font-size:13px">${sub}</div>
       ${s.k === 'work' ? `<div class="prog"><i style="width:${Math.round((s.pct ?? 0) * 100)}%"></i></div>` : ''}
-      ${inStore ? `<div class="tasks">${TASKS.map((t, i) => `<label><input type="checkbox" data-task="${sx.id}" data-i="${i}"${sx.tasks[i] ? ' checked' : ''}>${esc(t)}</label>`).join('')}</div>
-        <div class="muted" style="font-size:12px">${done}/${TASKS.length} tasks · photos are simulated in this mock</div>` : ''}
+      ${ctx.slot('merch.visit')}
       <div class="acts">
         <button class="btn" data-act="trucknot" data-id="${sx.id}"${state.t >= cur.start ? ' disabled' : ''}>Truck not here yet</button>
         <button class="btn" data-act="long" data-id="${sx.id}"${s.k !== 'work' ? ' disabled' : ''}>Running long +15 min</button>
@@ -52,7 +51,7 @@ export function merchandiserView(ctx: ViewCtx): string {
       <div class="row"><span>${onClock ? 'On the clock' : 'Off the clock'}</span><b class="mono">${hrs(sofar)} today</b></div>
       <div class="row"><span>This week</span><b class="mono" style="color:${p.weekProj > r.ot ? 'var(--wait)' : 'inherit'}">${(m.week + sofar / 60).toFixed(1)} → ${p.weekProj.toFixed(1)} / ${r.ot}</b></div>
     </div>
-    <div class="pbody">${curHtml}<div><span class="lbl">Today's route</span><div class="route">${route || '<div class="muted" style="padding:10px 0">No stops.</div>'}</div></div></div>
+    <div class="pbody">${ctx.slot('merch.top')}${curHtml}<div><span class="lbl">Today's route</span><div class="route">${route || '<div class="muted" style="padding:10px 0">No stops.</div>'}</div></div></div>
   </div>
   <p class="note" style="margin:0 auto;text-align:center">Clock-in happens automatically at store check-in. Hand this screen to an actual merchandiser and ask what's missing.</p>
   ${ctx.slot('merch.after')}`;

@@ -44,9 +44,12 @@
 | market | string | MSL area. Optional. |
 | routeTypes | array of route types | Route types this person is qualified for. Default ["LF"]. |
 
-Feature-owned data lives in its feature folder, e.g. store hours in
-`src/features/br-009-store-hours/hours.json` and complexity classes in
-`src/features/br-024-work-standards/standards.json`.
+Feature-owned data lives in its feature folder: store hours
+(`br-009-store-hours/hours.json`), complexity classes
+(`br-024-work-standards/standards.json`), aisles per chain
+(`br-002-guided-visit/aisles.json`), displays per store
+(`br-022-display-awareness/displays.json`), products and out-of-stock causes
+(`br-020-oos-root-cause/oos.json`).
 
 ### rules.json
 
