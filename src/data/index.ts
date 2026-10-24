@@ -14,4 +14,3 @@ export const seed: Seed = {
 };
 export const TASKS: string[] = lists.tasks;
 export const ISSUES: string[] = lists.issues;
-export const FINDING_AREAS: string[] = lists.findingAreas;

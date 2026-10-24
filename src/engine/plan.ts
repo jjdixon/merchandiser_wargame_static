@@ -4,17 +4,28 @@
 // departed for are "locked" (their times are frozen in store.lock). Open stops
 // are re-planned from the end of the last locked stop every time plan() runs,
 // so edits and events only ever change the future, never history.
-import type { DayPlan, Merchandiser, Point, Rules, SimState, Status, Stop, Store } from './types';
+import type { DayPlan, Merchandiser, Minutes, Point, Rules, SimState, Status, Stop, Store } from './types';
 import { fmt } from './time';
 
 export const KM_TO_MI = 0.621371;
 
 export const dist = (r: Rules, a: Point, b: Point) => Math.hypot(a[0] - b[0], a[1] - b[1]) * r.road;
 export const driveMin = (r: Rules, km: number) => (km / r.speed) * 60;
-/** Labor standard for one visit. */
-export const workMin = (r: Rules, s: Store) => r.fixed + s.cases * r.mpc + s.extra;
-/** When product is workable: truck arrival + receiving buffer. */
-export const readyAt = (r: Rules, s: Store) => s.eta + r.buffer;
+/**
+ * Labor minutes for one visit: fixed + cases × minutes-per-case + extra, then
+ * adjusted by any enabled feature's workMinutes hook (e.g. per-store standards).
+ */
+export function workMin(state: SimState, s: Store): Minutes {
+  const r = state.rules;
+  return state.ext.workMinutes.reduce((v, h) => h(state, s, v), r.fixed + s.cases * r.mpc + s.extra);
+}
+/**
+ * When product is workable: truck arrival + receiving buffer, then adjusted by
+ * any enabled feature's readyAt hook (e.g. store receiving hours).
+ */
+export function readyAt(state: SimState, s: Store): Minutes {
+  return state.ext.readyAt.reduce((v, h) => h(state, s, v), s.eta + state.rules.buffer);
+}
 
 export function plan(state: SimState, m: Merchandiser): DayPlan {
   const r = state.rules;
@@ -36,14 +47,14 @@ export function plan(state: SimState, m: Merchandiser): DayPlan {
       const km = dist(r, pos, s.xy);
       const d = driveMin(r, km);
       const first = t === null;
-      const ready = readyAt(r, s);
+      const ready = readyAt(state, s);
       // First stop: leave home so you arrive when product is ready (not before shiftStart).
       // Later stops: leave as soon as the previous one ends. Never in the past.
       const planned = first ? Math.max(r.shiftStart, ready - d) : (t as number);
       const depart = Math.max(planned, state.t);
       const arrive = depart + d;
       const start = Math.max(arrive, ready);
-      const work = workMin(r, s);
+      const work = workMin(state, s);
       const end = start + work;
       stops.push({ s, depart, arrive, start, end, drive: d, km, wait: start - arrive, work, first, locked: false });
       pos = s.xy;

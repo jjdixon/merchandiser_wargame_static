@@ -1,8 +1,8 @@
 import { allPlans, fmt, hrs, merchById, money, totals, workMin, type Stop } from '../engine';
 import { LEGEND, crewCard, esc, gantt, type ViewCtx } from './shared';
 
-export function schedulerView({ state }: ViewCtx): string {
-  const r = state.rules, plans = allPlans(state);
+export function schedulerView(ctx: ViewCtx): string {
+  const { state } = ctx, r = state.rules, plans = allPlans(state);
   const idx: Record<string, Stop> = {};
   plans.forEach(p => p.stops.forEach(x => (idx[x.s.id] = x)));
   const mi = (id: string | null) => (id ? state.merch.findIndex(m => m.id === id) : -1);
@@ -18,7 +18,7 @@ export function schedulerView({ state }: ViewCtx): string {
       x && x.end > s.win ? '<span class="flag late">late</span>' : '',
       !s.assign ? '<span class="flag late">needs coverage</span>' : ''].filter(Boolean).join(' · ');
     return `<tr class="${s.assign ? '' : 'un'}">
-      <td><div class="sname">${esc(s.name)}<small>${s.extra ? '+' + s.extra + ' min added · ' : ''}${Math.round(workMin(r, s))} min labor</small></div></td>
+      <td><div class="sname">${esc(s.name)}<small>${s.extra ? '+' + s.extra + ' min added · ' : ''}${Math.round(workMin(state, s))} min labor</small></div></td>
       <td class="n">${s.cases}</td><td class="n">${fmt(s.eta)}</td><td class="n">${fmt(s.win)}</td>
       <td>${lk ? `<span class="muted">${esc(merchById(state, s.assign!)?.name ?? '')}</span>` : `<select data-assign="${s.id}" aria-label="Assign ${esc(s.name)}">${opts}</select>`}</td>
       <td>${!lk && s.assign ? `<span class="ord"><button data-act="up" data-id="${s.id}" aria-label="Earlier">↑</button><button data-act="dn" data-id="${s.id}" aria-label="Later">↓</button></span>` : ''}</td>
@@ -35,5 +35,6 @@ export function schedulerView({ state }: ViewCtx): string {
       <div class="ctl"><span class="muted mono" style="font-size:12.5px">${hrs(t.paid)} paid · ${money(t.cost)} · ${t.costPerCase.toFixed(2)} $/case</span><button class="btn" data-act="auto">Auto-assign open stops</button></div></div>
     <div class="tw"><table><thead><tr><th>Store</th><th class="n">Cases</th><th class="n">Truck</th><th class="n">Done by</th><th>Merchandiser</th><th>Order</th><th class="n">Planned</th><th>Flags</th></tr></thead><tbody>${rows}</tbody></table></div>
     <div class="pb note">Labor per stop = ${r.fixed} min fixed + ${r.mpc} min × cases. Work can't start until ${r.buffer} min after the truck arrives. Change these under Pay &amp; labor rules. Auto-assign is a simple greedy pass ordered by truck time — good enough to argue with.</div>
-  </section>`;
+  </section>
+  ${ctx.slot('sched.after')}`;
 }

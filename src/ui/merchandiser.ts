@@ -2,7 +2,8 @@ import { KM_TO_MI, fmt, hrs, merchById, paidSoFar, plan, readyAt, status } from 
 import { ISSUES, TASKS } from '../data';
 import { esc, firstName, type ViewCtx } from './shared';
 
-export function merchandiserView({ state, selM }: ViewCtx): string {
+export function merchandiserView(ctx: ViewCtx): string {
+  const { state, selM } = ctx;
   const r = state.rules, m = merchById(state, selM)!, p = plan(state, m), s = status(state, p);
   const cur = s.stop && (s.k === 'wait' || s.k === 'work' || s.k === 'drive') ? s.stop : null;
   const onClock = p.clockIn != null && state.t >= p.clockIn && state.t < p.clockOut!;
@@ -17,11 +18,11 @@ export function merchandiserView({ state, selM }: ViewCtx): string {
   } else if (!cur) {
     const nx = p.stops.find(x => state.t < x.end);
     curHtml = `<div class="cur"><span class="lbl">${s.k === 'done' ? 'All done' : 'Next up'}</span><h3>${nx ? esc(nx.s.name) : 'Day complete'}</h3>
-      <div class="muted">${nx ? 'Leave by ' + fmt(nx.depart) + ' · truck ready ' + fmt(readyAt(r, nx.s)) : 'Clocked out ' + fmt(p.clockOut) + '. Mileage logged: ' + p.miles.toFixed(1) + ' mi.'}</div></div>`;
+      <div class="muted">${nx ? 'Leave by ' + fmt(nx.depart) + ' · truck ready ' + fmt(readyAt(state, nx.s)) : 'Clocked out ' + fmt(p.clockOut) + '. Mileage logged: ' + p.miles.toFixed(1) + ' mi.'}</div></div>`;
   } else {
     const sx = cur.s, done = TASKS.filter((_, i) => sx.tasks[i]).length, inStore = s.k !== 'drive';
     const sub = s.k === 'drive' ? `Arrive ${fmt(cur.arrive)} · ${(cur.km * KM_TO_MI).toFixed(1)} mi`
-      : s.k === 'wait' ? `Checked in ${fmt(cur.arrive)} (geofence OK) · truck ready ${fmt(readyAt(r, sx))} · paid idle so far ${Math.round(state.t - cur.arrive)} min`
+      : s.k === 'wait' ? `Checked in ${fmt(cur.arrive)} (geofence OK) · truck ready ${fmt(readyAt(state, sx))} · paid idle so far ${Math.round(state.t - cur.arrive)} min`
       : `${sx.cases} cases · est. done ${fmt(cur.end)} · store wants done by ${fmt(sx.win)}`;
     curHtml = `<div class="cur">
       <div style="display:flex;justify-content:space-between;align-items:center"><span class="lbl">Current stop</span><span class="pill p-${s.k}">${s.k === 'work' ? 'Working' : s.k === 'wait' ? 'Waiting on truck' : 'Driving'}</span></div>
@@ -53,5 +54,6 @@ export function merchandiserView({ state, selM }: ViewCtx): string {
     </div>
     <div class="pbody">${curHtml}<div><span class="lbl">Today's route</span><div class="route">${route || '<div class="muted" style="padding:10px 0">No stops.</div>'}</div></div></div>
   </div>
-  <p class="note" style="margin:0 auto;text-align:center">Clock-in happens automatically at store check-in. Hand this screen to an actual merchandiser and ask what's missing.</p>`;
+  <p class="note" style="margin:0 auto;text-align:center">Clock-in happens automatically at store check-in. Hand this screen to an actual merchandiser and ask what's missing.</p>
+  ${ctx.slot('merch.after')}`;
 }

@@ -17,7 +17,7 @@ const tiny = (over: Partial<Seed['rules']> = {}): Seed => ({
   scenarios: [{ id: 'base', label: 'Base' }],
 });
 
-describe('time helpers', () => {
+describe('core: time helpers', () => {
   it('round-trips HH:MM', () => {
     expect(parseHHMM('05:30')).toBe(330);
     expect(fmt(330)).toBe('5:30a');
@@ -26,10 +26,10 @@ describe('time helpers', () => {
   });
 });
 
-describe('planning', () => {
+describe('core: planning', () => {
   it('applies the labor standard: fixed + cases × minutes per case', () => {
     const s = newDay(tiny(), 'base');
-    expect(workMin(s.rules, storeById(s, 's1')!)).toBe(60);
+    expect(workMin(s, storeById(s, 's1')!)).toBe(60);
   });
 
   it('times the first departure so the merchandiser arrives when product is ready', () => {
@@ -76,7 +76,7 @@ describe('planning', () => {
   });
 });
 
-describe('simulation', () => {
+describe('core: simulation', () => {
   it('locks a stop once the merchandiser departs, so later edits only move the future', () => {
     const s = newDay(tiny(), 'base');
     tick(s, 361 - s.t);                    // 6:01, just after departing for s1
@@ -122,16 +122,9 @@ describe('simulation', () => {
     expect(storeById(s, 's1')!.assign).toBe('a');
     expect(status(s, plan(s, s.merch[0])).k).toBe('work');
   });
-
-  it('raises an uncovered-stop alert when product is ready and nobody is assigned', () => {
-    const s = newDay(tiny(), 'base');
-    callOut(s, s.merch[0]);
-    tick(s, 371 - s.t);
-    expect(s.alerts.some(a => a.text.includes('nobody is assigned'))).toBe(true);
-  });
 });
 
-describe('shipped seed data', () => {
+describe('core: shipped seed data', () => {
   it('loads every scenario without errors', () => {
     for (const scn of realSeed.scenarios) expect(() => newDay(realSeed, scn.id)).not.toThrow();
   });

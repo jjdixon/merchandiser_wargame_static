@@ -27,3 +27,12 @@ Format: ID · date · decision — why.
   store list, employee names or actual pay figures, set the repo back to private and
   move hosting** (internal IIS or a password-protected host) — git history can't be
   un-published.
+- **D-008** · 2026-10-23 · One feature folder per requirement, plugged into a small
+  pure core through declared plug-in points (hooks, curveballs, settings, slots,
+  tabs, actions). Features can't import each other; enforced by
+  `scripts/check-boundaries.mjs` in `npm run check`. Why: so a change to one
+  requirement stays inside its folder and the full test suite proves nothing else
+  moved. Cost: a new kind of plug-in occasionally needs a one-time core change.
+- **D-009** · 2026-10-23 · Pay math, the clock and event primitives stay in the core
+  (every screen depends on them). Features adjust their inputs via hooks rather than
+  replacing them.

@@ -1,0 +1,88 @@
+# Architecture: one requirement, one folder
+
+The goal: when someone asks to change a requirement (say BR-009), the change
+touches **only that requirement's folder**, and the test suite proves nothing else
+moved.
+
+```
+src/
+  engine/        CORE — clock, people, stores, day plan, pay math, event primitives.
+                 Pure TypeScript. Knows nothing about any feature.
+  app/feature.ts CONTRACT — what a feature may plug into (screen side).
+  ui/            CORE VIEWS — Scheduler, Merchandiser, Supervisor, Rules. Expose slots.
+  data/          Seed data (stores, people, rules, scenarios).
+  features/      ONE FOLDER PER REQUIREMENT (or per war-game tool)
+    index.ts       the registry — the only list of features
+    <id>/
+      engine.ts      pure logic + plug-ins (tested without a browser)
+      engine.test.ts tests, named with the feature id and its BR IDs
+      ui.ts          panels, tabs, actions (optional)
+      index.ts       combines engine + ui into one Feature
+      README.md      story, war-game check, decisions
+  main.ts        APP SHELL — wires registry, views, clock and events together
+```
+
+## The plug-in points
+
+A feature declares what it plugs into. The core calls these; it never imports a
+feature. Engine-side points live in `src/engine/types.ts` (`EngineFeature`);
+screen-side ones in `src/app/feature.ts` (`Feature`).
+
+| Plug-in | Where it's used | Example use |
+|---|---|---|
+| `readyAt(state, store, base)` | when product is workable (default: truck ETA + buffer) | store receiving hours (BR-009) |
+| `workMinutes(state, store, base)` | labor minutes for a visit (default: fixed + cases × mpc + extra) | per-store standards (BR-024) |
+| `onTick(state)` | after every clock step (≤ 1 min) | alerts, geofence events, actual-time drift |
+| `curveballs` | the header *Throw a curveball* bar | load cuts/adds (BR-017) |
+| `settings` + `ruleDefaults` | the *Pay & labor rules* screen; values in `rules.feature` | a per-feature switch or number |
+| `panels` (slot + render) | slots in core views: `sched.after`, `merch.after`, `super.main`, `super.aside`, `rules.after` | alert feed, coverage helpers |
+| `views` | a whole new tab | Findings, photo review (BR-043) |
+| `actions` / `changes` | clicks/changes on `data-act="<id>:<name>"` / `data-fchange="<id>:<name>"` | buttons inside a feature's panel |
+| `mount(app)` | once at startup — **locked features only** | floating findings button |
+
+Hooks of the same kind run in registry order, each receiving the previous value.
+
+## Rules (enforced by `npm run boundaries`, part of `npm run check`)
+
+1. **`src/engine` is pure** — imports only itself, no browser APIs.
+2. **Features never import each other.** If two features need to cooperate, add a
+   plug-in point or a field to the core.
+3. **A feature's `engine.ts` is pure** — imports only `src/engine` and `src/data`.
+   Screen code goes in its `ui.ts`.
+4. **Only `src/main.ts` and `src/features/index.ts` import feature folders.**
+
+## On/off switches
+
+Every feature has one (Pay & labor rules screen → *Features*), saved per browser.
+Locked features (pay rules, findings) are always on. New features start **off**.
+Switching mid-day is safe: stops already departed for are locked, so only the rest
+of the day changes.
+
+## Changing a requirement
+
+1. Find its folder: `docs/requirements.md` → *Where each requirement lives*.
+2. Edit only that folder. Run `npm run test:one -- BR-0xx` while working.
+3. Run `npm run check` — the full suite and the boundary check must pass. That's
+   the evidence nothing else changed.
+4. If the change can't be done without touching `src/engine`, `src/ui` or another
+   feature, **stop and say why first**. Usually the answer is a new plug-in point,
+   added once, with its own test in `tests/features.test.ts`.
+
+## Adding a requirement
+
+```
+npm run new-feature -- br-009-store-hours "Store hours" BR-009
+```
+
+Creates the folder from a template, registers it, and starts it switched off.
+
+## What stays in the core (and why)
+
+- **Clock and locking** (`tick`, `store.lock`) — every feature relies on history
+  being frozen.
+- **Day plan and pay math** (`plan`, `summarize`, `totals`) — every screen shows hours
+  and cost. Features adjust inputs through hooks rather than replacing the math.
+- **Event primitives** (`delayTruck`, `heavierLoad`, `addWork`, `callOut`,
+  `extraVisit`, `assign`, `move`, `raise`) — shared by curveballs and merchandiser
+  actions.
+- **The four core views** — they define the slots features fill.
